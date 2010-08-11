@@ -2,6 +2,12 @@
 
 let g:Perl_Support_Root_Dir=$HOME . '/.vim/bundle/perl-support'
 
+perl <<PERL
+  use File::Spec;
+
+  @INC = map { File::Spec->rel2abs($_) } @INC;
+PERL
+
 call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
 
