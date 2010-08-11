@@ -1637,6 +1637,8 @@ function! Perl_InsertTemplate ( key, ... )
 			let pos1  = 1
 			put! =val
 			let pos2  = line(".")
+			exe ':'.line('$')
+			normal dd
 			" proper indenting
 			if indent == 'indent'
 				exe ":".pos1
