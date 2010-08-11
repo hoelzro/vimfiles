@@ -161,50 +161,6 @@ if !exists("g:Perl_NoKeyMappings") || ( exists("g:Perl_NoKeyMappings") && g:Perl
   vnoremap    <buffer>  <silent>  <LocalLeader>cb    <C-C>:call Perl_CommentBlock("v")<CR>
   nnoremap    <buffer>  <silent>  <LocalLeader>cn         :call Perl_UncommentBlock()<CR>
   "
-  " ----------------------------------------------------------------------------
-  " Statements
-  " ----------------------------------------------------------------------------
-  "
-  nnoremap    <buffer>  <silent>  <LocalLeader>sd              :call Perl_InsertTemplate("statements.do-while")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sf              :call Perl_InsertTemplate("statements.for")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sfe             :call Perl_InsertTemplate("statements.foreach")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>si              :call Perl_InsertTemplate("statements.if")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sie             :call Perl_InsertTemplate("statements.if-else")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>se              :call Perl_InsertTemplate("statements.else")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sei             :call Perl_InsertTemplate("statements.elsif")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>su              :call Perl_InsertTemplate("statements.unless")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sue             :call Perl_InsertTemplate("statements.unless-else")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>st              :call Perl_InsertTemplate("statements.until")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sw              :call Perl_InsertTemplate("statements.while")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>s{              :call Perl_InsertTemplate("statements.block")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>sb              :call Perl_InsertTemplate("statements.block")<CR>
-
-  vnoremap    <buffer>  <silent>  <LocalLeader>sd    <C-C>:call Perl_InsertTemplate("statements.do-while", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sf    <C-C>:call Perl_InsertTemplate("statements.for", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sfe   <C-C>:call Perl_InsertTemplate("statements.foreach", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>si    <C-C>:call Perl_InsertTemplate("statements.if", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sie   <C-C>:call Perl_InsertTemplate("statements.if-else", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>se    <C-C>:call Perl_InsertTemplate("statements.else", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sei   <C-C>:call Perl_InsertTemplate("statements.elsif", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>su    <C-C>:call Perl_InsertTemplate("statements.unless", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sue   <C-C>:call Perl_InsertTemplate("statements.unless-else", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>st    <C-C>:call Perl_InsertTemplate("statements.until", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sw    <C-C>:call Perl_InsertTemplate("statements.while", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>s{    <C-C>:call Perl_InsertTemplate("statements.block", "v" )<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>sb    <C-C>:call Perl_InsertTemplate("statements.block", "v" )<CR>
-
-  inoremap    <buffer>  <silent>  <LocalLeader>sd    <C-C>:call Perl_InsertTemplate("statements.do-while")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>sf    <C-C>:call Perl_InsertTemplate("statements.for")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>sfe   <C-C>:call Perl_InsertTemplate("statements.foreach")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>si    <C-C>:call Perl_InsertTemplate("statements.if")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>sie   <C-C>:call Perl_InsertTemplate("statements.if-else")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>se    <C-C>:call Perl_InsertTemplate("statements.else")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>sei   <C-C>:call Perl_InsertTemplate("statements.elsif")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>su    <C-C>:call Perl_InsertTemplate("statements.unless")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>sue   <C-C>:call Perl_InsertTemplate("statements.unless-else")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>st    <C-C>:call Perl_InsertTemplate("statements.until")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>sw    <C-C>:call Perl_InsertTemplate("statements.while")<CR>
-  "
   noremap    <buffer>  <silent>  <LocalLeader>ntl        :call Perl_EditTemplates("local")<CR>
   noremap    <buffer>  <silent>  <LocalLeader>ntg        :call Perl_EditTemplates("global")<CR>
   noremap    <buffer>  <silent>  <LocalLeader>ntr        :call Perl_RereadTemplates()<CR>
