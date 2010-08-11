@@ -14,8 +14,5 @@
 § =============================================================
 §
 |includefile| = comments.template
-|includefile| = statements.template
-|includefile| = idioms.template
-|includefile| = pod.template
 §
 §%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
