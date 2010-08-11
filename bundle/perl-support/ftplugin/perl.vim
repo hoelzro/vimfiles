@@ -305,40 +305,6 @@ if !exists("g:Perl_NoKeyMappings") || ( exists("g:Perl_NoKeyMappings") && g:Perl
   vnoremap    <buffer>  <silent>  <LocalLeader>xe   <C-C>:call perlsupportregex#Perl_RegexExplain( "v" )<CR>
   "
   " ----------------------------------------------------------------------------
-  " POSIX character classes
-  " ----------------------------------------------------------------------------
-  "
-  nnoremap    <buffer>  <silent>  <LocalLeader>pa    a[:alnum:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ph    a[:alpha:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pi    a[:ascii:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pb    a[:blank:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pc    a[:cntrl:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pd    a[:digit:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pg    a[:graph:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pl    a[:lower:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pp    a[:print:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pn    a[:punct:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ps    a[:space:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pu    a[:upper:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>pw    a[:word:]<Esc>
-  nnoremap    <buffer>  <silent>  <LocalLeader>px    a[:xdigit:]<Esc>
-  "
-  inoremap    <buffer>  <silent>  <LocalLeader>pa    [:alnum:]
-  inoremap    <buffer>  <silent>  <LocalLeader>ph    [:alpha:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pi    [:ascii:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pb    [:blank:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pc    [:cntrl:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pd    [:digit:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pg    [:graph:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pl    [:lower:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pp    [:print:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pn    [:punct:]
-  inoremap    <buffer>  <silent>  <LocalLeader>ps    [:space:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pu    [:upper:]
-  inoremap    <buffer>  <silent>  <LocalLeader>pw    [:word:]
-  inoremap    <buffer>  <silent>  <LocalLeader>px    [:xdigit:]
-  "
-  " ----------------------------------------------------------------------------
   " POD
   " ----------------------------------------------------------------------------
   "
