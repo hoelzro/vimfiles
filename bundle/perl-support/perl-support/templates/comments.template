@@ -18,7 +18,7 @@ use warnings;
 use 5.010;
 §%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 == comment.file-description-pm == start ==
-package |PACKAGE|;
+package |?PACKAGE|;
 
 use strict;
 use warnings;
