@@ -1,5 +1,7 @@
 " vim: sts=2 sw=2
 
+let g:Perl_Support_Root_Dir=$HOME . '/.vim/bundle/perl-support'
+
 call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
 
