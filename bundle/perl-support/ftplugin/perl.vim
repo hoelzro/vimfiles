@@ -205,15 +205,6 @@ if !exists("g:Perl_NoKeyMappings") || ( exists("g:Perl_NoKeyMappings") && g:Perl
   inoremap    <buffer>  <silent>  <LocalLeader>st    <C-C>:call Perl_InsertTemplate("statements.until")<CR>
   inoremap    <buffer>  <silent>  <LocalLeader>sw    <C-C>:call Perl_InsertTemplate("statements.while")<CR>
   "
-  " ----------------------------------------------------------------------------
-  " Snippets
-  " ----------------------------------------------------------------------------
-  "
-  nnoremap    <buffer>  <silent>  <LocalLeader>nr    <C-C>:call Perl_CodeSnippet("r")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>nw    <C-C>:call Perl_CodeSnippet("w")<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>nw    <C-C>:call Perl_CodeSnippet("wv")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ne    <C-C>:call Perl_CodeSnippet("e")<CR>
-  "
   noremap    <buffer>  <silent>  <LocalLeader>ntl        :call Perl_EditTemplates("local")<CR>
   noremap    <buffer>  <silent>  <LocalLeader>ntg        :call Perl_EditTemplates("global")<CR>
   noremap    <buffer>  <silent>  <LocalLeader>ntr        :call Perl_RereadTemplates()<CR>
