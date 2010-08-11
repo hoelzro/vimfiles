@@ -1832,6 +1832,32 @@ function! Perl_ExpandUserMacros ( key )
   let s:Perl_Macro['|TIME|']  		= Perl_DateAndTime('t')
   let s:Perl_Macro['|YEAR|']  		= Perl_DateAndTime('y')
 
+  let package = expand('%:p:r')
+  perl <<PERL
+  use File::Spec;
+
+  my $path = VIM::Eval('package');
+  my @paths = grep { $_ ne '.' } @INC;
+  @paths = map { File::Spec->rel2abs($_) } @paths;
+  my $root;
+  foreach my $p (@paths) {
+    if($path =~ /^\Q$p\E/) {
+      $root = $p if !defined($root) || length($root) > length($p);
+    }
+  }
+
+  if($root) {
+    $root .= '/' unless substr($root, -1) eq '/';
+    $path =~ s/^\Q$root\E//;
+  } else {
+    $path = File::Spec->abs2rel($path);
+  }
+
+  $path =~ s/\//::/g;
+  VIM::DoCommand("let package = '$path'")
+PERL
+  let s:Perl_Macro['|PACKAGE|'] = package
+
   "------------------------------------------------------------------------------
   "  delete jump targets if mapping for C-j is off
   "------------------------------------------------------------------------------
