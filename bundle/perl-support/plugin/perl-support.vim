@@ -1562,9 +1562,24 @@ endfunction    " ----------  end of function Perl_OpenFold  ----------
 "  do macro expansion
 "------------------------------------------------------------------------------
 function! Perl_InsertTemplate ( key, ... )
+	let perl_version = str2float(system('perl -e "print $]"'))
+	if perl_version >= 5.012
+		let perl_version = 12
+	elseif perl_version >= 5.010
+		let perl_version = 10
+	else
+		let perl_version = 8
+	endif
 
-	if !has_key( s:Perl_Template, a:key )
-		echomsg "Template '".a:key."' not found. Please check your template file in '".s:Perl_GlobalTemplateDir."'"
+	let version_template = a:key . '-5.' . perl_version
+
+	let template = a:key
+	if has_key(s:Perl_Template, version_template)
+		let template = version_template
+	endif
+
+	if !has_key( s:Perl_Template, template )
+		echomsg "Template '".template."' not found. Please check your template file in '".s:Perl_GlobalTemplateDir."'"
 		return
 	endif
 
@@ -1581,13 +1596,13 @@ function! Perl_InsertTemplate ( key, ... )
 	let	equalprg_save	= &equalprg
 	set equalprg=
 
-  let mode  = s:Perl_InsertionAttribute[a:key]
-  let indent = s:Perl_IndentAttribute[a:key]
+	let mode  = s:Perl_InsertionAttribute[template]
+	let indent = s:Perl_IndentAttribute[template]
 
 	" remove <SPLIT> and insert the complete macro
 	"
 	if a:0 == 0
-		let val = Perl_ExpandUserMacros (a:key)
+		let val = Perl_ExpandUserMacros (template)
 		if val	== ""
 			return
 		endif
@@ -1670,7 +1685,7 @@ function! Perl_InsertTemplate ( key, ... )
 		" =====  visual mode  ===============================
 		"
 		if  a:1 == 'v'
-			let val = Perl_ExpandUserMacros (a:key)
+			let val = Perl_ExpandUserMacros (template)
 			let val	= Perl_ExpandSingleMacro( val, s:Perl_TemplateJumpTarget2, '' )
 			if val	== ""
 				return
@@ -1684,7 +1699,7 @@ function! Perl_InsertTemplate ( key, ... )
 
 			if len(part) < 2
 				let part	= [ "" ] + part
-				echomsg 'SPLIT missing in template '.a:key
+				echomsg 'SPLIT missing in template '.template
 			endif
 			"
 			" 'visual' and mode 'insert':
