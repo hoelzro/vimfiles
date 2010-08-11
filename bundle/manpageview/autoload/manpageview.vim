@@ -282,44 +282,6 @@ fun! manpageview#ManPageView(viamap,bknum,...) range
    let ext = substitute(manpagetopic,'^.*\.','','e')
   endif
 
-  " infer the appropriate extension based on the filetype {{{3
-  if ext == ""
-"   call Decho("attempt to infer on filetype<".&ft.">")
-
-   " filetype: vim
-   if &ft == "vim"
-   	if g:manpageview_winopen == "only"
-	 exe "help ".fnameescape(manpagetopic)
-	 only
-	elseif g:manpageview_winopen == "vsplit"
-	 exe "vert help ".fnameescape(manpagetopic)
-	elseif g:manpageview_winopen == "vsplit="
-	 exe "vert help ".fnameescape(manpagetopic)
-	 wincmd =
-	elseif g:manpageview_winopen == "hsplit="
-	 exe "help ".fnameescape(manpagetopic)
-	 wincmd =
-	else
-	 exe "help ".fnameescape(manpagetopic)
-	endif
-"	call Dret("manpageview#ManPageView")
-	return
-
-   " filetype: perl
-   elseif &ft == "perl"
-   	let ext = "pl"
-
-   " filetype:  php
-   elseif &ft == "php"
-   	let ext = "php"
-
-   " filetype: tex
-  elseif &ft == "tex"
-   let ext= "tex"
-   endif
-  endif
-"  call Decho("ext<".ext.">")
-
   " elide extension from manpagetopic {{{3
   if exists("g:manpageview_pgm_{ext}")
    let pgm          = g:manpageview_pgm_{ext}
