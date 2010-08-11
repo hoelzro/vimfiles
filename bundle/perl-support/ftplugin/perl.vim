@@ -105,62 +105,6 @@ if !exists("g:Perl_NoKeyMappings") || ( exists("g:Perl_NoKeyMappings") && g:Perl
    map    <buffer>  <silent>  <LocalLeader>hp         :call Perl_HelpPerlsupport()<CR>
   imap    <buffer>  <silent>  <LocalLeader>hp    <C-C>:call Perl_HelpPerlsupport()<CR>
   "
-  " ----------------------------------------------------------------------------
-  " Comments
-  " ----------------------------------------------------------------------------
-  "
-  inoremap    <buffer>  <silent>  <LocalLeader>cj    <C-C>:call Perl_AlignLineEndComm("a")<CR>a
-  inoremap    <buffer>  <silent>  <LocalLeader>cl    <C-C>:call Perl_LineEndComment("")<CR>A
-  nnoremap    <buffer>  <silent>  <LocalLeader>cj         :call Perl_AlignLineEndComm("a")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cl         :call Perl_LineEndComment("")<CR>A
-  vnoremap    <buffer>  <silent>  <LocalLeader>cj    <C-C>:call Perl_AlignLineEndComm("v")<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>cl    <C-C>:call Perl_MultiLineEndComments()<CR>A
-
-  nnoremap    <buffer>  <silent>  <LocalLeader>cs         :call Perl_GetLineEndCommCol()<CR>
-
-  nnoremap    <buffer>  <silent>  <LocalLeader>cfr        :call Perl_InsertTemplate("comment.frame")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cfu        :call Perl_InsertTemplate("comment.function")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cm         :call Perl_InsertTemplate("comment.method")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>chpl       :call Perl_InsertTemplate("comment.file-description-pl")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>chpm       :call Perl_InsertTemplate("comment.file-description-pm")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cht        :call Perl_InsertTemplate("comment.file-description-t")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>chpo       :call Perl_InsertTemplate("comment.file-description-pod")<CR>
-
-  inoremap    <buffer>  <silent>  <LocalLeader>cfr   <C-C>:call Perl_InsertTemplate("comment.frame")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>cfu   <C-C>:call Perl_InsertTemplate("comment.function")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>cm    <C-C>:call Perl_InsertTemplate("comment.method")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>chpl  <C-C>:call Perl_InsertTemplate("comment.file-description-pl")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>chpm  <C-C>:call Perl_InsertTemplate("comment.file-description-pm")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>cht   <C-C>:call Perl_InsertTemplate("comment.file-description-t")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>chpo  <C-C>:call Perl_InsertTemplate("comment.file-description-pod")<CR>
-
-  nnoremap    <buffer>  <silent>  <LocalLeader>ckb        $:call Perl_InsertTemplate("comment.keyword-bug")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ckt        $:call Perl_InsertTemplate("comment.keyword-todo")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ckr        $:call Perl_InsertTemplate("comment.keyword-tricky")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ckw        $:call Perl_InsertTemplate("comment.keyword-warning")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cko        $:call Perl_InsertTemplate("comment.keyword-workaround")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>ckn        $:call Perl_InsertTemplate("comment.keyword-keyword")<CR>
-
-  inoremap    <buffer>  <silent>  <LocalLeader>ckb   <C-C>$:call Perl_InsertTemplate("comment.keyword-bug")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>ckt   <C-C>$:call Perl_InsertTemplate("comment.keyword-todo")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>ckr   <C-C>$:call Perl_InsertTemplate("comment.keyword-tricky")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>ckw   <C-C>$:call Perl_InsertTemplate("comment.keyword-warning")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>cko   <C-C>$:call Perl_InsertTemplate("comment.keyword-workaround")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>ckn   <C-C>$:call Perl_InsertTemplate("comment.keyword-keyword")<CR>
-
-  nnoremap    <buffer>  <silent>  <LocalLeader>cc         :call Perl_CommentToggle()<CR>j
-  vnoremap    <buffer>  <silent>  <LocalLeader>cc    <C-C>:call Perl_CommentToggleRange()<CR>j
-
-  nnoremap    <buffer>  <silent>  <LocalLeader>cd    <Esc>:call Perl_InsertDateAndTime("d")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>cd    <Esc>:call Perl_InsertDateAndTime("d")<CR>a
-  nnoremap    <buffer>  <silent>  <LocalLeader>ct    <Esc>:call Perl_InsertDateAndTime("dt")<CR>
-  inoremap    <buffer>  <silent>  <LocalLeader>ct    <Esc>:call Perl_InsertDateAndTime("dt")<CR>a
-
-  nnoremap    <buffer>  <silent>  <LocalLeader>cv         :call Perl_CommentVimModeline()<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cb         :call Perl_CommentBlock("a")<CR>
-  vnoremap    <buffer>  <silent>  <LocalLeader>cb    <C-C>:call Perl_CommentBlock("v")<CR>
-  nnoremap    <buffer>  <silent>  <LocalLeader>cn         :call Perl_UncommentBlock()<CR>
-  "
   noremap    <buffer>  <silent>  <LocalLeader>ntl        :call Perl_EditTemplates("local")<CR>
   noremap    <buffer>  <silent>  <LocalLeader>ntg        :call Perl_EditTemplates("global")<CR>
   noremap    <buffer>  <silent>  <LocalLeader>ntr        :call Perl_RereadTemplates()<CR>
