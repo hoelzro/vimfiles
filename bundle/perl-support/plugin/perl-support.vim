@@ -1841,7 +1841,7 @@ function! Perl_ExpandUserMacros ( key )
   my $root;
   foreach my $p (@paths) {
     if($path =~ /^\Q$p\E/) {
-      $root = $p if !defined($root) || length($root) > length($p);
+      $root = $p if !defined($root) || length($root) < length($p);
     }
   }
 
