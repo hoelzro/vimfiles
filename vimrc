@@ -12,7 +12,6 @@ call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
 
 filetype plugin on
-filetype indent on
 
 function LoadXml()
     set omnifunc=xmlcomplete#CompleteTags
