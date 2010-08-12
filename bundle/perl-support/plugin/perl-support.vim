@@ -1830,6 +1830,7 @@ function! Perl_ExpandUserMacros ( key )
   let s:Perl_Macro['|SUFFIX|']    = expand("%:e")
   let s:Perl_Macro['|TIME|']      = Perl_DateAndTime('t')
   let s:Perl_Macro['|YEAR|']      = Perl_DateAndTime('y')
+  let s:Perl_Macro['|EMAIL|'] = substitute($EMAIL, '@', ' at ', '')
 
   let package = expand('%:p:r')
   perl <<PERL
