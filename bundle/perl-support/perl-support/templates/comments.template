@@ -23,6 +23,47 @@ package |?PACKAGE|;
 use strict;
 use warnings;
 
+our $VERSION = '0.01';
+
+=head1 NAME
+
+|?PACKAGE|
+
+=head1 VERSION
+
+0.01
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+=cut
+
+############################## functions go here! ##############################
+
+=head1 AUTHOR
+
+Rob Hoelz, C<< <rhoelz at inoc.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-|?DIST| at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=|?DIST|>. I will
+be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Rob Hoelz.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=cut
+
 1;
 §%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 == comment.file-description-t == start ==
