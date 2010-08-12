@@ -13,25 +13,6 @@ call pathogen#runtime_append_all_bundles()
 
 filetype plugin on
 
-function LoadXml()
-    set omnifunc=xmlcomplete#CompleteTags
-    set textwidth=0
-    set shiftwidth=2
-    set softtabstop=2
-    set textwidth=0
-endfunction
-
-function LoadPlain()
-    set noautoindent
-    set textwidth=0
-endfunction
-
-function LoadLua()
-    set softtabstop=2
-    set shiftwidth=2
-    source /usr/share/vim/vim72/indent/lua.vim
-endfunction
-
 " Assembly
 let asmsyntax='nasm'
 
@@ -136,19 +117,6 @@ function MakeViewSafe()
 endfunction
 autocmd VimLeave,BufLeave * call MakeViewSafe()
 autocmd BufRead * loadview
-
-" Omni completion
-autocmd FileType python set omnifunc=pythoncomplete#Complete
-autocmd FileType ruby set omnifunc=rubycomplete#Complete
-autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-autocmd FileType xml call LoadXml()
-autocmd FileType php set omnifunc=phpcomplete#CompletePHP
-autocmd FileType sql set omnifunc=sqlcomplete#Complete
-autocmd FileType c set omnifunc=ccomplete#Complete
-autocmd FileType lua call LoadLua()
-autocmd FileType '' call LoadPlain()
 
 " I hate end of line whitespace...highlight it
 highlight WhitespaceEOL ctermbg=red guibg=red
