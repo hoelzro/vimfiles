@@ -1856,6 +1856,7 @@ function! Perl_ExpandUserMacros ( key )
   VIM::DoCommand("let package = '$path'")
 PERL
   let s:Perl_Macro['|PACKAGE|'] = package
+  let s:Perl_Macro['|DIST|'] = substitute(package, '::', '-', 'g')
 
   "------------------------------------------------------------------------------
   "  delete jump targets if mapping for C-j is off
