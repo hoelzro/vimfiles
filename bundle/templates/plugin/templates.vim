@@ -1,7 +1,7 @@
 function InsertTemplate(name)
     perl << PERL
     my ($ok, $name) = VIM::Eval("a:name");
-    my $file = "/home/rhoelz/.vim/templates/$name";
+    my $file = "$ENV{'HOME'}/.vim/bundle/templates/templates/$name";
     my $fh;
     if(open $fh, '<', $file) {
 	my @lines = <$fh>;
