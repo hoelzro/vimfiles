@@ -159,8 +159,6 @@ let g:DoxygenToolkit_authorName="Rob Hoelz"
 map \dxa :DoxAuthor<CR>
 map \dxd :Dox<CR>
 
-au BufNewFile,BufRead SConstruct,SConscript,wscript,wscript_build setf python
-
 function InsertHeader()
   if !exists('b:comment_char')
     let b:comment_char = input("What's the comment character for the language in which you're working? ")
