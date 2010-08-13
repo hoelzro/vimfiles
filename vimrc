@@ -198,15 +198,6 @@ autocmd BufNewFile *.tt2 call InsertTemplate('html')
 autocmd BufNewFile *.xml call InsertTemplate('xml')
 autocmd BufNewFile dist.ini call InsertTemplate('dist-zilla')
 
-nmap <leader>swh :topleft vnew<CR>
-nmap <leader>swj :botright new<CR>
-nmap <leader>swk :topleft new<CR>
-nmap <leader>swl :botright vnew<CR>
-nmap <leader>sh  :leftabove vnew<CR>
-nmap <leader>sj  :rightbelow new<CR>
-nmap <leader>sk  :leftabove new<CR>
-nmap <leader>sl  :rightbelow vnew<CR>
-
 nmap <leader>vm :call ViewModule(expand("<cword>"))<CR>
 
 function MapToggle(key, opt)
