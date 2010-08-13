@@ -9,3 +9,4 @@ view-module:0:me
 vim-markdown:8d0860c:github:tpope/vim-markdown
 css-color:0.7:vimscript:2150
 fugitive:1.1:vimscript:2975
+dbext:12.00:vimscript:356
