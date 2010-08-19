@@ -94,6 +94,8 @@ set showmatch
 set smartcase
 set title
 set wildmenu
+set complete=.,w,b,u,t,i,kspell
+set dictionary=/usr/share/dict/words
 
 " Mappings
 map <C-p> :tabprev<CR>
