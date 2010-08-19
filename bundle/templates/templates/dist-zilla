@@ -7,5 +7,5 @@ license = Perl_5
 copyright_holder = Rob Hoelz
 
 [@Basic]
-[AutoPreReq]
+[AutoPrereq]
 [@Git]
