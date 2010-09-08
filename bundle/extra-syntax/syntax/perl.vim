@@ -186,12 +186,12 @@ syn match  perlPackageRef	 "\(\h\w*\)\=\(::\|'\)\I"me=e-1 contained
 " with transparency. Or maybe we should handle the bare word in that case. or make it into
 
 if exists("perl_want_scope_in_variables")
-  syn match  perlVarPlain	"\\\=\([@$%]\|\$#\)\$*\(\h\w*\)\=\(\(::\|'\)\h\w*\)*\w\@!" contains=perlPackageRef nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
-  syn match  perlVarPlain2	"\\\=%\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" contains=perlPackageRef nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
+  syn match  perlVarPlain	"\\\=\([@$]\|\$#\)\$*\(\h\w*\)\=\(\(::\|'\)\h\w*\)*\w\@!" contains=perlPackageRef nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
+  syn match  perlVarPlain2	"\\\=[*%]\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" contains=perlPackageRef nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
   syn match  perlFunctionName	"\\\=&\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" contains=perlPackageRef nextgroup=perlVarMember,perlVarSimpleMember
 else
-  syn match  perlVarPlain	"\\\=\([@$%]\|\$#\)\$*\(\h\w*\)\=\(\(::\|'\)\h\w*\)*\w\@!" nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
-  syn match  perlVarPlain2	"\\\=%\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
+  syn match  perlVarPlain	"\\\=\([@$]\|\$#\)\$*\(\h\w*\)\=\(\(::\|'\)\h\w*\)*\w\@!" nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
+  syn match  perlVarPlain2	"\\\=[*%]\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
   syn match  perlFunctionName	"\\\=&\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" nextgroup=perlVarMember,perlVarSimpleMember
 endif
 
