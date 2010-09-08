@@ -112,10 +112,10 @@ syn match perlStatementProc		"\<\%(subtype\|coerce\|as\|from\|via\|message\|enum
 syn match perlStatementProc             "\<\%(plan\|use_ok\|require_ok\|ok\|isnt\|diag\|like\|unlike\|cmp_ok\|is_deeply\|skip\|can_ok\|isa_ok\|pass\|fail\|BAIL_OUT\|meta_ok\|does_ok\|has_attribute_ok\|throws_ok\|dies_ok\|lives_ok\|lives_and\)\>"
 syn match perlMethodName +\%(\h\|::\|['"]\)\%(\w\|::\)\+["']\?\_s*\|+ contained nextgroup=perlPossibleComma
 syn match perlPossibleComma +\_s*\%(=>\|,\)\?\_s*\|+ contained nextgroup=perlAnonSubOrMethod
-syn match perlAnonSubOrMethod +\_s*\%(sub\|method\)\_s*\|+ contained contains=perlFunction nextgroup=perlMethodSignature
+syn match perlAnonSubOrMethod +\_s*sub\_s*\|+ contained contains=perlFunction nextgroup=perlMethodSignature
 syn match perlMethodSignature +\_s*\%((\_[^)]*)\)\?\_s*\|+ nextgroup=perlSubAttributes contained contains=@perlExpr,perlStatementProc
-syn match perlFunction +\<\%(class\|role\|extends\|with\)\>\_s*+ nextgroup=perlStringUnexpanded,perlString
-syn match perlFunction +\<\%(method\|before\|after\|around\|override\|augment\)\>\_s*+ nextgroup=perlMethodName
+syn match perlFunction +\<\%(extends\|with\)\>\_s*+ nextgroup=perlStringUnexpanded,perlString
+syn match perlFunction +\<\%(before\|after\|around\|override\|augment\)\>\_s*+ nextgroup=perlMethodName
 
 command -nargs=+ HiLink hi def link <args>
 HiLink perlMethodName Function
