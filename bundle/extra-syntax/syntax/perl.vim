@@ -162,17 +162,6 @@ syn keyword perlTodo			TODO TBD FIXME XXX contained
 " too slow. And what is after the -> is *not* considered as part of the
 " variable - there again, too complicated and too slow.
 
-" Special variables first ($^A, ...) and ($|, $', ...)
-syn match  perlVarPlain		 "$^[ADEFHILMOPSTWX]\="
-syn match  perlVarPlain		 "$[\\\"\[\]'&`+*.,;=%~!?@#$<>(-]"
-syn match  perlVarPlain		 "$\(0\|[1-9][0-9]*\)"
-" Same as above, but avoids confusion in $::foo (equivalent to $main::foo)
-syn match  perlVarPlain		 "$:[^:]"
-" These variables are not recognized within matches.
-syn match  perlVarNotInMatches	 "$[|)]"
-" This variable is not recognized within matches delimited by m//.
-syn match  perlVarSlash		 "$/"
-
 " And plain identifiers
 syn match  perlPackageRef	 "\(\h\w*\)\=\(::\|'\)\I"me=e-1 contained
 
@@ -194,6 +183,17 @@ else
   syn match  perlVarPlain2	"\\\=[*%]\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" nextgroup=perlVarMember,perlVarSimpleMember,perlMethod
   syn match  perlFunctionName	"\\\=&\$*\(\I\i*\)\=\(\(::\|'\)\I\i*\)*\>" nextgroup=perlVarMember,perlVarSimpleMember
 endif
+
+" Special variables first ($^A, ...) and ($|, $', ...)
+syn match  perlVarPlain		 "$^[ADEFHILMOPSTWX]\="
+syn match  perlVarPlain		 "$[\\\"\[\]'&`+*.,;=%~!?@#$<>(-]\w\@!"
+syn match  perlVarPlain		 "$\(0\|[1-9][0-9]*\)"
+" Same as above, but avoids confusion in $::foo (equivalent to $main::foo)
+syn match  perlVarPlain		 "$:[^:]"
+" These variables are not recognized within matches.
+syn match  perlVarNotInMatches	 "$[|)]"
+" This variable is not recognized within matches delimited by m//.
+syn match  perlVarSlash		 "$/"
 
 if exists("perl_extended_vars")
   syn cluster perlExpr		contains=perlStatementScalar,perlStatementRegexp,perlStatementNumeric,perlStatementList,perlStatementHash,perlStatementFiles,perlStatementTime,perlStatementMisc,perlVarPlain,perlVarPlain2,perlVarNotInMatches,perlVarSlash,perlVarBlock,perlShellCommand,perlFloat,perlNumber,perlStringUnexpanded,perlString,perlQQ
