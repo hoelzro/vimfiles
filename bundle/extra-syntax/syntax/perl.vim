@@ -114,7 +114,7 @@ syn match perlMethodName +\%(\h\|::\|['"]\)\%(\w\|::\)\+["']\?\_s*\|+ contained 
 syn match perlPossibleComma +\_s*\%(=>\|,\)\?\_s*\|+ contained nextgroup=perlAnonSubOrMethod
 syn match perlAnonSubOrMethod +\_s*\%(sub\|method\)\_s*\|+ contained contains=perlFunction nextgroup=perlMethodSignature
 syn match perlMethodSignature +\_s*\%((\_[^)]*)\)\?\_s*\|+ nextgroup=perlSubAttributes contained contains=@perlExpr,perlStatementProc
-syn match perlFunction +\<\%(class\|role\|extends\|with\)\>\_s*+ nextgroup=perlPackageRef
+syn match perlFunction +\<\%(class\|role\|extends\|with\)\>\_s*+ nextgroup=perlStringUnexpanded,perlString
 syn match perlFunction +\<\%(method\|before\|after\|around\|override\|augment\)\>\_s*+ nextgroup=perlMethodName
 
 command -nargs=+ HiLink hi def link <args>
