@@ -200,11 +200,7 @@ if exists("perl_extended_vars")
   syn region perlVarBlock	matchgroup=perlVarPlain start="\($#\|[@%$]\)\$*{" skip="\\}" end="}" contains=@perlExpr nextgroup=perlVarMember,perlVarSimpleMember
   syn region perlVarBlock	matchgroup=perlVarPlain start="&\$*{" skip="\\}" end="}" contains=@perlExpr
   syn match  perlVarPlain	"\\\=\(\$#\|[@%&$]\)\$*{\I\i*}" nextgroup=perlVarMember,perlVarSimpleMember
-  "syn region perlVarMember	matchgroup=perlVarPlain start="\(->\)\={" skip="\\}" end="}" contained contains=@perlExpr nextgroup=perlVarMember,perlVarSimpleMember
-  "syn match  perlVarSimpleMember	"\(->\)\={\I\i*}" nextgroup=perlVarMember,perlVarSimpleMember contains=perlVarSimpleMemberName contained
   syn match  perlVarSimpleMemberName	"\I\i*" contained
-  "syn region perlVarMember	matchgroup=perlVarPlain start="\(->\)\=\[" skip="\\]" end="]" contained contains=@perlExpr nextgroup=perlVarMember,perlVarSimpleMember
-  "syn match  perlMethod		"\(->\)\I\i*" contained
 endif
 
 " File Descriptors
@@ -347,21 +343,12 @@ syn region perlQQ		matchgroup=perlStringStartEnd start=+\<qr/+  end=+/[imosx]*+ 
 if version >= 600
   " XXX Any statements after the identifier are in perlString colour (i.e.
   " 'if $a' in 'print <<EOF if $a').
-  "if exists("perl_fold")
-    "syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\z(\I\i*\).*+    end=+^\z1$+ contains=@perlInterpDQ fold
-    "syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*"\z(.\{-}\)"+ end=+^\z1$+ contains=@perlInterpDQ fold
-    "syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*'\z(.\{-}\)'+ end=+^\z1$+ contains=@perlInterpSQ fold
-    "syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*""+           end=+^$+    contains=@perlInterpDQ,perlNotEmptyLine fold
-    "syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*''+           end=+^$+    contains=@perlInterpSQ,perlNotEmptyLine fold
-    "syn region perlAutoload	matchgroup=perlStringStartEnd start=+<<['"]\z(END_\(SUB\|OF_FUNC\|OF_AUTOLOAD\)\)['"]+ end=+^\z1$+ contains=ALL fold
-  "else
-    syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\z(\I\i*\)+      end=+^\z1$+ contains=@perlInterpDQ
-    syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*"\z(.\{-}\)"+ end=+^\z1$+ contains=@perlInterpDQ
-    syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*'\z(.\{-}\)'+ end=+^\z1$+ contains=@perlInterpSQ
-    syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*""+           end=+^$+    contains=@perlInterpDQ,perlNotEmptyLine
-    syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*''+           end=+^$+    contains=@perlInterpSQ,perlNotEmptyLine
-    syn region perlAutoload	matchgroup=perlStringStartEnd start=+<<\(['"]\|\)\z(END_\(SUB\|OF_FUNC\|OF_AUTOLOAD\)\)\1+ end=+^\z1$+ contains=ALL
-  "endif
+  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\z(\I\i*\)+      end=+^\z1$+ contains=@perlInterpDQ
+  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*"\z(.\{-}\)"+ end=+^\z1$+ contains=@perlInterpDQ
+  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*'\z(.\{-}\)'+ end=+^\z1$+ contains=@perlInterpSQ
+  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*""+           end=+^$+    contains=@perlInterpDQ,perlNotEmptyLine
+  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*''+           end=+^$+    contains=@perlInterpSQ,perlNotEmptyLine
+  syn region perlAutoload	matchgroup=perlStringStartEnd start=+<<\(['"]\|\)\z(END_\(SUB\|OF_FUNC\|OF_AUTOLOAD\)\)\1+ end=+^\z1$+ contains=ALL
 else
   syn match perlUntilEOFStart	"<<EOF.*"lc=5 nextgroup=perlUntilEOFDQ skipnl transparent
   syn match perlUntilEOFStart	"<<\s*\"EOF\".*" nextgroup=perlUntilEOFDQ skipnl transparent
