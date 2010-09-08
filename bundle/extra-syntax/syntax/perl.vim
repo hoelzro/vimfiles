@@ -138,7 +138,7 @@ syn keyword perlStatementFiles		chdir chmod chown chroot glob link mkdir readlin
 syn match   perlStatementFiles		"-[rwxoRWXOezsfdlpSbctugkTBMAC]\>"
 syn keyword perlStatementFlow		caller die dump eval exit wantarray
 syn keyword perlStatementInclude	require
-syn match   perlStatementInclude	"\<\(use\|no\)\s\+\(\(integer\|strict\|lib\|sigtrap\|subs\|vars\|warnings\|utf8\|byte\|base\|fields\)\>\)\="
+syn match   perlStatementInclude	"\<\(use\|no\)\>"
 syn keyword perlStatementScope		import
 syn keyword perlStatementProc		alarm exec fork getpgrp getppid getpriority kill pipe setpgrp setpriority sleep system times wait waitpid
 syn keyword perlStatementSocket		accept bind connect getpeername getsockname getsockopt listen recv send setsockopt shutdown socket socketpair
@@ -590,4 +590,4 @@ if exists("perl_fold")
 else
     syn keyword perlControl BEGIN END CHECK INIT UNITCHECK
 endif
-syn match   perlStatementInclude	"\<\(use\|no\)\s\+\(\l\+\>\)\="
+syn match   perlStatementInclude	"\<\(use\|no\)\s\+\l\+\(::\l\+\)*\>\="
