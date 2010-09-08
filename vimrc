@@ -199,6 +199,7 @@ autocmd BufNewFile *.html call InsertTemplate('html')
 autocmd BufNewFile *.tt2 call InsertTemplate('html')
 autocmd BufNewFile *.xml call InsertTemplate('xml')
 autocmd BufNewFile dist.ini call InsertTemplate('dist-zilla')
+autocmd BufNewFile PKGBUILD call InsertTemplate('PKGBUILD')
 
 nmap <leader>vm :call ViewModule(expand("<cword>"))<CR>
 
