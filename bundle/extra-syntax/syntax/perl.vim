@@ -148,7 +148,6 @@ syn keyword perlStatementPword		getpwuid getpwnam getpwent setpwent endpwent get
 syn keyword perlStatementTime		gmtime localtime time times
 
 syn keyword perlStatementMisc		warn formline reset scalar delete prototype lock
-syn keyword perlStatementNew		new
 
 syn keyword perlTodo			TODO TBD FIXME XXX contained
 
