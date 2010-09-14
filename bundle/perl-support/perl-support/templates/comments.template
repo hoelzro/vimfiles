@@ -70,6 +70,6 @@ use warnings;
 
 use Test::More tests => 1;
 
-ok(1);
+pass;
 §%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 == comment.file-description-pod == start ==
