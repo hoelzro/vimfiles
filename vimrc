@@ -121,8 +121,8 @@ autocmd VimLeave,BufLeave * call MakeViewSafe()
 autocmd BufRead * loadview
 
 " I hate end of line whitespace...highlight it
-highlight WhitespaceEOL ctermbg=red guibg=red
-match WhitespaceEOL /\s\+$/
+match Search /\s\+$/
+2match Search /\%>78v./
 
 " Doxygen helper settings
 let g:DoxygenToolkit_authorName="Rob Hoelz"
