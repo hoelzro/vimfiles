@@ -1,5 +1,7 @@
 " vim: sts=2 sw=2
 
+let $MANPAGER='less'
+
 let g:Perl_Support_Root_Dir=$HOME . '/.vim/bundle/perl-support'
 
 perl <<PERL
