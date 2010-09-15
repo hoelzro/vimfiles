@@ -124,7 +124,6 @@ autocmd BufRead * loadview
 
 " I hate end of line whitespace...highlight it
 match Search /\s\+$/
-2match Search /\%>78v./
 
 " Doxygen helper settings
 let g:DoxygenToolkit_authorName="Rob Hoelz"
