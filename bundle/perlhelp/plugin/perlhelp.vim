@@ -258,7 +258,7 @@ endfunction
 " Split the window or use the existing split to display the text.
 " Taken from asciitable.vim by Jeffrey Harkavy.
 function <SID>PerlHelpWindow(command, syntax)
-    let s:vheight = 19
+    let s:vheight = 40
     let s:vwinnum=bufnr('__PerlHelp')
     if getbufvar(s:vwinnum, 'PerlHelp')=='PerlHelp'
         let s:vwinnum=bufwinnr(s:vwinnum)
