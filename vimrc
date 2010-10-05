@@ -114,13 +114,8 @@ if &term == 'xterm-256color'
 endif
 
 " Automatic saving and loading of views
-function MakeViewSafe()
-    if(expand("%") != "")
-	mkview
-    endif
-endfunction
-autocmd VimLeave,BufLeave * call MakeViewSafe()
-autocmd BufRead * loadview
+autocmd BufWinLeave * silent mkview
+autocmd BufWinEnter * silent loadview
 
 " I hate end of line whitespace...highlight it
 match Search /\s\+$/
