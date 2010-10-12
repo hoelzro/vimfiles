@@ -98,6 +98,7 @@ set title
 set wildmenu
 set complete=.,w,b,u,t,i,kspell
 set dictionary=/usr/share/dict/words
+set backspace=indent,eol,start
 
 " Mappings
 map <C-p> :tabprev<CR>
