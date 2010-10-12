@@ -115,8 +115,8 @@ if &term == 'xterm-256color'
 endif
 
 " Automatic saving and loading of views
-autocmd BufWinLeave * silent mkview
-autocmd BufWinEnter * silent loadview
+autocmd BufWinLeave * silent! mkview
+autocmd BufWinEnter * silent! loadview
 
 " I hate end of line whitespace...highlight it
 match Search /\s\+$/
