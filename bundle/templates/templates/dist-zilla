@@ -6,6 +6,28 @@ author = Rob Hoelz <rob@hoelz.ro>
 license = Perl_5
 copyright_holder = Rob Hoelz
 
-[@Basic]
-[AutoPrereq]
-[@Git]
+[GatherDir]
+[PruneCruft]
+[ManifestSkip]
+[MetaYAML]
+[License]
+[Readme]
+[ExecDir]
+[ShareDir]
+[MakeMaker]
+[Manifest]
+[TestRelease]
+[ConfirmRelease]
+[AutoPrereqs]
+[Git::Check]
+changelog = Changelog
+[Git::Commit]
+changelog = Changelog
+[Git::Init]
+[Git::NextVersion]
+first_version = 0.01
+version_regexp = ^(\d+)\.(\d+)$
+[Git::Push]
+[Git::Tag]
+tag_format  = %v
+tag_message = %v
