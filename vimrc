@@ -217,3 +217,5 @@ MapToggle <F8> ignorecase
 MapToggle <F9> number
 MapToggle <F10> spell
 MapToggle <F11> wrapscan
+
+abbrev ddc use Data::Dumper::Concise;
