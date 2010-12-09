@@ -504,7 +504,7 @@ elseif &background=='dark'
     hi Special		ctermfg=179	ctermbg=NONE	cterm=NONE
     hi Error		ctermfg=209	ctermbg=NONE	cterm=NONE
     hi Todo		ctermfg=88	ctermbg=186	cterm=NONE
-    hi Search		ctermfg=NONE	ctermbg=88	cterm=NONE
+    hi Search		ctermfg=NONE	ctermbg=63	cterm=NONE
     hi Visual		ctermfg=16	ctermbg=153	cterm=NONE
     hi Cursor		ctermfg=16	ctermbg=46	cterm=NONE
     " NOTE THIS IS IN THE COOL SECTION
