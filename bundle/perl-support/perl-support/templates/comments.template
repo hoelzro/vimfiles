@@ -7,15 +7,16 @@ use warnings;
 == comment.file-description-pl-5.12 == start ==
 #!/usr/bin/env perl
 
-use 5.12.0;
+use strict;
 use warnings;
+use feature 'say';
 §%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 == comment.file-description-pl-5.10 == start ==
 #!/usr/bin/env perl
 
 use strict;
 use warnings;
-use 5.010;
+use feature 'say';
 §%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 == comment.file-description-pm == start ==
 package |?PACKAGE|;
