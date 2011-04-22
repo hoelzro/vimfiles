@@ -78,6 +78,7 @@ endif
 set showcmd
 set autochdir
 set softtabstop=4
+set tabstop=8
 set shiftwidth=4
 set scrolloff=3
 set autoindent
