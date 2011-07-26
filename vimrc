@@ -220,4 +220,15 @@ MapToggle <F9> number
 MapToggle <F10> spell
 MapToggle <F11> wrapscan
 
+augroup HelpInTabs
+  au!
+  au BufEnter *.txt call HelpInNewTab()
+
+  function HelpInNewTab()
+    if &buftype == 'help'
+      execute "normal \<C-W>T"
+    endif
+  endfunction
+augroup END
+
 abbrev ddc use Data::Dumper::Concise;
