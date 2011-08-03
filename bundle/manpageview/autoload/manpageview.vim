@@ -401,6 +401,9 @@ fun! manpageview#ManPageView(viamap,bknum,...) range
    else
     enew!
    endif
+  elseif g:manpageview_winopen == "tab"
+    tabnew
+    enew!
   else
    echohl ErrorMsg
    echo "***sorry*** g:manpageview_winopen<".g:manpageview_winopen."> not supported"

@@ -23,6 +23,7 @@ com! -nargs=* -count=0	OMan  let g:manpageview_winopen="only"   |call manpagevie
 com! -nargs=* -count=0	RMan  let g:manpageview_winopen="reuse"  |call manpageview#ManPageView(0,<count>,<f-args>)
 com! -nargs=* -count=0	VMan  let g:manpageview_winopen="vsplit="|call manpageview#ManPageView(0,<count>,<f-args>)
 com! -nargs=* -count=0	VEMan let g:manpageview_winopen="vsplit" |call manpageview#ManPageView(0,<count>,<f-args>)
+com! -nargs=* -count=0	TMan  let g:manpageview_winopen="tab"    |call manpageview#ManPageView(0,<count>,<f-args>)
 
 " ---------------------------------------------------------------------
 "  Restore: {{{1
