@@ -561,6 +561,7 @@ fun! manpageview#ManPageView(viamap,bknum,...) range
   exe cmdmod."setlocal fdc=0"
 "  exe cmdmod."setlocal isk+=-,.,(,)"
   exe cmdmod."setlocal nowrap"
+  exe cmdmod."setlocal ignorecase"
   set nolz
   exe cmdmod."1"
   exe cmdmod."norm! 0"
