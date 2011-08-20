@@ -236,3 +236,4 @@ endfunction
 
 abbrev ddc use Data::Dumper::Concise;
 inoremap <C-A> <C-O> call NoOp()<CR>
+nnoremap zo zO
