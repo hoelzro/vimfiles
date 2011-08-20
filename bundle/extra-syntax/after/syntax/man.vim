@@ -1,3 +1,9 @@
+if exists("g:manpage_sections")
+    finish
+endif
+
+let g:manpage_sections = 1
+
 function s:FindSections()
     let sections  = []
     let locations = {}
