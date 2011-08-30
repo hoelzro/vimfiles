@@ -31,7 +31,6 @@ endif
 syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
 syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo
 syn match   javaScriptCommentSkip      "^[ \t]*\*\($\|[ \t]\+\)"
-syn region  javaScriptComment	       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
 syn match   javaScriptSpecial	       "\\\d\d\d\|\\."
 syn region  javaScriptStringD	       start=+"+  skip=+\\\\\|\\"+  end=+"\|$+  contains=javaScriptSpecial,@htmlPreproc
 syn region  javaScriptStringS	       start=+'+  skip=+\\\\\|\\'+  end=+'\|$+  contains=javaScriptSpecial,@htmlPreproc
@@ -60,12 +59,14 @@ syn keyword javaScriptReserved		abstract boolean byte char class const debugger 
 if exists("javaScript_fold")
     syn match	javaScriptFunction      "\<function\>"
     syn region	javaScriptFunctionFold	start="^\z(\s*\).*\<function\>.*[^};]$" end="^\z1}" transparent fold keepend
+    syn region  javaScriptComment       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo fold keepend
 
     syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\<function\>"
     syn sync match javaScriptSync	grouphere NONE "^}"
 
     setlocal foldmethod=syntax
 else
+    syn region  javaScriptComment	       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
     syn keyword	javaScriptFunction      function
     syn match	javaScriptBraces	   "[{}\[\]]"
     syn match	javaScriptParens	   "[()]"
