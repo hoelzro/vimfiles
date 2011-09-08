@@ -4,35 +4,12 @@ endif
 
 let g:loaded_log_abbrev = 1
 
-function s:InsertPrintLog()
-    normal! aprint STDERR "\n";
-    normal! hhh
-    startinsert
-endfunction
-
-function s:InsertSayLog()
-    normal! asay STDERR "";
-    normal h
-    startinsert
-endfunction
-
-function s:InsertCatalystLog()
-    normal! a$c->log->info("");
-    normal! hh
-    startinsert
-endfunction
-
-function s:InsertJSLog()
-    normal! aconsole.log("");
-    normal! hh
-    startinsert
-endfunction
-
-function s:InsertNone()
-    normal! alog("");
-    normal! hh
-    startinsert
-endfunction
+let g:log_expressions = {}
+let g:log_expressions['print']    = 'print STDERR "^\n";'
+let g:log_expressions['say']      = 'say STDERR "^";'
+let g:log_expressions['catalyst'] = '$c->log->info("^");'
+let g:log_expressions['js']       = 'console.log("^");'
+let g:log_expressions['none']     = 'log("^");'
 
 function s:DetermineLogType()
     if     &filetype == 'perl'
@@ -71,24 +48,22 @@ function s:DetermineLogType()
     endif
 endfunction
 
+function s:ExpandLogExpression(expr)
+    let l:expr_wo_marker = substitute(a:expr, '\^', '', '')
+    let l:marker_index   = match(a:expr, '\^')
+    let l:left_count     = strlen(a:expr) - l:marker_index - 2
+
+    execute 'normal! a' . l:expr_wo_marker
+    execute 'normal! ' . repeat('h', l:left_count)
+    startinsert
+endfunction
+
 function s:InsertLog()
     if ! exists('b:insert_log_type')
         call s:DetermineLogType()
     endif
 
-    if     b:insert_log_type == 'print'
-        call s:InsertPrintLog()
-    elseif b:insert_log_type == 'say'
-        call s:InsertSayLog()
-    elseif b:insert_log_type == 'catalyst'
-        call s:InsertCatalystLog()
-    elseif b:insert_log_type == 'js'
-        call s:InsertJSLog()
-    elseif b:insert_log_type == 'none'
-        call s:InsertNone()
-    else
-        throw "Invalid log type '" . b:insert_log_type . "'"
-    endif
+    call s:ExpandLogExpression(g:log_expressions[b:insert_log_type])
 endfunction
 
 inoremap <Leader>ll <ESC>:call <SID>InsertLog()<CR>
