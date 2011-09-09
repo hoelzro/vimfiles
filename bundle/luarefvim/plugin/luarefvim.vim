@@ -13,7 +13,6 @@ let loaded_luarefvim = 1
 " mappings:
 vmap <silent> <unique> <Leader>lr y:call <SID>LookUp('<c-r>"')<CR>
 nmap <silent> <unique> <Leader>lr  :call <SID>LookUp(expand("<cword>"))<CR>
-map <silent> <unique> <Leader>lc :help luaref<CR>
 
 function <SID>LookUp(str)
 	if a:str == "--" "comment?
