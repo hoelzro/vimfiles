@@ -34,7 +34,9 @@ function s:CompleteLuaTags(ArgLead, CmdLine, CursorPos)
 endfunction
 
 function <SID>LookUp(str)
-	if a:str == "--" "comment?
+        if a:str == ""
+                return
+	elseif a:str == "--" "comment?
 		silent! execute ":help lrv-comment"
 	elseif a:str == ""
 		silent! execute ":help luaref"
