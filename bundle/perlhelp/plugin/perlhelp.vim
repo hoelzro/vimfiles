@@ -134,6 +134,9 @@ endfunction
 function <SID>PerlHelpFAQ(...)
     if a:0 == 0
         let l:topic = <SID>PerlHelpAsk('FAQ regular expression')
+        if empty(l:topic)
+            return
+        endif
     else
         let l:topic = a:1
     endif
@@ -156,6 +159,9 @@ endfunction
 function <SID>PerlHelpVar(...)
     if a:0 == 0
         let l:topic = <SID>PerlHelpAsk('variable')
+        if empty(l:topic)
+            return
+        endif
     else
         " Try to capture a variable.
         " This can be tricky since variables use some strange punctuation.
@@ -182,6 +188,9 @@ endfunction
 function <SID>PerlHelpFunc(...)
     if a:0 == 0
         let l:topic = <SID>PerlHelpAsk('function')
+        if empty(l:topic)
+            return
+        endif
     else
         " Try to eliminate the package or variable if it's a method.
         let l:topic = substitute(a:1, '^.*->', '', 'g')
@@ -208,6 +217,9 @@ endfunction
 function <SID>PerlHelp(question, option, ...)
     if a:0 == 0
         let l:topic = <SID>PerlHelpAsk(a:question)
+        if empty(l:topic)
+            return
+        endif
     else
         " Only grab soemthing that could be a topic or module.
         let l:topic = substitute(a:1, '^[^[:alnum:]_:]*\([[:alnum:]_:]*\).*', '\1', 'g')
