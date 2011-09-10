@@ -131,6 +131,11 @@ let g:DoxygenToolkit_authorName="Rob Hoelz"
 map \dxa :DoxAuthor<CR>
 map \dxd :Dox<CR>
 
+let perlhelp_prog = "cpandoc"
+if !executable(perlhelp_prog)
+  unlet perlhelp_prog
+endif
+
 function InsertHeader()
   if !exists('b:comment_char')
     let b:comment_char = input("What's the comment character for the language in which you're working? ")
