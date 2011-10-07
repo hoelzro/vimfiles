@@ -126,7 +126,7 @@ nmap <silent> <unique> <script> <Plug>PerlHelpVarAsk      :call <SID>PerlHelpVar
 " Functions. {{{1
 " Ask for text to lookup. {{{2
 function <SID>PerlHelpAsk(prompt)
-    let l:string = input('Enter the ' . a:prompt . ' to lookup: ')
+    let l:string = input('Enter the ' . a:prompt . ' to lookup: ', '', 'customlist,CompletePerlModules')
     return l:string
 endfunction
 
