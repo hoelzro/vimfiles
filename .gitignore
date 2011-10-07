@@ -2,3 +2,5 @@ view
 .VimballRecord
 .netrwhist
 tags
+.perl-modules.db
+perl-lib/
