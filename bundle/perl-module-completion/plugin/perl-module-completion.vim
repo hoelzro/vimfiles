@@ -47,4 +47,21 @@ PERL
 
     return matches
   endfunction
+
+  function OmniCompletePerlModules(findstart, base)
+    if a:findstart
+        let line  = getline(line('.'))
+        let match = matchstr(line, '^' . &include . '\s*')
+
+        if !empty(match)
+            return strlen(match)
+        else
+            return -1
+        end
+    else
+        return CompletePerlModules(a:base, getline(line('.')), col('.'))
+    endif
+  endfunction
+
+  autocmd FileType perl set omnifunc=OmniCompletePerlModules
 endif
