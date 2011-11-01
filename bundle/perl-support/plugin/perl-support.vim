@@ -1854,6 +1854,7 @@ function! Perl_ExpandUserMacros ( key )
   }
 
   $path =~ s/\//::/g;
+  $path =~ s/^(?:t::)?lib:://g;
   VIM::DoCommand("let package = '$path'")
 PERL
   let s:Perl_Macro['|PACKAGE|'] = package
