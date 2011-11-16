@@ -239,8 +239,8 @@ augroup END
 function NoOp()
 endfunction
 
-abbrev ddc use Data::Dumper::Concise;
-abbrev ddp use Data::Printer;
+iabbrev ddc use Data::Dumper::Concise;
+iabbrev ddp use Data::Printer;
 inoremap <C-A> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
