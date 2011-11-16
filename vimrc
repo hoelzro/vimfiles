@@ -249,10 +249,10 @@ function LeaderAbbreviate(lhs, rhs)
   execute l:code
 endfunction
 
-call LeaderAbbreviate('ddc', 'use Data::Dumper::Concise;')
-call LeaderAbbreviate('ddp', 'use Data::Dumper::Printer;')
-call LeaderAbbreviate('tm',  'use Test::More;')
-call LeaderAbbreviate('fs',  'use feature "say";')
+call LeaderAbbreviate('uddc', 'use Data::Dumper::Concise;')
+call LeaderAbbreviate('uddp', 'use Data::Dumper::Printer;')
+call LeaderAbbreviate('utm',  'use Test::More;')
+call LeaderAbbreviate('ufs',  'use feature "say";')
 inoremap <C-A> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
