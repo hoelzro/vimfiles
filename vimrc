@@ -239,8 +239,18 @@ augroup END
 function NoOp()
 endfunction
 
-iabbrev ddc use Data::Dumper::Concise;
-iabbrev ddp use Data::Printer;
+function InsertAbbreviation(abbrev)
+  call feedkeys(a:abbrev, 'n')
+  startinsert
+endfunction
+
+function LeaderAbbreviate(lhs, rhs)
+  let code = "inoremap <Leader>" . a:lhs . " <ESC>:call InsertAbbreviation('" . a:rhs . "')<CR>"
+  execute l:code
+endfunction
+
+call LeaderAbbreviate('ddc', 'use Data::Dumper::Concise;')
+call LeaderAbbreviate('ddp', 'use Data::Dumper::Printer;')
 inoremap <C-A> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
