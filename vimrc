@@ -250,7 +250,7 @@ function LeaderAbbreviate(lhs, rhs)
 endfunction
 
 call LeaderAbbreviate('uddc', 'use Data::Dumper::Concise;')
-call LeaderAbbreviate('uddp', 'use Data::Dumper::Printer;')
+call LeaderAbbreviate('uddp', 'use Data::Printer;')
 call LeaderAbbreviate('utm',  'use Test::More;')
 call LeaderAbbreviate('ufs',  'use feature "say";')
 inoremap <C-A> <C-O> call NoOp()<CR>
