@@ -131,7 +131,7 @@ let g:DoxygenToolkit_authorName="Rob Hoelz"
 map \dxa :DoxAuthor<CR>
 map \dxd :Dox<CR>
 
-let perlhelp_prog = "cpandoc"
+let perlhelp_prog = "mcpandoc"
 if !executable(perlhelp_prog)
   unlet perlhelp_prog
 endif
