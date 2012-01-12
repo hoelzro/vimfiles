@@ -256,7 +256,4 @@ call LeaderAbbreviate('ufs',  'use feature "say";')
 inoremap <C-A> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
-inoremap @$ @{$}<C-\><C-O>h
-inoremap %$ %{$}<C-\><C-O>h
-
 inoremap <Leader>ll <ESC>:call InsertLog()<CR>
