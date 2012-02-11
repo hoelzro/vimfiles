@@ -8,7 +8,7 @@ au FileType perl set equalprg=perltidy
 au BufRead,BufNewFile *.psgi set filetype=perl
 au BufRead,BufNewFile *.html.epl set filetype=epl
 au BufRead,BufNewFile *.html.ep set filetype=epl
-au BufRead,BufNewFile nginx.conf set filetype=nginx
+au BufRead,BufNewFile /etc/nginx/conf/*.conf set filetype=nginx
 au BufRead,BufNewFile *.rockspec set filetype=lua
 
 let b:tt2_syn_tags = '\[% %] <!-- -->'
