@@ -5,11 +5,15 @@ let g:originalWD = getcwd()
 
 let g:Perl_Support_Root_Dir=$HOME . '/.vim/bundle/perl-support'
 
-perl <<PERL
-  use File::Spec;
+if has('perl')
 
-  @INC = map { File::Spec->rel2abs($_) } @INC;
+    perl <<PERL
+use File::Spec;
+
+@INC = map { File::Spec->rel2abs($_) } @INC;
 PERL
+
+endif
 
 call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
