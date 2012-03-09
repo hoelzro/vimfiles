@@ -300,6 +300,8 @@ function <SID>PerlHelpWindow(command, syntax)
         let b:PerlHelp='PerlHelp'
     endif
 
+    setlocal ignorecase
+
     silent put! =a:command
     setlocal nomodifiable
     1 " Skip to the top of the text.
