@@ -119,7 +119,7 @@ let mapleader="\\"
 map <F2> :TlistToggle<CR>
 map <Leader>f $zf%
 
-if &term == 'xterm-256color'
+if &term =~ '.*-256color'
   colorscheme peaksea
 endif
 
