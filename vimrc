@@ -120,6 +120,7 @@ map <F2> :TlistToggle<CR>
 map <Leader>f $zf%
 
 if &term =~ '.*-256color'
+  set t_Co=256
   colorscheme peaksea
 endif
 
