@@ -67,7 +67,7 @@ let [s:pref, s:opts, s:new_opts] = ['g:ctrlp_', {
 	\ 'open_multi':            ['s:opmul', '1v'],
 	\ 'open_new_file':         ['s:newfop', 'v'],
 	\ 'prompt_mappings':       ['s:urprtmaps', 0],
-	\ 'regexp_search':         ['s:regexp', 0],
+	\ 'regexp_search':         ['s:regexp', 1],
 	\ 'root_markers':          ['s:rmarkers', []],
 	\ 'split_window':          ['s:splitwin', 0],
 	\ 'status_func':           ['s:status', {}],
