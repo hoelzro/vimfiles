@@ -255,17 +255,17 @@ syn match  perlFloat	"[-+]\=\<\.[[:digit:]_]\+\([eE][\-+]\=\d\+\)\="
 
 " Simple version of searches and matches
 " caters for m//, m##, m{} and m[] (and the !/ variant)
-syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]/+ end=+/[cgimosx]*+ contains=@perlInterpSlash
-syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]#+ end=+#[cgimosx]*+ contains=@perlInterpMatch
-syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]{+ end=+}[cgimosx]*+ contains=@perlInterpMatch
-syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]\[+ end=+\][cgimosx]*+ contains=@perlInterpMatch
+syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]/+ end=+/[cgimosxpdual]*+ contains=@perlInterpSlash
+syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]#+ end=+#[cgimosxpdual]*+ contains=@perlInterpMatch
+syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]{+ end=+}[cgimosxpdual]*+ contains=@perlInterpMatch
+syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]\[+ end=+\][cgimosxpdual]*+ contains=@perlInterpMatch
 
 " A special case for m!!x which allows for comments and extra whitespace in the pattern
-syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]!+ end=+![cgimosx]*+ contains=@perlInterpSlash,perlComment
+syn region perlMatch	matchgroup=perlMatchStartEnd start=+[m!]!+ end=+![cgimosxpdual]*+ contains=@perlInterpSlash,perlComment
 
 " Below some hacks to recognise the // variant. This is virtually impossible to catch in all
 " cases as the / is used in so many other ways, but these should be the most obvious ones.
-syn region perlMatch	matchgroup=perlMatchStartEnd start=+^split /+lc=5 start=+[^$@%]\<split /+lc=6 start=+^while /+lc=5 start=+[^$@%]\<while /+lc=6 start=+^if /+lc=2 start=+[^$@%]\<if /+lc=3 start=+[!=]\~\s*/+lc=2 start=+[(~]/+lc=1 start=+\.\./+lc=2 start=+\s/[^= \t0-9$@%]+lc=1,me=e-1,rs=e-1 start=+^/+ skip=+\\/+ end=+/[cgimosx]*+ contains=@perlInterpSlash
+syn region perlMatch	matchgroup=perlMatchStartEnd start=+^split /+lc=5 start=+[^$@%]\<split /+lc=6 start=+^while /+lc=5 start=+[^$@%]\<while /+lc=6 start=+^if /+lc=2 start=+[^$@%]\<if /+lc=3 start=+[!=]\~\s*/+lc=2 start=+[(~]/+lc=1 start=+\.\./+lc=2 start=+\s/[^= \t0-9$@%]+lc=1,me=e-1,rs=e-1 start=+^/+ skip=+\\/+ end=+/[cgimosxpdual]*+ contains=@perlInterpSlash
 
 
 " Substitutions
@@ -277,16 +277,16 @@ syn region perlMatch	matchgroup=perlMatchStartEnd start=+\<s/+  end=+/+me=e-1 co
 syn region perlMatch	matchgroup=perlMatchStartEnd start=+\<s#+  end=+#+me=e-1 contains=@perlInterpMatch nextgroup=perlSubstitutionHash
 syn region perlMatch	matchgroup=perlMatchStartEnd start=+\<s\[+ end=+\]+ contains=@perlInterpMatch nextgroup=perlSubstitutionBracket skipwhite skipempty skipnl
 syn region perlMatch	matchgroup=perlMatchStartEnd start=+\<s{+ end=+}+ contains=@perlInterpMatch nextgroup=perlSubstitutionCurly skipwhite skipempty skipnl
-syn region perlSubstitutionSQ		matchgroup=perlMatchStartEnd start=+'+  end=+'[ecgimosx]*+ contained contains=@perlInterpSQ
-syn region perlSubstitutionDQ		matchgroup=perlMatchStartEnd start=+"+  end=+"[ecgimosx]*+ contained contains=@perlInterpDQ
-syn region perlSubstitutionSlash	matchgroup=perlMatchStartEnd start=+/+  end=+/[ecgimosx]*+ contained contains=@perlInterpDQ
-syn region perlSubstitutionHash		matchgroup=perlMatchStartEnd start=+#+  end=+#[ecgimosx]*+ contained contains=@perlInterpDQ
-syn region perlSubstitutionBracket	matchgroup=perlMatchStartEnd start=+\[+ end=+\][ecgimosx]*+ contained contains=@perlInterpDQ
-syn region perlSubstitutionCurly	matchgroup=perlMatchStartEnd start=+{+  end=+}[ecgimosx]*+ contained contains=@perlInterpDQ
+syn region perlSubstitutionSQ		matchgroup=perlMatchStartEnd start=+'+  end=+'[ecgimosxpdualr]*+ contained contains=@perlInterpSQ
+syn region perlSubstitutionDQ		matchgroup=perlMatchStartEnd start=+"+  end=+"[ecgimosxpdualr]*+ contained contains=@perlInterpDQ
+syn region perlSubstitutionSlash	matchgroup=perlMatchStartEnd start=+/+  end=+/[ecgimosxpdualr]*+ contained contains=@perlInterpDQ
+syn region perlSubstitutionHash		matchgroup=perlMatchStartEnd start=+#+  end=+#[ecgimosxpdualr]*+ contained contains=@perlInterpDQ
+syn region perlSubstitutionBracket	matchgroup=perlMatchStartEnd start=+\[+ end=+\][ecgimosxpdualr]*+ contained contains=@perlInterpDQ
+syn region perlSubstitutionCurly	matchgroup=perlMatchStartEnd start=+{+  end=+}[ecgimosxpdual]*+ contained contains=@perlInterpDQ
 
 " A special case for m!!x which allows for comments and extra whitespace in the pattern
 syn region perlMatch	matchgroup=perlMatchStartEnd start=+\<s!+ end=+!+me=e-1 contains=@perlInterpSlash,perlComment nextgroup=perlSubstitutionPling
-syn region perlSubstitutionPling	matchgroup=perlMatchStartEnd start=+!+ end=+![ecgimosx]*+ contained contains=@perlInterpDQ
+syn region perlSubstitutionPling	matchgroup=perlMatchStartEnd start=+!+ end=+![ecgimosxpdualr]*+ contained contains=@perlInterpDQ
 
 " Substitutions
 " caters for tr///, tr### and tr[][]
