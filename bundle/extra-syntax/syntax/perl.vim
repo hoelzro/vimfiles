@@ -136,7 +136,7 @@ syn keyword perlStatementFiledesc	fcntl flock ioctl open opendir read seek seekd
 syn keyword perlStatementVector		pack vec
 syn keyword perlStatementFiles		chdir chmod chown chroot glob link mkdir readlink rename rmdir symlink umask unlink utime
 syn match   perlStatementFiles		"-[rwxoRWXOezsfdlpSbctugkTBMAC]\>"
-syn keyword perlStatementFlow		caller die dump eval exit wantarray
+syn keyword perlStatementFlow		caller die dump eval exit wantarray try catch
 syn keyword perlStatementInclude	require
 syn match   perlStatementInclude	"\<\(use\|no\)\>"
 syn keyword perlStatementScope		import
