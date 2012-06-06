@@ -270,3 +270,6 @@ inoremap <Leader>ll <ESC>:call InsertLog()<CR>
 
 let g:ctrlp_map = '<c-o>'
 let g:ctrlp_working_path_mode = 2
+
+" up arrow (↑)
+digraph -^ 8593
