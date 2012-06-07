@@ -273,3 +273,6 @@ let g:ctrlp_working_path_mode = 2
 
 " up arrow (↑)
 digraph -^ 8593
+
+" Make Y behave like other capitals
+map Y y$
