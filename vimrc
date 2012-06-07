@@ -276,3 +276,6 @@ digraph -^ 8593
 
 " Make Y behave like other capitals
 map Y y$
+
+cnoremap <C-a> <Home>
+cnoremap <C-e> <End>
