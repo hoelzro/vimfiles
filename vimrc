@@ -51,6 +51,10 @@ let javaScript_fold=1
 " Lisp
 let lisp_rainbow=1
 
+" Lua
+let lua_version=5
+let lua_subversion=1
+
 " Perl
 let perl_include_pod=1
 let perl_want_scope_in_variables=1
