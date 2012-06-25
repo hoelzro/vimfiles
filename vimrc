@@ -283,3 +283,5 @@ map Y y$
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
+
+vmap <Leader>= :Align =<CR>
