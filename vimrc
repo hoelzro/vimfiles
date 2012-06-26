@@ -273,7 +273,16 @@ endif
 
 call LeaderAbbreviate('uddp', 'use Data::Printer;')
 call LeaderAbbreviate('utm',  'use Test::More;')
-call LeaderAbbreviate('ufs',  'use feature qw(say);')
+
+let perl_version       = system("perl -e 'print $]'")
+let perl_version       = substitute(perl_version, '^5[.]', '', '')
+let perl_major_version = substitute(matchstr(perl_version, '...'), '^0*', '', '')
+
+if perl_major_version >= 10
+  call LeaderAbbreviate('ufs',  'use feature qw(say);')
+else
+  call LeaderAbbreviate('ufs',  'use Perl6::Say;')
+end
 inoremap <C-A> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
