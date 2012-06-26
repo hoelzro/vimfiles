@@ -266,7 +266,7 @@ endfunction
 call LeaderAbbreviate('uddc', 'use Data::Dumper::Concise;')
 call LeaderAbbreviate('uddp', 'use Data::Printer;')
 call LeaderAbbreviate('utm',  'use Test::More;')
-call LeaderAbbreviate('ufs',  'use feature "say";')
+call LeaderAbbreviate('ufs',  'use feature qw(say);')
 inoremap <C-A> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
