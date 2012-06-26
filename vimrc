@@ -259,7 +259,7 @@ function InsertAbbreviation(abbrev)
 endfunction
 
 function LeaderAbbreviate(lhs, rhs)
-  let code = "inoremap <Leader>" . a:lhs . " <C-o>:call InsertAbbreviation('" . a:rhs . "')<CR>"
+  let code = "inoremap <Leader>" . a:lhs . " " . a:rhs
   execute l:code
 endfunction
 
