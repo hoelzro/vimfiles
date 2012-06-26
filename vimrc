@@ -263,7 +263,14 @@ function LeaderAbbreviate(lhs, rhs)
   execute l:code
 endfunction
 
-call LeaderAbbreviate('uddc', 'use Data::Dumper::Concise;')
+let ddc_installed = system("perl -e '$ok = eval { require Data::Dumper::Concise }; print($ok ? 1 : 0);'")
+
+if ddc_installed
+  call LeaderAbbreviate('uddc', 'use Data::Dumper::Concise;')
+else
+  call LeaderAbbreviate('uddc', 'use Data::Dumper;')
+endif
+
 call LeaderAbbreviate('uddp', 'use Data::Printer;')
 call LeaderAbbreviate('utm',  'use Test::More;')
 call LeaderAbbreviate('ufs',  'use feature qw(say);')
