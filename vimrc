@@ -300,5 +300,6 @@ map Y y$
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap q1 q!
+cnoremap ssu sus
 
 vmap <Leader>= :Align => =<CR>
