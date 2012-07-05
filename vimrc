@@ -165,8 +165,13 @@ endfunction
 
 map <Leader>i :call InsertHeader()<CR>
 
-let g:keywordTypes = ['a-z,A-Z', 'a-z,A-Z,48-57', 'a-z,A-Z,48-57,_', 'a-z,A-Z,48-57,_,:']
-let g:keywordNames = ['word', 'alphanumeric', 'C identifier', 'Perl identifier']
+let g:keywordTypes = ['a-z,A-Z', 'a-z,A-Z,48-57', 'a-z,A-Z,48-57,_']
+let g:keywordNames = ['word', 'alphanumeric', 'C identifier']
+
+function AddKeywordType(name, chars)
+  call add(g:keywordTypes, a:chars)
+  call add(g:keywordNames, a:name)
+endfunction
 
 function RotateKeywords()
   if !exists('b:keywordIndex')
