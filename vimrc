@@ -251,6 +251,7 @@ augroup HelpInTabs
   function HelpInNewTab()
     if &buftype == 'help'
       execute "normal \<C-W>T"
+      setlocal ignorecase
     endif
   endfunction
 augroup END
