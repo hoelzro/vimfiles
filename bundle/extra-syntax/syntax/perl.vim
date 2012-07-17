@@ -588,3 +588,10 @@ else
     syn keyword perlControl BEGIN END CHECK INIT UNITCHECK
 endif
 syn match   perlStatementInclude	"\<\(use\|no\)\s\+\l\+\(::\l\+\)*\>\="
+
+let s:bcs = b:current_syntax
+unlet b:current_syntax
+syntax include @SQL syntax/sql.vim
+let b:current_syntax = s:bcs
+" match optional, surrounding single or double quote and any whitespace in the heredoc name
+syntax region perlHereDocSQL matchgroup=Statement start=+<<\(['"]\?\)\z(\s*\%(END_\)\?SQL\s*\)\1+ end=+^\z1$+ contains=@SQL
