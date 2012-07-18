@@ -311,3 +311,5 @@ cnoremap ssu sus
 vmap <Leader>= :Align => =<CR>
 
 autocmd InsertLeave * set nopaste
+
+autocmd VimResized * exe "normal! \<c-w>="
