@@ -5,12 +5,14 @@ endif
 let g:loaded_perl_module_completion = 1
 
 function s:ReadMinicpanPathFromRcFile(rcFile)
-    for line in readfile(a:rcFile)
-        let matches = matchlist(line, '\v^local:\s*(.+)')
-        if !empty(matches)
-            return matches[1]
-        endif
-    endfor
+    if filereadable(a:rcFile)
+        for line in readfile(a:rcFile)
+            let matches = matchlist(line, '\v^local:\s*(.+)')
+            if !empty(matches)
+                return matches[1]
+            endif
+        endfor
+    endif
     return ''
 endfunction
 
