@@ -4,3 +4,4 @@ view
 tags
 .perl-modules.db
 perl-lib/
+local.vim
