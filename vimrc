@@ -325,3 +325,9 @@ autocmd VimResized * exe "normal! \<c-w>="
 autocmd BufWritePost *.pl silent !chmod 755 %
 
 autocmd FileChangedShell * call HandleFileChange()
+
+try
+  source local.vim
+catch /Vim\%((\a\+)\)\=:E484/ " catch 'could not find local.vim'
+  " ignore it
+endtry
