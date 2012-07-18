@@ -327,7 +327,7 @@ autocmd BufWritePost *.pl silent !chmod 755 %
 autocmd FileChangedShell * call HandleFileChange()
 
 try
-  source local.vim
+  source ~/.vim/local.vim
 catch /Vim\%((\a\+)\)\=:E484/ " catch 'could not find local.vim'
   " ignore it
 endtry
