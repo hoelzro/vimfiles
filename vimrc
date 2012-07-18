@@ -256,6 +256,14 @@ augroup HelpInTabs
   endfunction
 augroup END
 
+function HandleFileChange()
+  if v:fcs_reason == 'mode'
+    let v:fcs_choice = ''
+  else
+    let v:fcs_choice = 'ask'
+  endif
+endfunction
+
 function NoOp()
 endfunction
 
@@ -313,3 +321,7 @@ vmap <Leader>= :Align => =<CR>
 autocmd InsertLeave * set nopaste
 
 autocmd VimResized * exe "normal! \<c-w>="
+
+autocmd BufWritePost *.pl silent !chmod 755 %
+
+autocmd FileChangedShell * call HandleFileChange()
