@@ -11,5 +11,6 @@ au BufRead,BufNewFile *.html.ep set filetype=epl
 au BufRead,BufNewFile /etc/nginx/* set filetype=nginx
 au BufRead,BufNewFile *.rockspec set filetype=lua
 au BufRead,BufNewFile .tmux.conf set filetype=tmux
+au BufRead,BufNewFile bash-* set filetype=sh " for CTRL-X CTRL-E
 
 let b:tt2_syn_tags = '\[% %] <!-- -->'
