@@ -124,7 +124,11 @@ fun! manpageview#ManPageView(viamap,bknum,...) range
 	 let bknum = bknum.a:1
 	 let topic = a:2
 	else
-     let topic= substitute(a:1,'[^-a-zA-Z.0-9_:].*$','','')
+     if filereadable(a:1)
+      let topic= a:1
+     else
+      let topic= substitute(a:1,'[^-a-zA-Z.0-9_:].*$','','')
+     endif
 "     call Decho("a:1<".a:1."> topic<".topic."> (after fix)")
 	endif
    else
