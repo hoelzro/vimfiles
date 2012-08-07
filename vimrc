@@ -298,6 +298,7 @@ else
   call LeaderAbbreviate('ufs',  'use Perl6::Say;')
 end
 inoremap <C-A> <C-O> call NoOp()<CR>
+inoremap <C-@> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
 inoremap <Leader>ll <ESC>:call InsertLog()<CR>
