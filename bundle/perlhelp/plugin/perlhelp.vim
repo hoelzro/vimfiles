@@ -106,22 +106,35 @@ if !hasmapto('<Plug>PerlHelpVarAsk')
     nmap <silent> <unique> <Leader>PV <Plug>PerlHelpVarAsk
 endif
 
+if !hasmapto('<Plug>PerlHelpChangesNormal')
+    nmap <silent> <unique> <Leader>pc <Plug>PerlHelpChangesNormal
+endif
+if !hasmapto('<Plug>PerlHelpChangesVisual')
+    vmap <silent> <unique> <Leader>pc <Plug>PerlHelpChangesVisual
+endif
+if !hasmapto('<Plug>PerlHelpChangesAsk')
+    nmap <silent> <unique> <Leader>PC <Plug>PerlHelpChangesAsk
+endif
+
 " Plug mappings for the key mappings. {{{2
-nmap <silent> <unique> <script> <Plug>PerlHelpNormal      :call <SID>PerlHelp('topic', '', expand("<cWORD>"))<CR>
-vmap <silent> <unique> <script> <Plug>PerlHelpVisual     y:call <SID>PerlHelp('topic', '', '<c-r>"')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpAsk         :call <SID>PerlHelp('topic', '')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpFuncNormal  :call <SID>PerlHelpFunc(expand("<cWORD>"))<CR>
-vmap <silent> <unique> <script> <Plug>PerlHelpFuncVisual y:call <SID>PerlHelpFunc('<c-r>"')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpFuncAsk     :call <SID>PerlHelpFunc()<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpModNormal   :call <SID>PerlHelp('module', '-m', expand("<cWORD>"))<CR>
-vmap <silent> <unique> <script> <Plug>PerlHelpModVisual  y:call <SID>PerlHelp('module', '-m', '<c-r>"')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpModAsk      :call <SID>PerlHelp('module', '-m')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpFAQNormal   :call <SID>PerlHelpFAQ(expand("<cword>"))<CR>
-vmap <silent> <unique> <script> <Plug>PerlHelpFAQVisual  y:call <SID>PerlHelpFAQ('<c-r>"')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpFAQAsk      :call <SID>PerlHelpFAQ()<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpVarNormal   :call <SID>PerlHelpVar(expand("<cWORD>"))<CR>
-vmap <silent> <unique> <script> <Plug>PerlHelpVarVisual  y:call <SID>PerlHelpVar('<c-r>"')<CR>
-nmap <silent> <unique> <script> <Plug>PerlHelpVarAsk      :call <SID>PerlHelpVar()<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpNormal          :call <SID>PerlHelp('topic', '', expand("<cWORD>"))<CR>
+vmap <silent> <unique> <script> <Plug>PerlHelpVisual         y:call <SID>PerlHelp('topic', '', '<c-r>"')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpAsk             :call <SID>PerlHelp('topic', '')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpFuncNormal      :call <SID>PerlHelpFunc(expand("<cWORD>"))<CR>
+vmap <silent> <unique> <script> <Plug>PerlHelpFuncVisual     y:call <SID>PerlHelpFunc('<c-r>"')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpFuncAsk         :call <SID>PerlHelpFunc()<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpModNormal       :call <SID>PerlHelp('module', '-m', expand("<cWORD>"))<CR>
+vmap <silent> <unique> <script> <Plug>PerlHelpModVisual      y:call <SID>PerlHelp('module', '-m', '<c-r>"')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpModAsk          :call <SID>PerlHelp('module', '-m')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpFAQNormal       :call <SID>PerlHelpFAQ(expand("<cword>"))<CR>
+vmap <silent> <unique> <script> <Plug>PerlHelpFAQVisual      y:call <SID>PerlHelpFAQ('<c-r>"')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpFAQAsk          :call <SID>PerlHelpFAQ()<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpVarNormal       :call <SID>PerlHelpVar(expand("<cWORD>"))<CR>
+vmap <silent> <unique> <script> <Plug>PerlHelpVarVisual      y:call <SID>PerlHelpVar('<c-r>"')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpVarAsk          :call <SID>PerlHelpVar()<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpChangesNormal   :call <SID>PerlHelpChanges(expand("<cWORD>"))<CR>
+vmap <silent> <unique> <script> <Plug>PerlHelpChangesVisual  y:call <SID>PerlHelpChanges('<c-r>"')<CR>
+nmap <silent> <unique> <script> <Plug>PerlHelpChangesAsk      :call <SID>PerlHelpChanges()<CR>
 
 " Functions. {{{1
 " Ask for text to lookup. {{{2
@@ -264,6 +277,24 @@ function <SID>PerlHelp(question, option, ...)
 
     " Display the text.
     call <SID>PerlHelpWindow(l:text, l:type)
+endfunction
+
+function <SID>PerlHelpChanges(...)
+    if a:0 == 0
+        let l:topic = <SID>PerlHelpAsk('module')
+        if empty(l:topic)
+            return
+        endif
+    else
+        " Only grab soemthing that could be a topic or module.
+        let l:topic = substitute(a:1, '^[^[:alnum:]_:]*\([[:alnum:]_:]*\).*', '\1', 'g')
+        " Eliminate trailing -'s.
+        let l:topic = substitute(l:topic, '-*$', '', '')
+    endif
+
+    let l:text = system("cpan-listchanges --all " . l:topic)
+
+    call <SID>PerlHelpWindow(l:text, 'changelog')
 endfunction
 
 " Display the actual text. {{{2
