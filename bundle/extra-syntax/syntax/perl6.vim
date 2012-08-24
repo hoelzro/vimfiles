@@ -2239,11 +2239,33 @@ endif
 "syn sync match p6SyncPod groupthere p6PodDelimRegion    "^=begin\>"
 "syn sync match p6SyncPod groupthere p6PodDelimEndRegion "^=end\>"
 
-" Let's just sync whole file, the other methods aren't reliable (or I don't
-" know how to use them reliably)
-syn sync fromstart
+let perl6_fold = 1
+if exists("perl6_fold")
+  " Let's just sync whole file, the other methods aren't reliable (or I don't
+  " know how to use them reliably)
+  syn sync fromstart
 
-setlocal foldmethod=syntax
+  setlocal foldmethod=syntax
+
+  " macro proto rule regex module class role
+  " package enum grammar slang? if else elsif unless for loop repeat while
+  " until gather given BEGIN CHECK INIT START FIRST ENTER LEAVE KEEP
+  "  UNDO NEXT LAST PRE POST END CATCH CONTROL TEMP
+  "  XXX not sub foo;
+  "  XXX but sub foo\n{
+  "  XXX anonymous subroutines and shit (anon keyword, bare block, pointy block (->, <->))
+  "  XXX fold POD
+  "  XXX fold =begin =end
+  "  XXX (only|proto|multi|my|our) RETTYPE? (sub|method|submethod)? $name {
+  "  XXX make sure subroutines with return types, formal params, and traits work
+  "  XXX sub GLOBAL::$name { ... }
+  "  XXX sub &$name, &*$name
+  "  XXX Operator overloading (prefix:, postfix:, infix:, circumfix:, etc)
+  "syn region perlSubFold     start="^\z(\s*\).*\<sub\>.*[^};]$" end="^\z1}" transparent fold keepend
+
+  syn region perlSubFold start="^\z(\s*\)\%(multi\s\+\)\?\%(sub\|method\|submethod\)\>\s*" end="^\z1}" transparent fold keepend
+  syn region perlSubFold start="^\z(\s*\)multi\>\s\+\%(sub\|method\)\@!" end="^\z1}" transparent fold keepend
+endif
 
 let b:current_syntax = "perl6"
 
