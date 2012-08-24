@@ -2,13 +2,6 @@
 autocmd BufWinLeave * silent! mkview
 autocmd BufWinEnter * silent! loadview
 
-" templates
-autocmd BufNewFile *.html call InsertTemplate('html')
-autocmd BufNewFile *.tt2 call InsertTemplate('html')
-autocmd BufNewFile *.xml call InsertTemplate('xml')
-autocmd BufNewFile dist.ini call InsertTemplate('dist-zilla')
-autocmd BufNewFile PKGBUILD call InsertTemplate('PKGBUILD')
-
 " prevent saving to files that I'm probably writing on accident
 autocmd BufWritePre 1 throw 'Suspicious filename "1"'
 autocmd BufWritePre 2 throw 'Suspicious filename "2"'
