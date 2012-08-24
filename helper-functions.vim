@@ -16,10 +16,5 @@ function InsertHeader()
   call append(line('.') - 1, text)
 endfunction
 
-function InsertAbbreviation(abbrev)
-  call feedkeys(a:abbrev, 'n')
-  startinsert
-endfunction
-
 function NoOp()
 endfunction
