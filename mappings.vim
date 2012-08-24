@@ -3,7 +3,9 @@ map <C-n> :tabnext<CR>
 map gf <C-w>gf
 map <C-c> :tabnew<CR>
 
-map <F2> :TlistToggle<CR>
+if exists(':TlistToggle')
+  map <F2> :TlistToggle<CR>
+endif
 map <Leader>f $zf%
 
 map <Leader>i :call InsertHeader()<CR>
