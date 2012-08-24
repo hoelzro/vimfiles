@@ -75,10 +75,6 @@ let sql_type_default='mysql'
 " TeX
 let tex_fold_enabled=1
 
-if &t_Co > 1
-	syntax enable
-	set number
-endif
 set showcmd
 set autochdir
 set softtabstop=4
@@ -109,6 +105,16 @@ set visualbell
 set noerrorbells
 set t_vb=
 
+if &t_Co > 1
+  syntax enable
+  set number
+endif
+
+if &term =~ '.*-256color'
+  set t_Co=256
+  colorscheme peaksea
+endif
+
 " Mappings
 map <C-p> :tabprev<CR>
 map <C-n> :tabnext<CR>
@@ -118,11 +124,6 @@ let mapleader="\\"
 
 map <F2> :TlistToggle<CR>
 map <Leader>f $zf%
-
-if &term =~ '.*-256color'
-  set t_Co=256
-  colorscheme peaksea
-endif
 
 " Automatic saving and loading of views
 autocmd BufWinLeave * silent! mkview
