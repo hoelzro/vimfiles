@@ -41,8 +41,6 @@ inoremap <C-A> <C-O> call NoOp()<CR>
 inoremap <C-@> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
-inoremap <Leader>ll <ESC>:call InsertLog()<CR>
-
 " Make Y behave like other capitals
 map Y y$
 
