@@ -10,9 +10,9 @@ autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
 " open help windows in their own tabs
 augroup HelpInTabs
   au!
-  au BufEnter *.txt call HelpInNewTab()
+  au BufEnter *.txt call <SID>HelpInNewTab()
 
-  function HelpInNewTab()
+  function s:HelpInNewTab()
     if &buftype == 'help'
       execute "normal \<C-W>T"
       setlocal ignorecase
@@ -20,7 +20,7 @@ augroup HelpInTabs
   endfunction
 augroup END
 
-function HandleFileChange()
+function s:HandleFileChange()
   if v:fcs_reason == 'mode'
     let v:fcs_choice = ''
   else
@@ -31,4 +31,4 @@ endfunction
 autocmd InsertLeave * set nopaste
 autocmd VimResized * exe "normal! \<c-w>="
 autocmd BufWritePost *.pl silent !chmod 755 %
-autocmd FileChangedShell * call HandleFileChange()
+autocmd FileChangedShell * call <SID>HandleFileChange()
