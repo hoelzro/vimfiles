@@ -1,7 +1,6 @@
 " vim: sts=2 sw=2
 
 let $MANPAGER='less'
-let g:originalWD = getcwd()
 
 let g:Perl_Support_Root_Dir=$HOME . '/.vim/bundle/perl-support'
 
@@ -37,9 +36,6 @@ let doxygen_enhanced_color=1
 " Haskell
 let hs_highlight_types = 1
 let hs_highlight_more_types = 1
-"let g:haddock_browser = '/usr/bin/firefox'
-"let g:haddock_docdir = '/home/rob/programming/docs/haskell/'
-"autocmd BufEnter *.hs compiler ghc
 
 " Java
 let java_highlight_all=1
@@ -135,11 +131,6 @@ autocmd BufWinEnter * silent! loadview
 " I hate end of line whitespace...highlight it
 match Search /\s\+$/
 
-" Doxygen helper settings
-let g:DoxygenToolkit_authorName="Rob Hoelz"
-map \dxa :DoxAuthor<CR>
-map \dxd :Dox<CR>
-
 let perlhelp_prog = "mcpandoc"
 if !executable(perlhelp_prog)
   unlet perlhelp_prog
@@ -226,23 +217,6 @@ autocmd BufNewFile PKGBUILD call InsertTemplate('PKGBUILD')
 autocmd BufWritePre 1 throw 'Suspicious filename "1"'
 autocmd BufWritePre 2 throw 'Suspicious filename "2"'
 autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
-
-nmap <leader>vm :call ViewModule(expand("<cword>"))<CR>
-
-function MapToggle(key, opt)
-   let cmd = ':set '.a:opt.'! \| set '.a:opt."?\<CR>"
-   exec 'nnoremap '.a:key.' '.cmd
-   exec 'inoremap '.a:key." \<C-O>".cmd
-endfunction
-command -nargs=+ MapToggle call MapToggle(<f-args>)
-
-MapToggle <F5> hlsearch
-MapToggle <F6> list
-MapToggle <F7> paste
-MapToggle <F8> ignorecase
-MapToggle <F9> number
-MapToggle <F10> spell
-MapToggle <F11> wrapscan
 
 augroup HelpInTabs
   au!
