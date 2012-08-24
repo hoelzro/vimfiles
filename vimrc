@@ -104,10 +104,10 @@ set backspace=indent,eol,start
 set visualbell
 set noerrorbells
 set t_vb=
+set number
 
 if &t_Co > 1
   syntax enable
-  set number
 endif
 
 if &term =~ '.*-256color'
