@@ -51,4 +51,3 @@ cnoremap <C-e> <End>
 cnoremap q1 q!
 cnoremap ssu sus
 
-vmap <Leader>= :Align => =<CR>
