@@ -15,3 +15,7 @@ autocmd BufNewFile PKGBUILD call InsertTemplate('PKGBUILD')
 
 let g:ctrlp_map = '<c-o>'
 let g:ctrlp_working_path_mode = 2
+
+" NERD tree settings
+let NERDTreeShowBookmarks   = 1
+let NERDTreeShowLineNumbers = 1
