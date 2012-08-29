@@ -10,7 +10,7 @@ autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
 " open help windows in their own tabs
 augroup HelpInTabs
   au!
-  au BufEnter *.txt call <SID>HelpInNewTab()
+  au BufRead *.txt call <SID>HelpInNewTab()
 
   function s:HelpInNewTab()
     if &buftype == 'help'
