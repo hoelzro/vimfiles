@@ -33,6 +33,7 @@ set noerrorbells
 set t_vb=
 set viewoptions=folds,cursor
 set number
+set listchars=eol:¬,tab:▸\ 
 
 if &t_Co > 1
     syntax enable
