@@ -6,13 +6,6 @@ if !executable(perlhelp_prog)
   unlet perlhelp_prog
 endif
 
-" templates
-autocmd BufNewFile *.html call InsertTemplate('html')
-autocmd BufNewFile *.tt2 call InsertTemplate('html')
-autocmd BufNewFile *.xml call InsertTemplate('xml')
-autocmd BufNewFile dist.ini call InsertTemplate('dist-zilla')
-autocmd BufNewFile PKGBUILD call InsertTemplate('PKGBUILD')
-
 let g:ctrlp_map = '<c-o>'
 let g:ctrlp_working_path_mode = 2
 
