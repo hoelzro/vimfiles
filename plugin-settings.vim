@@ -6,6 +6,9 @@ if !executable(perlhelp_prog)
   unlet perlhelp_prog
 endif
 
+let g:ackprg       = expand('~/bin/ack -H --nocolor --nogroup')
+let g:ackhighlight = 1
+
 let g:ctrlp_map = '<c-o>'
 let g:ctrlp_working_path_mode = 2
 
