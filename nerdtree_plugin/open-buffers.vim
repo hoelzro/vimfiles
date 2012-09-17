@@ -1,3 +1,7 @@
+if exists('g:loaded_nerdtree_open_buffers')
+  finish
+endif
+
 function NERDTreeOpenAllFilesInBuffers()
   let dir         = g:NERDTreeDirNode.GetSelected()
   let index       = 0
