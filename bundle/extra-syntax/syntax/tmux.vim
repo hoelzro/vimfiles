@@ -62,6 +62,7 @@ syn keyword tmuxOptsSet pane-active-border-bg pane-active-border-fg
 syn keyword tmuxOptsSet pane-border-bg pane-border-fg
 syn keyword tmuxOptsSet display-panes-active-colour alternate-screen
 syn keyword tmuxOptsSet detach-on-destroy
+syn keyword tmuxOptsSet message-command-attr message-command-bg message-command-fg
 
 syn keyword tmuxOptsSetw monitor-activity aggressive-resize force-width
 syn keyword tmuxOptsSetw force-height remain-on-exit uft8 mode-fg mode-bg
@@ -73,6 +74,9 @@ syn keyword tmuxOptsSetw window-status-current-attr window-status-current-bg
 syn keyword tmuxOptsSetw window-status-current-fg mode-mouse synchronize-panes
 syn keyword tmuxOptsSetw window-status-format window-status-current-format
 syn keyword tmuxOptsSetw word-separators
+syn keyword tmuxOptsSetw window-status-activity-attr window-status-activity-bg window-status-activity-fg
+syn keyword tmuxOptsSetw window-status-bell-attr window-status-bell-bg window-status-bell-fg
+syn keyword tmuxOptsSetw window-status-content-attr window-status-content-bg window-status-content-fg
 
 syn keyword tmuxTodo FIXME NOTE TODO XXX contained
 
