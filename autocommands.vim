@@ -12,7 +12,7 @@ augroup HelpInTabs
   au!
   au BufRead *.txt call <SID>HelpInNewTab()
 
-  function s:HelpInNewTab()
+  function! s:HelpInNewTab()
     if &buftype == 'help'
       execute "normal \<C-W>T"
       setlocal ignorecase
@@ -20,7 +20,7 @@ augroup HelpInTabs
   endfunction
 augroup END
 
-function s:HandleFileChange()
+function! s:HandleFileChange()
   if v:fcs_reason == 'mode'
     let v:fcs_choice = ''
   else

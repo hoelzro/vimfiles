@@ -1,4 +1,4 @@
-function InsertHeader()
+function! InsertHeader()
   if !exists('b:comment_char')
     let b:comment_char = input("What's the comment character for the language in which you're working? ")
   endif
@@ -16,5 +16,5 @@ function InsertHeader()
   call append(line('.') - 1, text)
 endfunction
 
-function NoOp()
+function! NoOp()
 endfunction

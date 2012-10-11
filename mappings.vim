@@ -13,7 +13,7 @@ noremap <Leader>tt :call RotateKeywords()<CR>
 noremap <Leader>ss :call ToggleSQLMode()<CR>
 
 " custom abbrevations for Perl modules I use a lot
-function LeaderAbbreviate(lhs, rhs)
+function! LeaderAbbreviate(lhs, rhs)
   let code = "inoremap <Leader>" . a:lhs . " " . a:rhs
   execute l:code
 endfunction
