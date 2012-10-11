@@ -48,8 +48,8 @@ noremap Y y$
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
-cnoremap q1 q!
-cnoremap ssu sus
+cabbrev q1 q!
+cabbrev ssu sus
 
 vnoremap <Leader>= :Tabularize assignment<CR>
 
