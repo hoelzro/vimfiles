@@ -1,11 +1,15 @@
-" Automatic saving and loading of views
-autocmd BufWinLeave * silent! mkview
-autocmd BufWinEnter * silent! loadview
+augroup Custom
+  autocmd!
 
-" prevent saving to files that I'm probably writing on accident
-autocmd BufWritePre 1 throw 'Suspicious filename "1"'
-autocmd BufWritePre 2 throw 'Suspicious filename "2"'
-autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
+  " Automatic saving and loading of views
+  autocmd BufWinLeave * silent! mkview
+  autocmd BufWinEnter * silent! loadview
+
+  " prevent saving to files that I'm probably writing on accident
+  autocmd BufWritePre 1 throw 'Suspicious filename "1"'
+  autocmd BufWritePre 2 throw 'Suspicious filename "2"'
+  autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
+augroup END
 
 " open help windows in their own tabs
 augroup HelpInTabs
@@ -28,7 +32,9 @@ function! s:HandleFileChange()
   endif
 endfunction
 
-autocmd InsertLeave * set nopaste
-autocmd VimResized * exe "normal! \<c-w>="
-autocmd BufWritePost *.pl silent !chmod 755 %
-autocmd FileChangedShell * call <SID>HandleFileChange()
+augroup Custom
+  autocmd InsertLeave * set nopaste
+  autocmd VimResized * exe "normal! \<c-w>="
+  autocmd BufWritePost *.pl silent !chmod 755 %
+  autocmd FileChangedShell * call <SID>HandleFileChange()
+augroup END
