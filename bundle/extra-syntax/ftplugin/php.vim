@@ -1,1 +1,1 @@
-set omnifunc=phpcomplete#CompletePHP
+setlocal omnifunc=phpcomplete#CompletePHP

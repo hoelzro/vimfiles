@@ -1,1 +1,1 @@
-set omnifunc=ccomplete#Complete
+setlocal omnifunc=ccomplete#Complete

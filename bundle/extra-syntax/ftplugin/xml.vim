@@ -1,4 +1,4 @@
-set omnifunc=xmlcomplete#CompleteTags
-set textwidth=0
-set shiftwidth=2
-set softtabstop=2
+setlocal omnifunc=xmlcomplete#CompleteTags
+setlocal textwidth=0
+setlocal shiftwidth=2
+setlocal softtabstop=2

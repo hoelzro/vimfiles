@@ -1,1 +1,1 @@
-set omnifunc=sqlcomplete#Complete
+setlocal omnifunc=sqlcomplete#Complete
