@@ -52,3 +52,6 @@ cnoremap q1 q!
 cnoremap ssu sus
 
 vnoremap <Leader>= :Tabularize assignment<CR>
+
+nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
+nnoremap <Leader>sv :source $MYVIMRC<CR>
