@@ -15,6 +15,3 @@ function! InsertHeader()
 
   call append(line('.') - 1, text)
 endfunction
-
-function! NoOp()
-endfunction

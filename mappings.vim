@@ -39,8 +39,8 @@ else
   call LeaderAbbreviate('ufs',  'use Perl6::Say;')
 end
 
-inoremap <C-A> <C-O> call NoOp()<CR>
-inoremap <C-@> <C-O> call NoOp()<CR>
+inoremap <C-A> <nop>
+inoremap <C-@> <nop>
 nnoremap zo zO
 
 " Make Y behave like other capitals
