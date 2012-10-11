@@ -1,16 +1,16 @@
-map <C-p> :tabprev<CR>
-map <C-n> :tabnext<CR>
-map gf <C-w>gf
-map <C-c> :tabnew<CR>
+noremap <C-p> :tabprev<CR>
+noremap <C-n> :tabnext<CR>
+noremap gf <C-w>gf
+noremap <C-c> :tabnew<CR>
 
 if exists(':TlistToggle')
-  map <F2> :TlistToggle<CR>
+  noremap <F2> :TlistToggle<CR>
 endif
-map <Leader>f $zf%
+noremap <Leader>f $zf%
 
-map <Leader>i :call InsertHeader()<CR>
-map <Leader>tt :call RotateKeywords()<CR>
-map <Leader>ss :call ToggleSQLMode()<CR>
+noremap <Leader>i :call InsertHeader()<CR>
+noremap <Leader>tt :call RotateKeywords()<CR>
+noremap <Leader>ss :call ToggleSQLMode()<CR>
 
 " custom abbrevations for Perl modules I use a lot
 function LeaderAbbreviate(lhs, rhs)
@@ -44,11 +44,11 @@ inoremap <C-@> <C-O> call NoOp()<CR>
 nnoremap zo zO
 
 " Make Y behave like other capitals
-map Y y$
+noremap Y y$
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap q1 q!
 cnoremap ssu sus
 
-vmap <Leader>= :Tabularize assignment<CR>
+vnoremap <Leader>= :Tabularize assignment<CR>
