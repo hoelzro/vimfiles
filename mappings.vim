@@ -42,7 +42,6 @@ end
 inoremap <C-A> <nop>
 inoremap <C-@> <nop>
 inoremap <Esc> <nop>
-inoremap <BS>  <nop>
 nnoremap zo zO
 
 " Make Y behave like other capitals
