@@ -63,6 +63,7 @@ syn keyword tmuxOptsSet pane-border-bg pane-border-fg
 syn keyword tmuxOptsSet display-panes-active-colour alternate-screen
 syn keyword tmuxOptsSet detach-on-destroy
 syn keyword tmuxOptsSet message-command-attr message-command-bg message-command-fg
+syn keyword tmuxOptsSet renumber-windows
 
 syn keyword tmuxOptsSetw monitor-activity aggressive-resize force-width
 syn keyword tmuxOptsSetw force-height remain-on-exit uft8 mode-fg mode-bg
