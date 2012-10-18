@@ -1,7 +1,6 @@
 noremap <C-p> :tabprev<CR>
 noremap <C-n> :tabnext<CR>
 noremap gf <C-w>gf
-noremap <C-c> :tabnew<CR>
 
 if exists(':TlistToggle')
   noremap <F2> :TlistToggle<CR>
