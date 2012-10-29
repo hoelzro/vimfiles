@@ -29,6 +29,53 @@ fu! recover#Recover(on) "{{{1
     endif
 endfu
 
+if has('perl')
+    perl <<PERL
+use strict;
+use warnings;
+
+sub main::is_owner_alive {
+    my ( $swap_filename ) = @_;
+
+    my $fh;
+    unless(open $fh, '<:raw', $swap_filename) {
+        VIM::Msg("Error opening '$swap_filename': $!");
+        return 0;
+    }
+    seek $fh, 24, 1;
+    # for some reason, sysread functions *very* strangely
+    # within Vim, or at least on swap files
+    my $buffer = do {
+        local $/ = \4;
+        <$fh>;
+    };
+
+    close $fh;
+
+    # parse out the owner PID from the swap file
+    my $pid = unpack('L', $buffer);
+
+    return kill(0, $pid);
+}
+PERL
+endif
+
+function! s:IsOwnerAlive(swap_filename)
+    let is_alive = 0
+    if has('perl')
+        perl <<PERL
+use strict;
+use warnings;
+
+my ( undef, $swap_filename ) = VIM::Eval('a:swap_filename');
+my $is_alive = main::is_owner_alive($swap_filename);
+VIM::DoCommand("let l:is_alive = $is_alive");
+PERL
+    endif
+
+    return is_alive
+endfunction
+
 fu! s:Swapname() "{{{1
     " Use sil! so a failing redir (e.g. recursive redir call)
     " won't hurt. (https://github.com/chrisbra/Recover.vim/pull/8)
@@ -98,6 +145,11 @@ endfun
 
 fu! recover#ConfirmSwapDiff() "{{{1
     let delete = 0
+
+    if <sid>IsOwnerAlive(v:swapname)
+        return
+    endif
+
     if has("unix")
 	" Check, whether the files differ issue #7
 	let tfile = tempname()
