@@ -411,6 +411,8 @@ fun! manpageview#ManPageView(viamap,bknum,...) range
    return
   endif
 
+  let $MANWIDTH = winwidth(0)
+
   " add some maps for multiple manpage handling {{{3
   if g:manpageview_multimanpage
    nmap <silent> <script> <buffer> <PageUp>				:call search("^NAME$",'bW')<cr>z<cr>5<c-y>
@@ -605,12 +607,13 @@ fun! s:MPVSaveSettings()
 
   if !exists("s:sxqkeep")
 "   call Dfunc("s:MPVSaveSettings()")
+   let s:manwidth          = expand('$MANWIDTH')
    let s:sxqkeep           = &sxq
    let s:srrkeep           = &srr
    let s:repkeep           = &report
    let s:gdkeep            = &gd
    let s:cwhkeep           = &cwh
-   let s:magickeep         = &magic
+   let s:magickeep         = &l:magic
    setlocal srr=> report=10000 nogd magic
    if &cwh < 2
     " avoid hit-enter prompts
@@ -621,6 +624,8 @@ fun! s:MPVSaveSettings()
   else
    let &sxq= ""
   endif
+  let s:curmanwidth = $MANWIDTH
+  let $MANWIDTH     = winwidth(0)
 "  call Dret("s:MPVSaveSettings")
  endif
 
@@ -631,12 +636,13 @@ endfun
 fun! s:MPVRestoreSettings()
   if exists("s:sxqkeep")
 "   call Dfunc("s:MPV_RestoreSettings()")
-   let &sxq    = s:sxqkeep   | unlet s:sxqkeep
-   let &srr    = s:srrkeep   | unlet s:srrkeep
-   let &report = s:repkeep   | unlet s:repkeep
-   let &gd     = s:gdkeep    | unlet s:gdkeep
-   let &cwh    = s:cwhkeep   | unlet s:cwhkeep
-   let &magic  = s:magickeep | unlet s:magickeep
+   let &sxq      = s:sxqkeep     | unlet s:sxqkeep
+   let &srr      = s:srrkeep     | unlet s:srrkeep
+   let &report   = s:repkeep     | unlet s:repkeep
+   let &gd       = s:gdkeep      | unlet s:gdkeep
+   let &cwh      = s:cwhkeep     | unlet s:cwhkeep
+   let &l:magic  = s:magickeep   | unlet s:magickeep
+   let $MANWIDTH = s:curmanwidth | unlet s:curmanwidth
 "   call Dret("s:MPV_RestoreSettings")
   endif
 endfun
