@@ -16,3 +16,17 @@ let g:ctrlp_working_path_mode = 2
 let NERDTreeShowBookmarks   = 1
 let NERDTreeShowLineNumbers = 1
 let NERDTreeIgnore          = ['\.o$']
+
+" VimWiki settings
+
+let g:vimwiki_listsyms = ' .oO✓'
+let g:vimwiki_folding  = 1
+
+function! VimwikiLinkHandler(link)
+  if a:link =~ '^man:'
+    call manpageview#ManPageView(0, 1, a:link[4:])
+    return 1
+  endif
+
+  return 0
+endfunction
