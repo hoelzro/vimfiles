@@ -25,6 +25,8 @@ match Search /\s\+$/
 
 " up arrow (↑)
 digraph -^ 8593
+" combining acute accent
+digraph '' 769
 
 try
   source ~/.vim/local.vim
