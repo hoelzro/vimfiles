@@ -47,6 +47,9 @@ let python_highlight_all=1
 let ruby_space_errors=1
 let ruby_fold=1
 
+" Rust
+let no_rust_conceal=1
+
 " Shell
 let is_bash=1
 
