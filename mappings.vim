@@ -51,6 +51,7 @@ cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cabbrev q1 q!
 cabbrev ssu sus
+cnoreabbrev su sus
 
 vnoremap <Leader>= :Tabularize assignment<CR>
 
