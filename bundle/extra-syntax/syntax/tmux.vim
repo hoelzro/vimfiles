@@ -42,7 +42,7 @@ syn keyword tmuxCmds display[-message] setenv set-environment showenv
 syn keyword tmuxCmds show-environment choose-client displayp display-panes
 syn keyword tmuxCmds run[-shell] lockc lock-client locks lock-session lsp
 syn keyword tmuxCmds list-panes pipep pipe-pane showmsgs show-messages capturep
-syn keyword tmuxCmds capture-pane joinp join-pane choose-buffer
+syn keyword tmuxCmds capture-pane joinp join-pane choose-buffer choose-tree
 
 syn keyword tmuxOptsSet prefix status status-fg status-bg bell-action
 syn keyword tmuxOptsSet default-command history-limit status-left status-right
