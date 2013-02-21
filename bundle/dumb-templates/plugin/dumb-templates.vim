@@ -121,6 +121,12 @@ function! s:InsertPerlTestTemplate()
 endfunction
 
 function! s:InsertPerlTemplate()
+  " this happens when Vim checks a buffer to
+  " see if it's been modified.
+  if !buflisted(bufname('%'))
+    return
+  endif
+
   if ! <SID>IsFileEmpty()
     return
   endif
@@ -137,6 +143,12 @@ function! s:InsertPerlTemplate()
 endfunction
 
 function! s:InsertRubyTemplate()
+  " this happens when Vim checks a buffer to
+  " see if it's been modified.
+  if !buflisted(bufname('%'))
+    return
+  endif
+
   if ! <SID>IsFileEmpty()
     return
   endif
