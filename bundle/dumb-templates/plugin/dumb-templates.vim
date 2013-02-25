@@ -166,10 +166,17 @@ function! s:InsertVimWikiTemplate()
     return
   endif
 
+  let first_line = getline(1)
+  let date       = strftime('%A, %Y-%m-%d')
+
+  if stridx(first_line, date) == -1
+    return
+  endif
+
   let template = []
 
   if <SID>IsFileEmpty()
-    let template = [ '= ' . strftime('%A, %Y-%m-%d') . ' =' ]
+    let template = [ '= ' . date . ' =' ]
   endif
 
   call extend(template, ['', '== ' . strftime('%H') . ':00 ==', ''])
