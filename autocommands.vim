@@ -33,6 +33,8 @@ function! s:HandleFileChange()
 endfunction
 
 augroup Custom
+  autocmd!
+
   autocmd InsertLeave * set nopaste
   autocmd VimResized * exe "normal! \<c-w>="
   autocmd BufWritePost *.pl silent !chmod 755 %
