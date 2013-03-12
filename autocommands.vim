@@ -92,6 +92,10 @@ augroup VimWiki
 
       echo 'pushing changes for ' . wiki.path
       call system('cd ' . shellescape(wiki.path) . '; git add --all .; git commit -m update; git push')
+
+      if v:shell_error != 0
+        call input('An error occurred when pushing changes! (please enter to exit Vim) ')
+      endif
     endfor
   endfunction
 
