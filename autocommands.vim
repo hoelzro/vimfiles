@@ -59,6 +59,12 @@ augroup VimWiki
     return len(status_output) != 0
   endfunction
 
+  function! s:IsRebasing(path)
+    let file = a:path . '/.git/rebase-apply'
+
+    return filereadable(file)
+  endfunction
+
   function! s:AddDirtyWikiFile()
     let path = expand('%:p')
     for wiki in g:vimwiki_list
@@ -87,6 +93,10 @@ augroup VimWiki
 
     for wiki in values(g:dirty_wikis)
       if !<SID>IsActuallyDirty(wiki.path)
+        continue
+      endif
+
+      if <SID>IsRebasing(wiki.path)
         continue
       endif
 
