@@ -15,3 +15,37 @@ function! InsertHeader()
 
   call append(line('.') - 1, text)
 endfunction
+
+function! s:IsActuallyDirty(path)
+  let status_output = system('cd ' . shellescape(a:path) . '; git status --porcelain')
+  return len(status_output) != 0
+endfunction
+
+function! s:IsRebasing(path)
+  let file = a:path . '/.git/rebase-apply'
+
+  return filereadable(file)
+endfunction
+
+function! FlushVimWiki()
+  if !exists('g:dirty_wikis')
+    return
+  endif
+
+  for wiki in values(g:dirty_wikis)
+    if !<SID>IsActuallyDirty(wiki.path)
+      continue
+    endif
+
+    if <SID>IsRebasing(wiki.path)
+      continue
+    endif
+
+    echo 'pushing changes for ' . wiki.path
+    call system('cd ' . shellescape(wiki.path) . '; git add --all .; git commit -m update; git push')
+
+    if v:shell_error != 0
+      call input('An error occurred when pushing changes! (please enter to exit Vim) ')
+    endif
+  endfor
+endfunction
