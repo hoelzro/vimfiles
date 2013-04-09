@@ -1422,8 +1422,9 @@ endfun
 
 " offers up completions for man pages
 fun! manpageview#ManPageComplete(ArgLead, CmdLine, CursorPos)
-  let mandirs = glob('/usr/share/man/man*', 1, 1)
-  let matches = split(globpath(join(mandirs, ','), '**/' . a:ArgLead . '*.[0123456789n]*'), '\n')
+  let manpath = join(split(system('manpath'), ':'), ',')
+  let mandirs = join(split(globpath(manpath, 'man[0123456789n]'), '\n'), ',')
+  let matches = split(globpath(mandirs, '**/' . a:ArgLead . '*.[0123456789n]*'), '\n')
   let matches = map(matches, "substitute(v:val, '^.*/', '', '')")
   let matches = map(matches, "substitute(v:val, '[.].*$', '', '')")
 
