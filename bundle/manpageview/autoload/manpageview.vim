@@ -1420,6 +1420,28 @@ fun! manpageview#BookSearch(direction)
 "  call Dret("manpageview#BookSearch")
 endfun
 
+" offers up completions for man pages
+fun! manpageview#ManPageComplete(ArgLead, CmdLine, CursorPos)
+  let mandirs = glob('/usr/share/man/man*', 1, 1)
+  let matches = split(globpath(join(mandirs, ','), '**/' . a:ArgLead . '*.[0123456789n]*'), '\n')
+  let matches = map(matches, "substitute(v:val, '^.*/', '', '')")
+  let matches = map(matches, "substitute(v:val, '[.].*$', '', '')")
+
+  sort(matches)
+
+  " XXX fairly inefficient
+  let i = 0
+  while i < len(matches) - 1
+	while i < len(matches) - 1 && matches[i] ==# matches[i + 1]
+	  unlet matches[i + 1]
+	endwhile
+
+	let i = i + 1
+  endwhile
+
+  return matches
+endfun
+
 " =====================================================================
 "  Restore: {{{1
 let &cpo= s:keepcpo
