@@ -175,7 +175,12 @@ fun! manpageview#ManPageView(...) range
   while i <= a:0
    if a:{i} =~ '^"' 
 	" start extracting quoted argument(s)
-	let topic= substitute(a:{i},'^"','','')
+	if filereadable(a:{i})
+	 let topic= a:{i}
+	else
+	 let topic= substitute(a:{i},'^"','','')
+	endif
+
 	if topic =~ '"$'
 	 " handling :Man "topic"
 	 let topic= substitute(topic,'"$','','')
@@ -253,60 +258,6 @@ fun! manpageview#ManPageView(...) range
   endif
 
   " ---------------------------------------------------------------------
-  " infer the appropriate extension based on the filetype {{{3
-  if ext == ""
-"   DechoWF "(ManPageView) attempt to infer on filetype<".&ft.">"
-
-   " filetype: vim
-   if &ft == "vim"
-"	DechoWF "(ManPageView) special vim handler"
-	let retval= manpageview#ManPageVim(topic)
-"	call Dret("manpageview#ManPageView ".retval)
-	return retval
-
-   " filetype: perl
-   elseif &ft == "perl" || &ft == "perldoc"
-"	DechoWF "(ManPageView) special perl handler"
-   	let ext = "pl"
-
-   " filetype:  php
-   elseif &ft == "php" || &ft == "manphp"
-"	DechoWF "(ManPageView) special php handler"
-   	let ext = "php"
-
-	" filetype:  python
-   elseif &ft == "python" || &ft == "pydoc"
-"	DechoWF "(ManPageView) special python handler"
-   	let ext = "py"
-
-   " filetype: info
-   elseif &ft == "info"
-"	DechoWF "(ManPageView) special info handler"
-	let ext= "i"
-
-   " filetype: tex
-   elseif &ft == "tex"
-"	DechoWF "(ManPageView) special tex handler"
-    let ext= "tex"
-    let retval= manpageview#ManPageTexLookup(0,topic)
-"    call Dret("manpageview#ManPageView ".retval)
-    return retval
-   endif
-
-  elseif ext == "vim"
-"   DechoWF "(ManPageView) special vim handler"
-   let retval= manpageview#ManPageVim(substitute(topic,'\.vim$','',''))
-"   call Dret("manpageview#ManPageView ".retval)
-   return retval
-
-  elseif ext == "tex"
-   let retval= manpageview#ManPageTexLookup(0,substitute(topic,'\.tex$',"",""))
-"   call Dret("manpageview#ManPageView ".retval)
-   return retval
-  endif
-"  DechoWF "(ManPageView) ext<".ext.">"
-
-  " ---------------------------------------------------------------------
   " elide extension from topic {{{3
   if exists("g:manpageview_pgm_{ext}") || ext == "."
    let pgm   = g:manpageview_pgm_{ext}
@@ -374,13 +325,6 @@ fun! manpageview#ManPageView(...) range
    let manpageview_syntax= "man"
   endif
 "  DechoWF "(ManPageView) manpageview_syntax<".manpageview_syntax."> topic<".topic."> bknum#".bknum
-
-  " ---------------------------------------------------------------------
-  " support for searching for options from conf pages {{{3
-  if bknum == "" && manpageview_fname =~ '\.conf$'
-   let manpagesrch = '^\s\+'.topic
-   let topic       = manpageview_fname
-  endif
 "  DechoWF "(ManPageView) topic<".topic."> bknum#".bknum
 
   " ---------------------------------------------------------------------
@@ -708,6 +652,7 @@ fun! manpageview#ManPageView(...) range
    exe cmdmod."setlocal fdc=0"
 "   exe cmdmod."setlocal isk+=-,.,(,)"
    exe cmdmod."setlocal nowrap"
+   exe cmdmod."setlocal ignorecase"
    set nolz
    exe cmdmod."1"
    exe cmdmod."norm! 0"
