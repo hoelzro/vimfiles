@@ -167,6 +167,12 @@ fun! manpageview#ManPageView(...) range
   let manpageview_fname = expand("%")
   call s:MPVSaveSettings()
 
+  if exists('b:manpageview_sections')
+    let sections = b:manpageview_sections
+  else
+    let sections = []
+  endif
+
   " ---------------------------------------------------------------------
   " parse arguments for topic and booknumber {{{3
   "   merge quoted arguments :  ie.  handle  :Man "some topic here"
@@ -575,6 +581,10 @@ fun! manpageview#ManPageView(...) range
 	  let mpb= shellescape(bknum,1)
 	 else
 	  let mpb= ""
+	 endif
+
+	 if !empty(sections)
+	  let iopt = iopt . " -S " . join(sections, ':')
 	 endif
 "	 DechoWF "(ManPageView) ‣pgm    <".(exists("pgm")?     pgm     : 'n/a').">"
 "	 DechoWF "(ManPageView) ‣iopt   <".(exists("iopt")?    iopt    : 'n/a').">"
