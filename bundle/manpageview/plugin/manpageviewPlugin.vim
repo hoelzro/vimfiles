@@ -17,7 +17,7 @@ if !hasmapto('<Plug>ManPageView') && &kp =~ '^man\>'
 endif
 nno <silent> <script> <Plug>ManPageView		:call manpageview#KMap(expand("<cword>"))<cr>
 
-com! -nargs=* -count=0	Man		call manpageview#ManPageView(0,<count>,<f-args>)
+com! -nargs=* -count=0	Man		let g:manpageview_winopen="hsplit" |call manpageview#ManPageView(0,<count>,<f-args>)
 com! -nargs=* -count=0	HMan	let g:manpageview_winopen="hsplit" |call manpageview#ManPageView(0,<count>,<f-args>)
 com! -nargs=* -count=0	HEMan	let g:manpageview_winopen="hsplit="|call manpageview#ManPageView(0,<count>,<f-args>)
 com! -nargs=* -count=0	OMan	let g:manpageview_winopen="only"   |call manpageview#ManPageView(0,<count>,<f-args>)
