@@ -1427,6 +1427,7 @@ fun! manpageview#ManPageComplete(ArgLead, CmdLine, CursorPos)
   let matches = split(globpath(mandirs, '**/' . a:ArgLead . '*.[0123456789n]*'), '\n')
   let matches = map(matches, "substitute(v:val, '^.*/', '', '')")
   let matches = map(matches, "substitute(v:val, '[.].*$', '', '')")
+  let matches = filter(matches, "v:val =~# '^\\V" . a:ArgLead . "'")
 
   sort(matches)
 
