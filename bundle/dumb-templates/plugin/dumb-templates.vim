@@ -184,6 +184,11 @@ function! s:InsertVimWikiTemplate()
   call <SID>InsertTemplate(template)
 endfunction
 
+function! s:DetermineJavaPackageName()
+  let path = split(expand('%:p:h'), '/')
+  return ''
+endfunction
+
 function! s:InsertJavaTemplate()
   " this happens when Vim checks a buffer to
   " see if it's been modified.
@@ -195,6 +200,7 @@ function! s:InsertJavaTemplate()
     return
   endif
 
+  let package_name = <SID>DetermineJavaPackageName()
   let class_name = substitute(expand('%:t'), '\.java$', '', '')
 
   let template = [
@@ -204,6 +210,10 @@ function! s:InsertJavaTemplate()
 \ '    }',
 \ '}',
 \ ]
+
+  if !empty(package_name)
+    let template = extend(template, ['package ' . package_name . ';', ''], 0)
+  endif
 
   call <SID>InsertTemplate(template)
 endfunction
