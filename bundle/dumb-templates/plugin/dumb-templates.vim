@@ -184,12 +184,37 @@ function! s:InsertVimWikiTemplate()
   call <SID>InsertTemplate(template)
 endfunction
 
+function! s:InsertJavaTemplate()
+  " this happens when Vim checks a buffer to
+  " see if it's been modified.
+  if !buflisted(bufname('%'))
+    return
+  endif
+
+  if ! <SID>IsFileEmpty()
+    return
+  endif
+
+  let class_name = substitute(expand('%:t'), '\.java$', '', '')
+
+  let template = [
+\ 'public class ' . class_name . ' {',
+\ '    public static void main(String[] args) {',
+\ '↑',
+\ '    }',
+\ '}',
+\ ]
+
+  call <SID>InsertTemplate(template)
+endfunction
+
 augroup DumbTemplateInsertion
   autocmd!
 
   autocmd FileType perl    call <SID>InsertPerlTemplate()
   autocmd FileType ruby    call <SID>InsertRubyTemplate()
   autocmd FileType vimwiki call <SID>InsertVimWikiTemplate()
+  autocmd FileType java    call <SID>InsertJavaTemplate()
 augroup END
 
 " vim:sw=2 sts=2
