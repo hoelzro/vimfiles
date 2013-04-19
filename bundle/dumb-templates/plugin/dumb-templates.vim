@@ -13,6 +13,7 @@ function! s:IsDiaryFile()
   return match(expand('%:p'), 'diary') != -1
 endfunction
 
+" XXX fix me for modules not under lib
 function! s:DeterminePackageName()
   let path      = split(expand('%:p:r'), '/')
   let lib_index = -1
