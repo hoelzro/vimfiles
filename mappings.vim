@@ -57,3 +57,6 @@ vnoremap <Leader>= :Tabularize assignment<CR>
 
 nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
 nnoremap <Leader>sv :source $MYVIMRC<CR>
+
+nnoremap <C-x>n :set number!<CR>
+nnoremap <C-x>l :set list!<CR>
