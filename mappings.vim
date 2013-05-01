@@ -60,4 +60,5 @@ nnoremap <Leader>sv :source $MYVIMRC<CR>
 
 nnoremap <C-x>n :set number!<CR>
 nnoremap <C-x>l :set list!<CR>
+nnoremap <C-x>s :set spell!<CR>
 nnoremap <C-x><C-x> <C-x>
