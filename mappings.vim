@@ -43,6 +43,7 @@ inoremap <C-@> <nop>
 inoremap <Esc> <nop>
 inoremap <C-c> <Esc>
 nnoremap zo zO
+inoreabbrev deafult default
 
 " Make Y behave like other capitals
 noremap Y y$
