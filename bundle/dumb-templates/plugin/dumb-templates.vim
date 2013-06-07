@@ -128,6 +128,10 @@ function! s:InsertPerlTemplate()
     return
   endif
 
+  if &readonly
+    return
+  endif
+
   if ! <SID>IsFileEmpty()
     return
   endif
@@ -147,6 +151,10 @@ function! s:InsertRubyTemplate()
   " this happens when Vim checks a buffer to
   " see if it's been modified.
   if !buflisted(bufname('%'))
+    return
+  endif
+
+  if &readonly
     return
   endif
 
@@ -194,6 +202,10 @@ function! s:InsertJavaTemplate()
   " this happens when Vim checks a buffer to
   " see if it's been modified.
   if !buflisted(bufname('%'))
+    return
+  endif
+
+  if &readonly
     return
   endif
 
