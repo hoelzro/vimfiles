@@ -33,16 +33,17 @@ function! FlushVimWiki()
   endif
 
   for wiki in values(g:dirty_wikis)
-    if !<SID>IsActuallyDirty(wiki.path)
+    let path = expand(wiki.path)
+    if !<SID>IsActuallyDirty(path)
       continue
     endif
 
-    if <SID>IsRebasing(wiki.path)
+    if <SID>IsRebasing(path)
       continue
     endif
 
-    echo 'pushing changes for ' . wiki.path
-    call system('cd ' . shellescape(wiki.path) . '; git add --all .; git commit -m update; git push')
+    echo 'pushing changes for ' . path
+    call system('cd ' . shellescape(path) . '; git add --all .; git commit -m update; git push')
 
     if v:shell_error != 0
       call input('An error occurred when pushing changes! (please enter to exit Vim) ')
