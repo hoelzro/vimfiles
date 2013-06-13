@@ -49,9 +49,9 @@ augroup VimWiki
   endfunction
 
   function! s:IsGitRepo(path)
-    call system('cd ' . shellescape(a:path) . '; git status &>/dev/null')
+    let file = a:path . '.git'
 
-    return !v:shell_error
+    return isdirectory(file)
   endfunction
 
   function! s:AddDirtyWikiFile()
