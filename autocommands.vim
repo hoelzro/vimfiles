@@ -61,7 +61,7 @@ augroup VimWiki
 
       if <SID>IsPrefix(wiki_path, path)
         if !<SID>IsGitRepo(wiki_path)
-          return
+          continue
         endif
 
         if !exists('g:dirty_wikis')
