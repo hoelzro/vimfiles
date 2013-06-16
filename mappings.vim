@@ -65,3 +65,5 @@ nnoremap <C-x>s :set spell!<CR>
 nnoremap <C-x>i :set ignorecase!<CR>
 nnoremap <C-x>p :set paste<CR>
 nnoremap <C-x><C-x> <C-x>
+
+vnoremap . :normal .<CR>
