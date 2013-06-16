@@ -67,3 +67,6 @@ nnoremap <C-x>p :set paste<CR>
 nnoremap <C-x><C-x> <C-x>
 
 vnoremap . :normal .<CR>
+
+nnoremap <Left> :previous<CR>
+nnoremap <Right> :next<CR>
