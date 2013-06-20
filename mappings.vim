@@ -70,3 +70,23 @@ vnoremap . :normal .<CR>
 
 nnoremap <Left> :previous<CR>
 nnoremap <Right> :next<CR>
+
+" tmux-friendly window mappings
+
+function! FigureOutWindows(vim_direction, tmux_direction)
+  let current_tab = tabpagenr()
+  let num_windows = tabpagewinnr(current_tab, '$')
+
+  " it would be nice if this determined if a window existed
+  " in the direction we're going rather than just counting
+  if !empty($TMUX) && num_windows == 1
+    call system('tmux select-pane -' . a:tmux_direction)
+  else
+    execute 'wincmd ' . a:vim_direction
+  endif
+endfunction
+
+nnoremap <silent> <C-w>h :call FigureOutWindows('h', 'L')<CR>
+nnoremap <silent> <C-w>j :call FigureOutWindows('j', 'D')<CR>
+nnoremap <silent> <C-w>k :call FigureOutWindows('k', 'U')<CR>
+nnoremap <silent> <C-w>l :call FigureOutWindows('l', 'R')<CR>
