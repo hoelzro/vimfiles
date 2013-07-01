@@ -26,9 +26,9 @@ function ToggleSQLMode()
   for kw in l:sql_keywords
     let l:lower = tolower(kw)
     if b:in_sql_mode
-      execute 'abbreviate <buffer> ' . l:lower . ' ' . kw
+      execute 'iabbrev <buffer> ' . l:lower . ' ' . kw
     else
-      execute 'unabbreviate <buffer> ' . l:lower
+      execute 'iunabbrev <buffer> ' . l:lower
     endif
   endfor
 
