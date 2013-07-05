@@ -14,6 +14,8 @@ augroup Custom
   autocmd VimResized * exe "normal! \<c-w>="
   autocmd BufWritePost *.pl silent !chmod 755 %
   autocmd FileChangedShell * call <SID>HandleFileChange()
+
+  autocmd BufWinLeave * call FlushBadWords()<CR>
 augroup END
 
 " open help windows in their own tabs
