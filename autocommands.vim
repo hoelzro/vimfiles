@@ -9,6 +9,11 @@ augroup Custom
   autocmd BufWritePre 1 throw 'Suspicious filename "1"'
   autocmd BufWritePre 2 throw 'Suspicious filename "2"'
   autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
+
+  autocmd InsertLeave * set nopaste
+  autocmd VimResized * exe "normal! \<c-w>="
+  autocmd BufWritePost *.pl silent !chmod 755 %
+  autocmd FileChangedShell * call <SID>HandleFileChange()
 augroup END
 
 " open help windows in their own tabs
@@ -31,15 +36,6 @@ function! s:HandleFileChange()
     let v:fcs_choice = 'ask'
   endif
 endfunction
-
-augroup Custom
-  autocmd!
-
-  autocmd InsertLeave * set nopaste
-  autocmd VimResized * exe "normal! \<c-w>="
-  autocmd BufWritePost *.pl silent !chmod 755 %
-  autocmd FileChangedShell * call <SID>HandleFileChange()
-augroup END
 
 augroup VimWiki
   autocmd!
