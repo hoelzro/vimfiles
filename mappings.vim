@@ -99,9 +99,6 @@ function! LogLastBadWord(consider_previous)
     let b:last_word_previous_position = [ current_position[1], current_position[2] ]
 
     if !empty(previous_position)
-      echomsg string(previous_position)
-      echomsg string(current_position)
-
       if previous_position[0] == current_position[1] && (previous_position[1] - 1) == current_position[2]
         return
       endif
