@@ -131,6 +131,21 @@ function! FlushBadWords()
   call writefile(old_bad_words, filename)
 endfunction
 
+function! SwapLastTwoChars()
+  let cmdline = getcmdline()
+  let cursor  = getcmdpos()
+
+  if cursor > len(cmdline)
+    let cursor = len(cmdline)
+  endif
+
+  let cursor = cursor - 1 " 0-index it
+
+  return cmdline[:cursor - 2] . cmdline[cursor] . cmdline[cursor - 1] .  cmdline[cursor + 1:]
+endfunction
+
 " XXX consider this for command mode too
 inoremap <silent> <Backspace> <C-o>:call LogLastBadWord(1)<CR><Backspace>
 inoremap <silent> <C-w>       <C-o>:call LogLastBadWord(0)<CR><C-w>
+
+cnoremap <silent> <C-t> <C-\>eSwapLastTwoChars()<CR>
