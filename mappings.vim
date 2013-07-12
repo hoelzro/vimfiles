@@ -54,6 +54,7 @@ cabbrev q1 q!
 cabbrev ssu sus
 cnoreabbrev su sus
 cnoreabbrev Help help
+cnoreabbrev tanbew tabnew
 
 vnoremap <Leader>= :Tabularize assignment<CR>
 
