@@ -10,7 +10,7 @@ set shiftwidth=4
 set scrolloff=3
 set autoindent
 set background=dark
-set directory=/var/tmp
+set directory=~/.vim/swaps/,/var/tmp
 set expandtab
 set smarttab
 set formatoptions=cqort
