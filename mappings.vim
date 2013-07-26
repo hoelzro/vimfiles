@@ -1,4 +1,5 @@
 mapclear
+abclear
 
 noremap <C-p> :tabprev<CR>
 noremap <C-n> :tabnext<CR>
