@@ -61,8 +61,17 @@ vnoremap <Leader>= :Tabularize assignment<CR>
 nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
 nnoremap <Leader>sv :source $MYVIMRC<CR>
 
+let s:handy_mappings = []
+
 function! s:DefineHandyMapping(char, command)
+  call add(s:handy_mappings, [ a:char, a:command ])
   execute 'nnoremap <C-x>' . a:char . ' ' . a:command . '<CR>'
+endfunction
+
+function! s:DisplayHandyMappings()
+  for pair in s:handy_mappings
+    echo pair[0] . '	' . pair[1]
+  endfor
 endfunction
 
 call <SID>DefineHandyMapping('n', ':set number!')
@@ -71,6 +80,7 @@ call <SID>DefineHandyMapping('s', ':set spell!')
 call <SID>DefineHandyMapping('i', ':set ignorecase!')
 call <SID>DefineHandyMapping('p', ':set paste!')
 
+nnoremap <C-x>? :call <SID>DisplayHandyMappings()<CR>
 nnoremap <C-x><C-x> <C-x>
 
 vnoremap . :normal .<CR>
