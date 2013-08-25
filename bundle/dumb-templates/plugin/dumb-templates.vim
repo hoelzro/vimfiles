@@ -128,6 +128,10 @@ function! s:InsertPerlTemplate()
     return
   endif
 
+  if !&modifiable
+    return
+  endif
+
   if &readonly
     return
   endif
