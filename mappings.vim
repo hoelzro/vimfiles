@@ -55,6 +55,7 @@ cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cabbrev q1 q!
 cabbrev ssu sus
+cabbrev us sus
 cnoreabbrev su sus
 cnoreabbrev Help help
 cnoreabbrev tanbew tabnew
