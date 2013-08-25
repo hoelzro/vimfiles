@@ -1,11 +1,11 @@
 " Vim plugin for diffing when swap file was found
 " ---------------------------------------------------------------
 " Author: Christian Brabandt <cb@256bit.org>
-" Version: 0.15
-" Last Change: Mon, 20 Aug 2012 20:16:32 +0200
+" Version: 0.18
+" Last Change: Wed, 14 Aug 2013 22:39:13 +0200
 " Script:  http://www.vim.org/scripts/script.php?script_id=3068
 " License: VIM License
-" GetLatestVimScripts: 3068 15 :AutoInstall: recover.vim
+" GetLatestVimScripts: 3068 18 :AutoInstall: recover.vim
 "
 fu! recover#Recover(on) "{{{1
     if a:on
@@ -15,8 +15,8 @@ fu! recover#Recover(on) "{{{1
 	endif
 	augroup Swap
 	    au!
-	    au SwapExists * call recover#ConfirmSwapDiff()
-	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained * 
+	    au SwapExists * nested :call recover#ConfirmSwapDiff()
+	    au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
 			\ call <sid>CheckSwapFileExists()
 	augroup END
     else
@@ -88,7 +88,7 @@ fu! s:Swapname() "{{{1
 endfu
 
 fu! s:CheckSwapFileExists() "{{{1
-    if !&swapfile 
+    if !&swapfile
 	return
     endif
 
@@ -96,7 +96,7 @@ fu! s:CheckSwapFileExists() "{{{1
     if !empty(swap) && !filereadable(swap)
 	" previous SwapExists autocommand deleted our swapfile,
 	" recreate it and avoid E325 Message
-	sil setl noswapfile swapfile
+	call s:SetSwapfile()
     endif
 endfu
 
@@ -116,16 +116,20 @@ fu! s:CheckRecover() "{{{1
 	call delete(t)
 	if !v:shell_error
 	    call inputsave()
-	    let p = confirm("No differences: Delete old swap file?",
-		    \ "&No\n&Yes")
+	    redraw! " prevent overwriting of 'Select File to use for recovery dialog'
+	    let p = confirm("No differences: Delete old swap file '".b:swapname."'?",
+		    \ "&No\n&Yes", 2)
 	    call inputrestore()
 	    if p == 2
 		" Workaround for E305 error
 		let v:swapchoice=''
 		call delete(b:swapname)
+		" can trigger SwapExists autocommands again!
+		call s:SetSwapfile()
 	    endif
+	    call recover#AutoCmdBRP(0)
 	else
-	    echo 'Found Swapfile '.b:swapname . ', showing diff!'
+	    echo "Found Swapfile '". b:swapname. "', showing diff!"
 	    call recover#DiffRecoveredFile()
 	    " Not sure, why this needs feedkeys
 	    " Sometimes cursor is wrong, I hate when this happens
@@ -135,59 +139,176 @@ fu! s:CheckRecover() "{{{1
 	    " autoopen): in this case ':wincmd l\n:0\n' must be fed to
 	    " feedkeys
 	    if bufnr('') == 1 && winnr('$') < 3
-		call feedkeys(":wincmd l\n", 't')
+		call feedkeys(":wincmd l\<cr>", 't')
 	    endif
-	    call feedkeys(":0\n", 't')
+	    if !(v:version > 703 || (v:version == 703 && has("patch708")))
+		call feedkeys(":0\<cr>", 't')
+	    endif
 	endif
 	let b:did_recovery = 1
+	if get(s:, 'fencview_autodetect', 0)
+	    setl buftype=
+	endif
+	" Don't delete the auto command yet.
+	"call recover#AutoCmdBRP(0)
     endif
 endfun
 
 fu! recover#ConfirmSwapDiff() "{{{1
-    let delete = 0
+    if exists("b:swapchoice")
+	let v:swapchoice = b:swapchoice
+	return
+    endif
 
     if <sid>IsOwnerAlive(v:swapname)
         return
     endif
 
-    if has("unix")
+    let delete = 0
+    let do_modification_check = exists("g:RecoverPlugin_Edit_Unmodified") ? g:RecoverPlugin_Edit_Unmodified : 0
+    let not_modified = 0
+    let msg = ""
+    let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
+    let tfile = tempname()
+    if executable('vim') && !s:isWin()
+	" Doesn't work on windows (system() won't be able to fetch the output)
+	" Capture E325 Warning message
+	" Leave English output, so parsing will be easier
+	" TODO: make it work on windows.
+	if s:isWin()
+	  let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
+	  let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
+	endif
+	let cmd = printf("%svim -u NONE -es -V %s %s",
+	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C '),
+	    \ (s:isWin() ? wincmd : ''),
+	    \ bufname)
+	let msg = system(cmd)
+	let msg = substitute(msg, '.*\(E325.*process ID:.\{-}\)\%x0d.*', '\1', '')
+	let msg = substitute(msg, "\e\\[\\d\\+C", "", "g")
+	if do_modification_check
+	    let not_modified = (match(msg, "modified: no") > -1)
+	endif
+    endif
+    if has("unix") && !empty(msg) && system("uname") =~? "linux"
+	" try to get process name from pid
+	" This is Linux specific.
+	" TODO Is there a portable way to retrive this info for at least unix?
+	let pid_pat = 'process ID:\s*\zs\d\+'
+	let pid = matchstr(msg, pid_pat)+0
+	if !empty(pid) && isdirectory('/proc')
+	    let pname = 'not existing'
+	    let proc = '/proc/'. pid. '/status'
+	    if filereadable(proc)
+		let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
+	    endif
+	    let msg = substitute(msg, pid_pat, '& ['.pname."]\n", '')
+	    if not_modified && pname !~? 'vim'
+		let not_modified = 0
+	    endif
+	endif
+    endif
+    if executable('vim') && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
-	let tfile = tempname()
-	let cmd = printf("vim -u NONE -U NONE -N -es -r %s -c ':w %s|:q!'; diff %s %s",
-		    \ shellescape(v:swapname), tfile, shellescape(expand("%:p")), tfile)
+	" doesn't work on Windows? (cmd is ok, should be executable)
+	if s:isWin()
+	    let tfile = substitute(tfile, '/', '\\', 'g')
+	endif
+	let cmd = printf("vim -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+		    \ (s:isWin() ? '' : '-es'),
+		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
+		    \ tfile, (s:isWin() ? '&' : '&&'),
+		    \ bufname, tfile)
 	call system(cmd)
 	" if return code of diff is zero, files are identical
-	call delete(tfile)
 	let delete = !v:shell_error
+	if !do_modification_check
+	    echo msg
+	endif
     endif
-    if delete
+    call delete(tfile)
+    if delete && !do_modification_check
 	echomsg "Swap and on-disk file seem to be identical"
     endif
-    call inputsave()
-    let cmd = printf("%s", "&Yes\n&No\n&Abort". (delete ? "\n&Delete" : ""))
-    let p = confirm("Swap File found: Diff buffer? ", cmd)
-    call inputrestore()
+    let cmd = printf("D&iff\n&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort%s",
+		\ ( (delete || !empty(msg)) ? "\n&Delete" : ""))
+    if !empty(msg)
+	let info = 'Please choose: '
+    else
+	let info = "Swap File '". v:swapname. "' found: "
+    endif
+"    if has("gui_running") && &go !~ 'c'
+"	call inputsave()
+"	let p = confirm(info, cmd, (modified ? 3 : delete ? 7 : 1), 'I')
+"    else
+"	echo info
+"	call s:Output(cmd)
+    if not_modified
+	let p = 3
+    else
+	call inputsave()
+	let p = confirm(info, cmd, (delete ? 7 : 1), 'I')
+    "    endif
+	call inputrestore()
+    endif
     let b:swapname=v:swapname
-    if p == 1
-	let v:swapchoice='e'
+    if p == 1 || p == 3
+	" Diff or Edit Anyway
+	call s:SwapChoice('e')
 	" postpone recovering until later, for now, we are opening anyways...
 	" (this is done by s:CheckRecover()
 	" in an BufReadPost autocommand
-	call recover#AutoCmdBRP(1)
+	if (p == 1)
+	    call recover#AutoCmdBRP(1)
+	endif
+	" disable fencview (issue #23)
+	" This is a hack, fencview doesn't allow to selectively disable it :(
+        let s:fencview_autodetect = get(g:, 'fencview_autodetect', 0)
+        if s:fencview_autodetect
+	    setl buftype=help
+        endif
     elseif p == 2
+	" Open Read-Only
 	" Don't show the Recovery dialog
 	let v:swapchoice='o'
 	call <sid>EchoMsg("Found SwapFile, opening file readonly!")
 	sleep 2
     elseif p == 4
+	" Recover
+	let v:swapchoice='r'
+    elseif p == 5
+	" Quit
+	let v:swapchoice='q'
+    elseif p == 6
+	" Abort
+	let v:swapchoice='a'
+    elseif p == 7
 	" Delete Swap file, if not different
-	let v:swapchoice='d'
+	call s:SwapChoice('d')
 	call <sid>EchoMsg("Found SwapFile, deleting...")
+	" might trigger SwapExists again!
+	call s:SetSwapfile()
     else
 	" Show default menu from vim
 	return
     endif
 endfun
+
+fu! s:Output(msg) "{{{1
+    " Display as one string, without linebreaks
+    let msg = substitute(a:msg, '\n', '/', 'g')
+    for item in split(msg, '&')
+	echohl WarningMsg
+	echon item[0]
+	echohl Normal
+	echon item[1:]
+    endfor
+endfun
+
+fu! s:SwapChoice(char) "{{{1
+    let v:swapchoice = a:char
+    let b:swapchoice = a:char
+endfu
 
 fu! recover#DiffRecoveredFile() "{{{1
     " recovered version
@@ -203,7 +324,7 @@ fu! recover#DiffRecoveredFile() "{{{1
     set nospr
     noa vert new
     let &l:spr = curspr
-    if glob(expand('#'))
+    if !empty(glob(fnameescape(expand('#'))))
 	0r #
 	$d _
     endif
@@ -273,6 +394,16 @@ fu! s:ModifySTL(enable) "{{{1
     endif
 endfu
 
+fu! s:SetSwapfile() "{{{1
+    if &l:swf
+	" Reset swapfile to use .swp extension
+	sil setl noswapfile swapfile
+    endif
+endfu
+
+fu! s:isWin() "{{{1
+    return has("win32") || has("win16") || has("win64")
+endfu
 fu! recover#BalloonExprRecover() "{{{1
     " Set up a balloon expr.
     if exists("b:swapbufnr") && v:beval_bufnr!=?b:swapbufnr
@@ -293,29 +424,17 @@ fu! recover#RecoverFinish() abort "{{{1
     diffoff
     call s:ModifySTL(0)
     exe bufwinnr(curbufnr) " wincmd w"
-    unlet! b:swapname b:did_recovery b:swapbufnr
+    call s:SetSwapfile()
+    unlet! b:swapname b:did_recovery b:swapbufnr b:swapchoice
 endfun
 
 fu! recover#AutoCmdBRP(on) "{{{1
-    if a:on
+    if a:on && !exists("#SwapBRP")
 	augroup SwapBRP
 	    au!
-	    " Escape spaces and backslashes
-	    " On windows, we can simply replace the backslashes by forward
-	    " slashes, since backslashes aren't allowed there anyway. On Unix,
-	    " backslashes might exists in the path, so we handle this
-	    " situation there differently.
-	    if has("win16") || has("win32") || has("win64") || has("win32unix")
-		exe ":au BufNewFile,BufReadPost "
-		    \ escape(substitute(fnamemodify(expand('<afile>'),
-		    \ ':p'), '\\', '/', 'g'), ' \\')"
-		    \ :call s:CheckRecover()"
-	    else
-		exe ":au BufNewFile,BufReadPost " escape(fnamemodify(expand('<afile>'),
-		    \ ':p'), ' \\')" :call s:CheckRecover()"
-	    endif
+	    au BufNewFile,BufReadPost <buffer> :call s:CheckRecover()
 	augroup END
-    else
+    elseif !a:on && exists('#SwapBRP')
 	augroup SwapBRP
 	    au!
 	augroup END
