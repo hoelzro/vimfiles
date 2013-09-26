@@ -1,7 +1,8 @@
-" Vim syntax file " Language:	  Java
+" Vim syntax file
+" Language:	Java
 " Maintainer:	Claudio Fleiner <claudio@fleiner.com>
 " URL:		http://www.fleiner.com/vim/syntax/java.vim
-" Last Change:	2010 March 23
+" Last Change:	2012 Oct 05
 
 " Please check :help java.vim for comments on some of the options available.
 
@@ -17,6 +18,9 @@ if !exists("main_syntax")
   syn region javaFold start="{" end="}" transparent fold
 endif
 
+let s:cpo_save = &cpo
+set cpo&vim
+
 " don't use standard HiLink, it will not work with included syntax files
 if version < 508
   command! -nargs=+ JavaHiLink hi link <args>
@@ -26,7 +30,8 @@ endif
 
 " some characters that cannot be in a java program (outside a string)
 syn match javaError "[\\@`]"
-syn match javaError "<<<\|\.\.\|=>\|<>\|||=\|&&=\|[^-]->\|\*\/"
+syn match javaError "<<<\|\.\.\|=>\|||=\|&&=\|[^-]->\|\*\/"
+
 syn match javaOK "\.\.\."
 
 " use separate name so that it can be deleted in javacc.vim
@@ -120,11 +125,8 @@ syn region  javaLabelRegion	transparent matchgroup=javaLabel start="\<case\>" ma
 syn match   javaUserLabel	"^\s*[_$a-zA-Z][_$a-zA-Z0-9_]*\s*:"he=e-1 contains=javaLabel
 syn keyword javaLabel		default
 
-if !exists("java_allow_cpp_keywords")
-  syn keyword javaError auto delete extern friend inline redeclared
-  syn keyword javaError register signed sizeof struct template typedef union
-  syn keyword javaError unsigned operator
-endif
+" highlighting C++ keywords as errors removed, too many people find it
+" annoying.  Was: if !exists("java_allow_cpp_keywords")
 
 " The following cluster contains all java groups except the contained ones
 syn cluster javaTop add=javaExternal,javaError,javaError,javaBranch,javaLabelRegion,javaLabel,javaConditional,javaRepeat,javaBoolean,javaConstant,javaTypedef,javaOperator,javaType,javaType,javaStatement,javaStorageClass,javaAssert,javaExceptions,javaMethodDecl,javaClassDecl,javaClassDecl,javaClassDecl,javaScopeDecl,javaError,javaError2,javaUserLabel,javaLangObject,javaAnnotation,javaVarArg
@@ -164,7 +166,7 @@ if !exists("java_ignore_javadoc") && main_syntax != 'jsp'
   syn region  javaDocComment	start="/\*\*"  end="\*/" keepend contains=javaCommentTitle,@javaHtml,javaDocTags,javaDocSeeTag,javaTodo,@Spell
   syn region  javaCommentTitle	contained matchgroup=javaDocComment start="/\*\*"   matchgroup=javaCommentTitle keepend end="\.$" end="\.[ \t\r<&]"me=e-1 end="[^{]@"me=s-2,he=s-1 end="\*/"me=s-1,he=s-1 contains=@javaHtml,javaCommentStar,javaTodo,@Spell,javaDocTags,javaDocSeeTag
 
-  syn region javaDocTags	 contained start="{@\(link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)" end="}"
+  syn region javaDocTags	 contained start="{@\(code\|link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)" end="}"
   syn match  javaDocTags	 contained "@\(param\|exception\|throws\|since\)\s\+\S\+" contains=javaDocParam
   syn match  javaDocParam	 contained "\s\S\+"
   syn match  javaDocTags	 contained "@\(version\|author\|return\|deprecated\|serial\|serialField\|serialData\)\>"
@@ -344,5 +346,7 @@ if main_syntax == 'java'
 endif
 
 let b:spell_options="contained"
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
 " vim: ts=8
