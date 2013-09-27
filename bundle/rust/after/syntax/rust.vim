@@ -1,5 +1,3 @@
-set colorcolumn=0 " override setting from Rust vim files on Arch
-
 if !exists('g:rust_conceal') || !has('conceal') || &enc != 'utf-8'
 	finish
 endif
