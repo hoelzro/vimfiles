@@ -121,6 +121,22 @@ function! s:InsertPerlTestTemplate()
   call <SID>InsertTemplate(template)
 endfunction
 
+function! s:InsertPSGITemplate()
+  let template = [
+\ '#!/usr/bin/env perl',
+\ '',
+\ 'use strict;',
+\ 'use warnings;',
+\ '',
+\ 'sub {',
+\ '    my ( $env ) = @_',
+\ '↑',
+\ '};'
+\ ]
+
+  call <SID>InsertTemplate(template)
+endfunction
+
 function! s:InsertPerlTemplate()
   " this happens when Vim checks a buffer to
   " see if it's been modified.
@@ -148,6 +164,8 @@ function! s:InsertPerlTemplate()
     call <SID>InsertPerlModuleTemplate()
   elseif extension == 't'
     call <SID>InsertPerlTestTemplate()
+  elseif extension == 'psgi'
+    call <SID>InsertPSGITemplate()
   endif
 endfunction
 
