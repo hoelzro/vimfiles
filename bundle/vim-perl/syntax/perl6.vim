@@ -3,7 +3,7 @@
 " Maintainer:    vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl/tree/master
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2009-07-04
+" Last Change:   2013-07-21
 
 " Contributors:  Luke Palmer <fibonaci@babylonia.flatirons.org>
 "                Moritz Lenz <moritz@faui2k3.org>
@@ -68,6 +68,8 @@ if version < 600
 elseif exists("b:current_syntax")
     finish
 endif
+let s:keepcpo= &cpo
+set cpo&vim
 
 " identifiers
 syn match p6Normal display "\K\%(\k\|[-']\K\@=\)*"
@@ -2246,5 +2248,8 @@ syn sync fromstart
 setlocal foldmethod=syntax
 
 let b:current_syntax = "perl6"
+
+let &cpo = s:keepcpo
+unlet s:keepcpo
 
 " vim:ts=8:sts=4:sw=4:expandtab:ft=vim

@@ -3,7 +3,7 @@
 " Author:        Moriki, Atsushi <4woods+vim@gmail.com>
 " Homepage:      http://github.com/vim-perl/vim-perl
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2013-05-12
+" Last Change:   2013-07-21
 "
 " Instration:
 "   put tt2.vim and tt2html.vim in to your syntax diretory.
@@ -58,6 +58,9 @@ endif
 if exists("b:current_syntax")
   finish
 endif
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 syn case match
 
@@ -200,5 +203,8 @@ if exists("b:tt2_syn_tags")
 endif
 
 let b:current_syntax = "tt2"
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
 " vim:ts=4:sw=4

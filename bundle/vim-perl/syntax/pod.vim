@@ -4,7 +4,7 @@
 " Previously:    Scott Bigham <dsb@killerbunnies.org>
 " Homepage:      http://github.com/vim-perl/vim-perl
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2013-05-12
+" Last Change:   2013-07-21
 
 " To add embedded POD documentation highlighting to your syntax file, add
 " the commands:
@@ -26,6 +26,9 @@ if version < 600
 elseif exists("b:current_syntax")
   finish
 endif
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 " POD commands
 syn match podCommand    "^=encoding"  nextgroup=podCmdText contains=@NoSpell
@@ -179,5 +182,8 @@ if exists("perl_pod_formatting")
 endif
 
 let b:current_syntax = "pod"
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
 " vim: ts=8
