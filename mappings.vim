@@ -127,3 +127,6 @@ function! SwapLastTwoChars()
 endfunction
 
 cnoremap <silent> <C-t> <C-\>eSwapLastTwoChars()<CR>
+
+" Invoke SkyBison
+nnoremap : :<C-U>call SkyBison('')<CR>
