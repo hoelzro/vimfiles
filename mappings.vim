@@ -113,45 +113,6 @@ nnoremap <silent> <C-w>j :call FigureOutWindows('j', 'D')<CR>
 nnoremap <silent> <C-w>k :call FigureOutWindows('k', 'U')<CR>
 nnoremap <silent> <C-w>l :call FigureOutWindows('l', 'R')<CR>
 
-function! LogLastBadWord(consider_previous)
-  if a:consider_previous
-    let previous_position             = get(b:, 'last_word_previous_position', [])
-    let current_position              = getpos('.')
-    let b:last_word_previous_position = [ current_position[1], current_position[2] ]
-
-    if !empty(previous_position)
-      if previous_position[0] == current_position[1] && (previous_position[1] - 1) == current_position[2]
-        return
-      endif
-    endif
-  endif
-
-  if !has_key(b:, 'last_word_bad_words')
-    let b:last_word_bad_words = []
-  endif
-
-  call add(b:last_word_bad_words, expand('<cword>'))
-endfunction
-
-function! FlushBadWords()
-  let bad_words = get(b:, 'last_word_bad_words', [])
-
-  if empty(bad_words)
-    return
-  endif
-
-  let old_bad_words = []
-
-  let filename = expand('~/.vim/bad-words')
-
-  if filereadable(filename)
-    let old_bad_words = readfile(filename)
-  endif
-
-  call extend(old_bad_words, bad_words)
-  call writefile(old_bad_words, filename)
-endfunction
-
 function! SwapLastTwoChars()
   let cmdline = getcmdline()
   let cursor  = getcmdpos()
@@ -164,9 +125,5 @@ function! SwapLastTwoChars()
 
   return cmdline[:cursor - 2] . cmdline[cursor] . cmdline[cursor - 1] .  cmdline[cursor + 1:]
 endfunction
-
-" XXX consider this for command mode too
-inoremap <silent> <Backspace> <C-o>:call LogLastBadWord(1)<CR><Backspace>
-inoremap <silent> <C-w>       <C-o>:call LogLastBadWord(0)<CR><C-w>
 
 cnoremap <silent> <C-t> <C-\>eSwapLastTwoChars()<CR>
