@@ -16,6 +16,7 @@ augroup FileTypes
   autocmd BufRead,BufNewFile .tmux.conf set filetype=tmux
   autocmd BufRead,BufNewFile bash-* set filetype=sh " for CTRL-X CTRL-E
   autocmd BufRead,BufNewFile *.t set filetype=perl
+  autocmd BufRead,BufNewFile *.qml set filetype=qml
 augroup END
 
 let b:tt2_syn_tags = '\[% %] <!-- -->'
