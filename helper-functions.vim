@@ -50,3 +50,29 @@ function! FlushVimWiki()
     endif
   endfor
 endfunction
+
+" XXX override <CR> in window?
+function! Page(command)
+  " redirect command output to variable
+  redir => paged_stuff
+  silent execute a:command
+  redir END
+
+  " set up scratch window
+  botright 10new
+  setlocal buftype=nofile
+  setlocal bufhidden=hide
+  setlocal noswapfile
+  setlocal nobuflisted
+  execute 'file ' . a:command
+
+  " set up custom commands
+  nnoremap <buffer> <silent> q :q<CR>
+
+  " inject output into window
+  let lines = split(paged_stuff, '\n')
+  call append(0, lines)
+  normal Gdd " remove the last lien
+endfunction
+
+command! -nargs=+ -complete=command Page call Page(<q-args>)
