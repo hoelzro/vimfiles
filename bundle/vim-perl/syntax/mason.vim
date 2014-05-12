@@ -3,7 +3,7 @@
 " Maintainer:   vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl/tree/master
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:  2013-11-14
+" Last Change:  2013-12-07
 " Contributors: Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 "               Andrew Smith <andrewdsmith@yahoo.com>
 "
@@ -54,12 +54,13 @@ endif
 " them. If you have any suggestions, please let me know.
 "
 syn region masonPod start="^=[a-z]" end="^=cut" keepend contained contains=@podTop
-syn region masonPerlBraces start="{" end="}" contained
-syn region masonLine matchgroup=Delimiter start="^%" end="$" keepend contains=@perlTop,masonPerlBraces
-syn region masonExpr matchgroup=Delimiter start="<%" end="%>" contains=@perlTop
+syn cluster perlTop remove=perlBraces
+syn region masonLine matchgroup=Delimiter start="^%" end="$" keepend contains=@perlTop
+syn region masonPerlComment start="#" end="\%(%>\)\@=\|$" contained contains=perlTodo,@Spell
+syn region masonExpr matchgroup=Delimiter start="<%" end="%>" contains=@perlTop,masonPerlComment
 syn region masonPerl matchgroup=Delimiter start="<%perl>" end="</%perl>" contains=masonPod,@perlTop
-syn region masonComp keepend matchgroup=Delimiter start="<&\s*\%(\a\+:\)\?[-._/[:alnum:]]*" end="&>" contains=@perlTop
-syn region masonComp keepend matchgroup=Delimiter skipnl start="<&|\s*\%(\a\+:\)\?[-._/[:alnum:]]*" end="&>" contains=@perlTop nextgroup=masonCompContent
+syn region masonComp keepend matchgroup=Delimiter start="<&\s*\%([-._/[:alnum:]]\+:\)\?[-._/[:alnum:]]*" end="&>" contains=@perlTop
+syn region masonComp keepend matchgroup=Delimiter skipnl start="<&|\s*\%([-._/[:alnum:]]\+:\)\?[-._/[:alnum:]]*" end="&>" contains=@perlTop nextgroup=masonCompContent
 syn region masonCompContent matchgroup=Delimiter start="" end="</&>" contained contains=@masonTop
 
 syn region masonArgs matchgroup=Delimiter start="<%args>" end="</%args>" contains=masonPod,@perlTop
@@ -96,6 +97,7 @@ if version >= 508 || !exists("did_mason_syn_inits")
 
 	HiLink masonDoc Comment
 	HiLink masonPod Comment
+	HiLink masonPerlComment perlComment
 
 	delc HiLink
 endif

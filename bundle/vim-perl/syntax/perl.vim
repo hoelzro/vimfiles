@@ -3,7 +3,7 @@
 " Maintainer:    vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl/tree/master
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2013-12-04
+" Last Change:   2014-04-01
 " Contributors:  Andy Lester <andy@petdance.com>
 "                Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 "                Lukas Mai <l.mai.web.de>
@@ -83,7 +83,7 @@ syn match perlControl			"\<\%(BEGIN\|CHECK\|INIT\|END\|UNITCHECK\)\>\_s*" nextgr
 
 syn match perlStatementStorage		"\<\%(my\|our\|local\|state\)\>"
 syn match perlStatementControl		"\<\%(return\|last\|next\|redo\|goto\|break\)\>"
-syn match perlStatementScalar		"\<\%(chom\=p\|chr\|crypt\|r\=index\|lc\%(first\)\=\|length\|ord\|pack\|sprintf\|substr\|uc\%(first\)\=\)\>"
+syn match perlStatementScalar		"\<\%(chom\=p\|chr\|crypt\|r\=index\|lc\%(first\)\=\|length\|ord\|pack\|sprintf\|substr\|fc\|uc\%(first\)\=\)\>"
 syn match perlStatementRegexp		"\<\%(pos\|quotemeta\|split\|study\)\>"
 syn match perlStatementNumeric		"\<\%(abs\|atan2\|cos\|exp\|hex\|int\|log\|oct\|rand\|sin\|sqrt\|srand\)\>"
 syn match perlStatementList		"\<\%(splice\|unshift\|shift\|push\|pop\|join\|reverse\|grep\|map\|sort\|unpack\)\>"
@@ -94,9 +94,9 @@ syn match perlStatementFiledesc		"\<\%(fcntl\|flock\|ioctl\|open\%(dir\)\=\|read
 syn match perlStatementVector		"\<vec\>"
 syn match perlStatementFiles		"\<\%(ch\%(dir\|mod\|own\|root\)\|glob\|link\|mkdir\|readlink\|rename\|rmdir\|symlink\|umask\|unlink\|utime\)\>"
 syn match perlStatementFiles		"-[rwxoRWXOezsfdlpSbctugkTBMAC]\>"
-syn match perlStatementFlow		"\<\%(caller\|die\|dump\|eval\|exit\|wantarray\)\>"
-syn match perlStatementInclude		"\<\%(require\|import\)\>"
-syn match perlStatementInclude		"\<\%(use\|no\)\s\+\%(\%(attributes\|attrs\|autouse\|parent\|base\|big\%(int\|num\|rat\)\|blib\|bytes\|charnames\|constant\|diagnostics\|encoding\%(::warnings\)\=\|feature\|fields\|filetest\|if\|integer\|less\|lib\|locale\|mro\|open\|ops\|overload\|re\|sigtrap\|sort\|strict\|subs\|threads\%(::shared\)\=\|utf8\|vars\|version\|vmsish\|warnings\%(::register\)\=\)\>\)\="
+syn match perlStatementFlow		"\<\%(caller\|die\|dump\|eval\|exit\|wantarray\|evalbytes\)\>"
+syn match perlStatementInclude		"\<\%(require\|import\|unimport\)\>"
+syn match perlStatementInclude		"\<\%(use\|no\)\s\+\%(\%(attributes\|attrs\|autodie\|autouse\|parent\|base\|big\%(int\|num\|rat\)\|blib\|bytes\|charnames\|constant\|diagnostics\|encoding\%(::warnings\)\=\|feature\|fields\|filetest\|if\|integer\|less\|lib\|locale\|mro\|open\|ops\|overload\|overloading\|re\|sigtrap\|sort\|strict\|subs\|threads\%(::shared\)\=\|utf8\|vars\|version\|vmsish\|warnings\%(::register\)\=\)\>\)\="
 syn match perlStatementProc		"\<\%(alarm\|exec\|fork\|get\%(pgrp\|ppid\|priority\)\|kill\|pipe\|set\%(pgrp\|priority\)\|sleep\|system\|times\|wait\%(pid\)\=\)\>"
 syn match perlStatementSocket		"\<\%(accept\|bind\|connect\|get\%(peername\|sock\%(name\|opt\)\)\|listen\|recv\|send\|setsockopt\|shutdown\|socket\%(pair\)\=\)\>"
 syn match perlStatementIPC		"\<\%(msg\%(ctl\|get\|rcv\|snd\)\|sem\%(ctl\|get\|op\)\|shm\%(ctl\|get\|read\|write\)\)\>"
@@ -176,10 +176,10 @@ endif
 " File Descriptors
 syn match  perlFiledescRead	"<\h\w*>"
 
-syn match  perlFiledescStatementComma	"(\=\s*\u\w*\s*,"me=e-1 transparent contained contains=perlFiledescStatement
-syn match  perlFiledescStatementNocomma "(\=\s*\u\w*\s*[^, \t]"me=e-1 transparent contained contains=perlFiledescStatement
+syn match  perlFiledescStatementComma	"(\=\s*\<\u\w*\>\s*,"me=e-1 transparent contained contains=perlFiledescStatement
+syn match  perlFiledescStatementNocomma "(\=\s*\<\u\w*\>\s*[^, \t]"me=e-1 transparent contained contains=perlFiledescStatement
 
-syn match  perlFiledescStatement	"\u\w*" contained
+syn match  perlFiledescStatement	"\<\u\w*\>" contained
 
 " Special characters in strings and matches
 syn match  perlSpecialString	"\\\%(\o\{1,3}\|x\%({\x\+}\|\x\{1,2}\)\|c.\|[^cx]\)" contained extend
@@ -365,8 +365,10 @@ else
     syn match perlSubAttributes "" contained nextgroup=perlSubError
     syn match perlSubAttributes ":\_s*" contained nextgroup=@perlSubAttrMaybe
 endif
-syn match perlSubPrototypeError "(\%(\_s*\%(\%(\\\%([$@%&*]\|\[[$@%&*]\+\]\)\|[$&*]\|[@%]\%(\_s*)\)\@=\|;\%(\_s*[)$@%&*\\]\)\@=\|_\%(\_s*[);]\)\@=\)\_s*\)*\)\@>\zs\_[^)]\+" contained
-syn match perlSubPrototype +(\_[^)]*)\_s*\|+ nextgroup=perlSubAttributes,perlComment contained contains=perlSubPrototypeError
+if !exists("perl_no_subprototype_error") " Set 1 if using signatures feature in perl5.19.9
+    syn match perlSubPrototypeError "(\%(\_s*\%(\%(\\\%([$@%&*]\|\[[$@%&*]\+\]\)\|[$&*]\|[@%]\%(\_s*)\)\@=\|;\%(\_s*[)$@%&*\\]\)\@=\|_\%(\_s*[);]\)\@=\)\_s*\)*\)\@>\zs\_[^)]\+" contained
+    syn match perlSubPrototype +(\_[^)]*)\_s*\|+ nextgroup=perlSubAttributes,perlComment contained contains=perlSubPrototypeError
+endif
 syn match perlSubName +\%(\h\|::\|'\w\)\%(\w\|::\|'\w\)*\_s*\|+ contained nextgroup=perlSubPrototype,perlComment
 
 syn match perlFunction +\<sub\>\_s*+ nextgroup=perlSubName
@@ -390,10 +392,10 @@ syn match  perlFormatField	"@$" contained
 
 " __END__ and __DATA__ clauses
 if exists("perl_fold")
-  syntax region perlDATA		start="^__DATA__$" skip="." end="." fold
+  syntax region perlDATA		start="^__DATA__$" skip="." end="." contains=@perlDATA fold
   syntax region perlDATA		start="^__END__$" skip="." end="." contains=perlPOD,@perlDATA fold
 else
-  syntax region perlDATA		start="^__DATA__$" skip="." end="."
+  syntax region perlDATA		start="^__DATA__$" skip="." end="." contains=@perlDATA
   syntax region perlDATA		start="^__END__$" skip="." end="." contains=perlPOD,@perlDATA
 endif
 
@@ -408,7 +410,7 @@ if exists("perl_fold")
   endif
   if !exists("perl_nofold_subs")
     if exists("perl_fold_anonymous_subs") && perl_fold_anonymous_subs
-      syn region perlSubFold     start="\<sub\>[^\n;]*{" end="}" transparent fold keepend extend
+      syn region perlSubFold     start="\<sub\>[^;]*{" end="}" transparent fold keepend extend
       syn region perlSubFold     start="\<\%(BEGIN\|END\|CHECK\|INIT\)\>\s*{" end="}" transparent fold keepend
     else
       syn region perlSubFold     start="^\z(\s*\)\<sub\>.*[^};]$" end="^\z1}\s*\%(#.*\)\=$" transparent fold keepend
@@ -511,7 +513,9 @@ HiLink perlStatementIndirObj	perlStatement
 HiLink perlFunctionName		perlIdentifier
 HiLink perlMethod		perlIdentifier
 HiLink perlFunctionPRef		perlType
-HiLink perlPOD			perlComment
+if !get(g:, 'perl_include_pod', 1)
+  HiLink perlPOD		perlComment
+endif
 HiLink perlShellCommand		perlString
 HiLink perlSpecialAscii		perlSpecial
 HiLink perlSpecialDollar	perlSpecial

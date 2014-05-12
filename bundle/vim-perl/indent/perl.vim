@@ -3,7 +3,7 @@
 " Maintainer:    vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2013-07-24
+" Last Change:   2013-12-15
 
 " Suggestions and improvements by :
 "   Aaron J. Sherman (use syntax for hints)
@@ -134,6 +134,7 @@ function! GetPerlIndent()
                         \ || synid == "perlMatchStartEnd"
                         \ || synid == "perlHereDoc"
                         \ || synid == "perlBraces"
+                        \ || synid == "perlStatementIndirObj"
                         \ || synid =~ "^perlFiledescStatement"
                         \ || synid =~ '^perl\(Sub\|Block\|Package\)Fold'
                 let brace = strpart(line, bracepos, 1)
@@ -151,6 +152,7 @@ function! GetPerlIndent()
             if synid == ""
                         \ || synid == "perlMatchStartEnd"
                         \ || synid == "perlBraces"
+                        \ || synid == "perlStatementIndirObj"
                         \ || synid =~ '^perl\(Sub\|Block\|Package\)Fold'
                 let ind = ind - &sw
             endif
