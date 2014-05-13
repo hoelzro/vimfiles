@@ -8,6 +8,7 @@ augroup Custom
   " prevent saving to files that I'm probably writing on accident
   autocmd BufWritePre 1 throw 'Suspicious filename "1"'
   autocmd BufWritePre 2 throw 'Suspicious filename "2"'
+  autocmd BufWritePre ' throw 'Suspicious filename "''"'
   autocmd BufWritePre [\\] throw 'Suspicious filename "\"'
 
   autocmd InsertLeave * set nopaste
