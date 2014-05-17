@@ -67,7 +67,7 @@ function! s:Opener.New(path, opts)
 
     let newObj._path = a:path
     let newObj._stay = nerdtree#has_opt(a:opts, 'stay')
-    let newObj._reuse = nerdtree#has_opt(a:opts, 'reuse')
+    let newObj._reuse = 0
     let newObj._keepopen = nerdtree#has_opt(a:opts, 'keepopen')
     let newObj._where = has_key(a:opts, 'where') ? a:opts['where'] : ''
     let newObj._treetype = b:NERDTreeType
