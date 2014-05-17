@@ -15,6 +15,9 @@ augroup Custom
   autocmd VimResized * exe "normal! \<c-w>="
   autocmd BufWritePost *.pl silent !chmod 755 %
   autocmd FileChangedShell * call <SID>HandleFileChange()
+
+  autocmd InsertEnter * let b:old_fold=&foldmethod | set foldmethod=manual
+  autocmd InsertLeave * let &foldmethod=b:old_fold
 augroup END
 
 " open help windows in their own tabs
