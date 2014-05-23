@@ -64,6 +64,7 @@ function! Page(command)
   setlocal bufhidden=hide
   setlocal noswapfile
   setlocal nobuflisted
+  setlocal modifiable
   execute 'file ' . a:command
 
   " set up custom commands
