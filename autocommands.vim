@@ -1,10 +1,6 @@
 augroup Custom
   autocmd!
 
-  " Automatic saving and loading of views
-  autocmd BufWinLeave * silent! mkview
-  autocmd BufWinEnter * silent! loadview
-
   " prevent saving to files that I'm probably writing on accident
   autocmd BufWritePre 1 throw 'Suspicious filename "1"'
   autocmd BufWritePre 2 throw 'Suspicious filename "2"'
