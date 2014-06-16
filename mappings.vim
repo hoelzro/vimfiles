@@ -1,4 +1,4 @@
-mapclear
+mapclear!
 abclear
 
 noremap <C-p> :tabprev<CR>
