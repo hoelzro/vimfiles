@@ -43,8 +43,7 @@ end
 
 inoremap <C-A> <nop>
 inoremap <C-@> <nop>
-inoremap <Esc> <nop>
-inoremap <C-c> <Esc>
+inoremap <C-c> <nop>
 nnoremap zo zO
 inoreabbrev deafult default
 inoreabbrev langauge language
