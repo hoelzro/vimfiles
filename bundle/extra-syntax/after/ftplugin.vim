@@ -15,7 +15,7 @@ augroup FileTypes
   autocmd BufRead,BufNewFile *.rockspec set filetype=lua
   autocmd BufRead,BufNewFile .tmux.conf set filetype=tmux
   autocmd BufRead,BufNewFile bash-* set filetype=sh " for CTRL-X CTRL-E
-  autocmd BufRead,BufNewFile *.t set filetype=perl
+  autocmd BufRead,BufNewFile *.t setf  perl
   autocmd BufRead,BufNewFile *.qml set filetype=qml
 augroup END
 
