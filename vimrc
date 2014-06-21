@@ -10,7 +10,13 @@ PERL
 
 endif
 
+let old_verbose=&verbose
+let old_verbosefile=&verbosefile
 set all&
+let &verbose=old_verbose
+let &verbosefile=old_verbosefile
+unlet old_verbose
+unlet old_verbosefile
 
 call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
