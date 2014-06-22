@@ -39,6 +39,7 @@ let perl_extended_vars=1
 let perl_fold=1
 let perl_nofold_packages=1
 let perl_fold_anonymous_subs=1
+let perl_no_subprototype_error=1
 
 " Python
 let python_highlight_space_errors=1
