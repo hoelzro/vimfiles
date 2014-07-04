@@ -1429,7 +1429,7 @@ fun! manpageview#ManPageComplete(ArgLead, CmdLine, CursorPos)
   let matches = map(matches, "substitute(v:val, '[.].*$', '', '')")
   let matches = filter(matches, "v:val =~# '^\\V" . a:ArgLead . "'")
 
-  sort(matches)
+  call sort(matches)
 
   " XXX fairly inefficient
   let i = 0
