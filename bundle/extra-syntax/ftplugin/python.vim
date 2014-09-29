@@ -1,4 +1,4 @@
 setlocal omnifunc=pythoncomplete#Complete
 setlocal foldmethod=expr
-setlocal foldexpr=pymode#folding#expr(v:lnum)
-setlocal foldtext=pymode#folding#text()
+setlocal foldexpr=python_fold#GetPythonFold(v:lnum)
+setlocal foldtext=python_fold#PythonFoldText()
