@@ -14,7 +14,6 @@ augroup Custom
 
   autocmd InsertEnter * let b:old_fold=&foldmethod | set foldmethod=manual
   autocmd InsertLeave * let &foldmethod=b:old_fold
-  autocmd InsertLeave * normal zv
 augroup END
 
 " open help windows in their own tabs
