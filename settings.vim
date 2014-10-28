@@ -15,6 +15,7 @@ set expandtab
 set smarttab
 set formatoptions=cqort
 set mouse=
+set foldminlines=3
 set foldmethod=syntax
 set modeline
 set hls
