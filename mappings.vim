@@ -89,6 +89,7 @@ nnoremap <C-x>? :call <SID>DisplayHandyMappings()<CR>
 nnoremap <C-x><C-x> <C-x>
 
 vnoremap . :normal .<CR>
+vnoremap , :normal A,<CR>
 
 nnoremap <Left> :previous<CR>
 nnoremap <Right> :next<CR>
