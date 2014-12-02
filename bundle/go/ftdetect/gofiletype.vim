@@ -16,10 +16,6 @@ endfunction
 function! s:gofiletype_post()
   let &g:fileformats = s:current_fileformats
   let &g:fileencodings = s:current_fileencodings
-
-  setlocal softtabstop=8
-  setlocal shiftwidth=8
-  setlocal noexpandtab
 endfunction
 
 au BufNewFile *.go setlocal filetype=go fileencoding=utf-8 fileformat=unix
