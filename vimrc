@@ -28,8 +28,10 @@ source ~/.vim/helper-functions.vim
 source ~/.vim/mappings.vim
 source ~/.vim/autocommands.vim
 
+" Define a highlight group for things that annoy me
+highlight Annoyance ctermbg=236
 " I hate end of line whitespace...highlight it
-match Search /\s\+$/
+match Annoyance /\s\+$/
 
 " up arrow (↑)
 digraph -^ 8593

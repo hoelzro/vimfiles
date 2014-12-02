@@ -5,8 +5,8 @@ augroup FileTypes
   autocmd BufNewFile,BufRead SConstruct,SConscript,wscript,wscript_build setf python
   autocmd BufNewFile,BufRead *.p6 setf perl6
   autocmd BufNewFile,BufRead /etc/lighttpd/*.conf,lighttpd.conf set filetype=lighttpd
-  autocmd FileType c 2match Search /\%>78v./
-  autocmd FileType perl 2match Search /\%>78v./
+  autocmd FileType c 2match Annoyance /\%>78v./
+  autocmd FileType perl 2match Annoyance /\%>78v./
   autocmd FileType perl setlocal equalprg=perltidy
   autocmd BufRead,BufNewFile *.psgi set filetype=perl
   autocmd BufRead,BufNewFile *.html.epl set filetype=epl
