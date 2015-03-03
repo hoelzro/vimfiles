@@ -57,7 +57,7 @@ cabbrev q1 q!
 cabbrev ssu sus
 cabbrev us sus
 cabbrev Sus sus
-cnoreabbrev su sus
+cnoremap su suspend
 cnoreabbrev Help help
 cnoreabbrev tanbew tabnew
 
