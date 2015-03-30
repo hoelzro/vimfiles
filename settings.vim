@@ -23,6 +23,7 @@ set incsearch
 set infercase
 set ruler
 set showmatch
+set ignorecase
 set smartcase
 set title
 set wildmenu
