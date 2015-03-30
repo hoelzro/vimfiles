@@ -7,3 +7,5 @@ set nocindent
 set smartindent
 set cinwords=if,elif,else,for,while,try,except,finally,def,class
 filetype plugin indent on
+
+inoremap <Leader>upp from pprint import pprint as pp
