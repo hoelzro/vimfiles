@@ -128,3 +128,8 @@ function! SwapLastTwoChars()
 endfunction
 
 cnoremap <silent> <C-t> <C-\>eSwapLastTwoChars()<CR>
+
+" work in concert with a CompleteDone mapping autocommands.vim
+inoremap <C-p> <C-o>:let b:oldignorecase=&l:ignorecase \| :setlocal noignorecase<CR><C-p>
+inoremap <C-n> <C-o>:let b:oldignorecase=&l:ignorecase \| :setlocal noignorecase<CR><C-n>
+inoremap <C-x> <C-o>:let b:oldignorecase=&l:ignorecase \| :setlocal noignorecase<CR><C-x>
