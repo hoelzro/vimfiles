@@ -41,7 +41,7 @@ if &t_Co > 1
     syntax enable
 endif
 
-if &term =~ '.*-256color' || &term ==# 'nvim'
+if has('gui_running') || &t_Co == 256
   set t_Co=256
   colorscheme peaksea
 endif
