@@ -130,6 +130,24 @@ endfunction
 cnoremap <silent> <C-t> <C-\>eSwapLastTwoChars()<CR>
 
 " work in concert with a CompleteDone mapping autocommands.vim
-inoremap <C-p> <C-o>:let b:oldignorecase=&l:ignorecase \| :setlocal noignorecase<CR><C-p>
-inoremap <C-n> <C-o>:let b:oldignorecase=&l:ignorecase \| :setlocal noignorecase<CR><C-n>
-inoremap <C-x> <C-o>:let b:oldignorecase=&l:ignorecase \| :setlocal noignorecase<CR><C-x>
+function! ForceCaseSensitiveCompletion()
+  let b:oldignorecase=&l:ignorecase
+  setlocal noignorecase
+
+  iunmap <C-p>
+  iunmap <C-n>
+  iunmap <C-x>
+endfunction
+
+function! RestoreOldCaseSensitivity()
+  let &l:ignorecase=b:oldignorecase
+  unlet b:oldignorecase
+
+  inoremap <C-p> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-p>
+  inoremap <C-n> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-n>
+  inoremap <C-x> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-x>
+endfunction
+
+inoremap <C-p> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-p>
+inoremap <C-n> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-n>
+inoremap <C-x> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-x>
