@@ -8,6 +8,10 @@
 " This file wasn't actually written by Niklas!  But its contents are generated
 " by a Perl script that is based on his css.vim.
 
+if !has('perl')
+  finish
+endif
+
 perl <<PERL
 use strict;
 
