@@ -170,7 +170,7 @@ fu! recover#ConfirmSwapDiff() "{{{1
     let msg = ""
     let bufname = s:isWin() ? fnamemodify(expand('%'), ':p:8') : shellescape(expand('%'))
     let tfile = tempname()
-    if executable('vim') && !s:isWin()
+    if executable(v:progname) && !s:isWin()
 	" Doesn't work on windows (system() won't be able to fetch the output)
 	" Capture E325 Warning message
 	" Leave English output, so parsing will be easier
@@ -179,8 +179,9 @@ fu! recover#ConfirmSwapDiff() "{{{1
 	  let wincmd = printf('-c "redir > %s|1d|:q!" ', tfile)
 	  let wincmd = printf('-c "call feedkeys(\"o\n\e:q!\n\")"')
 	endif
-	let cmd = printf("%svim -u NONE -es -V %s %s",
+	let cmd = printf("%s%s -u NONE -es -V %s %s",
 	    \ (s:isWin() ? '' : 'TERM=vt100 LC_ALL=C '),
+            \ v:progname,
 	    \ (s:isWin() ? wincmd : ''),
 	    \ bufname)
 	let msg = system(cmd)
@@ -203,18 +204,18 @@ fu! recover#ConfirmSwapDiff() "{{{1
 		let pname = matchstr(readfile(proc)[0], '^Name:\s*\zs.*')
 	    endif
 	    let msg = substitute(msg, pid_pat, '& ['.pname."]\n", '')
-	    if not_modified && pname !~? 'vim'
+	    if not_modified && pname !~? v:progname
 		let not_modified = 0
 	    endif
 	endif
     endif
-    if executable('vim') && executable('diff') "&& s:isWin()
+    if executable(v:progname) && executable('diff') "&& s:isWin()
 	" Check, whether the files differ issue #7
 	" doesn't work on Windows? (cmd is ok, should be executable)
 	if s:isWin()
 	    let tfile = substitute(tfile, '/', '\\', 'g')
 	endif
-	let cmd = printf("vim -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
+	let cmd = printf(v:progname . " -u NONE -N %s -r %s -c \":w %s|:q!\" %s diff %s %s",
 		    \ (s:isWin() ? '' : '-es'),
 		    \ (s:isWin() ? fnamemodify(v:swapname, ':p:8') : shellescape(v:swapname)),
 		    \ tfile, (s:isWin() ? '&' : '&&'),
