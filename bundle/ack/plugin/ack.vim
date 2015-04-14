@@ -18,7 +18,7 @@ function! s:Ack(cmd, args)
     echo "Searching ..."
 
     " If no pattern is provided, search for the word under the cursor
-    if empty(a:args)
+    if empty(a:args) " XXX doesn't mean no pattern
         let l:grepargs = expand("<cword>")
     else
         let l:grepargs = a:args
@@ -26,9 +26,9 @@ function! s:Ack(cmd, args)
 
     " Format, used to manage column jump
     if a:cmd =~# '-g$'
-        let g:ackformat="%f"
+        let g:ackformat="%f" " XXX no global
     else
-        let g:ackformat="%f:%l:%c:%m"
+        let g:ackformat="%f:%l:%c:%m" " XXX no global
     end
 
     let grepprg_bak=&grepprg
@@ -48,6 +48,7 @@ function! s:Ack(cmd, args)
         botright copen
     endif
 
+    " XXX why exec?
     exec "nnoremap <silent> <buffer> q :ccl<CR>"
     exec "nnoremap <silent> <buffer> t <C-W><CR><C-W>T"
     exec "nnoremap <silent> <buffer> T <C-W><CR><C-W>TgT<C-W><C-W>"
@@ -58,7 +59,7 @@ function! s:Ack(cmd, args)
 
     " If highlighting is on, highlight the search keyword.
     if exists("g:ackhighlight")
-        let @/=a:args
+        let @/=a:args " XXX doesn't translate
         set hlsearch
     end
 
