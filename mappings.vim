@@ -137,17 +137,18 @@ function! ForceCaseSensitiveCompletion()
   iunmap <C-p>
   iunmap <C-n>
   iunmap <C-x>
+  return ''
 endfunction
 
 function! RestoreOldCaseSensitivity()
   let &l:ignorecase=b:oldignorecase
   unlet b:oldignorecase
 
-  inoremap <C-p> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-p>
-  inoremap <C-n> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-n>
-  inoremap <C-x> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-x>
+  inoremap <C-p> <C-r>=ForceCaseSensitiveCompletion()<CR><C-p>
+  inoremap <C-n> <C-r>=ForceCaseSensitiveCompletion()<CR><C-n>
+  inoremap <C-x> <C-r>=ForceCaseSensitiveCompletion()<CR><C-x>
 endfunction
 
-inoremap <C-p> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-p>
-inoremap <C-n> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-n>
-inoremap <C-x> <C-o>:call ForceCaseSensitiveCompletion()<CR><C-x>
+inoremap <C-p> <C-r>=ForceCaseSensitiveCompletion()<CR><C-p>
+inoremap <C-n> <C-r>=ForceCaseSensitiveCompletion()<CR><C-n>
+inoremap <C-x> <C-r>=ForceCaseSensitiveCompletion()<CR><C-x>
