@@ -45,6 +45,9 @@ let perl_sub_signatures=1
 " Python
 let python_highlight_space_errors=1
 let python_highlight_all=1
+let pyindent_continue='&shiftwidth'
+let pyindent_open_paren='&shiftwidth'
+let pyindent_nested_paren='&shiftwidth'
 
 " Ruby
 let ruby_space_errors=1
