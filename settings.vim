@@ -1,6 +1,6 @@
 let $MANPAGER='less'
 
-filetype plugin on
+filetype plugin indent on
 
 set showcmd
 set autochdir
