@@ -3,7 +3,7 @@
 " Maintainer:    vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2013-12-16
+" Last Change:   2015-02-09
 
 if exists("b:did_ftplugin") | finish | endif
 let b:did_ftplugin = 1
@@ -77,7 +77,7 @@ endif
 "---------------------------------------------
 
 " Undo the stuff we changed.
-let b:undo_ftplugin = "setlocal fo< com< cms< inc< inex< def< isf< kp< path<" .
+let b:undo_ftplugin = "setlocal fo< com< cms< inc< inex< def< isk< isf< kp< path<" .
 	    \	      " | unlet! b:browsefilter"
 
 " proper matching for matchit plugin

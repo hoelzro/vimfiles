@@ -3,7 +3,7 @@
 " Maintainer:    vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   2013-12-15
+" Last Change:   2015-05-08
 
 " Suggestions and improvements by :
 "   Aaron J. Sherman (use syntax for hints)
@@ -45,11 +45,6 @@ function! GetPerlIndent()
 
     " Indent POD markers to column 0
     if cline =~ '^\s*=\L\@!'
-        return 0
-    endif
-
-    " Don't reindent comments on first column
-    if cline =~ '^#.'
         return 0
     endif
 

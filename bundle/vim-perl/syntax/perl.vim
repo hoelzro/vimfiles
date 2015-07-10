@@ -3,7 +3,7 @@
 " Maintainer:    vim-perl <vim-perl@googlegroups.com>
 " Homepage:      http://github.com/vim-perl/vim-perl/tree/master
 " Bugs/requests: http://github.com/vim-perl/vim-perl/issues
-" Last Change:   {{LAST_CHANGE}}
+" Last Change:   2015-04-02
 " Contributors:  Andy Lester <andy@petdance.com>
 "                Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 "                Lukas Mai <l.mai.web.de>
@@ -28,7 +28,7 @@
 " unlet perl_fold
 " unlet perl_fold_blocks
 " unlet perl_nofold_packages
-" let perl_nofold_subs = 1
+" unlet perl_nofold_subs
 " unlet perl_fold_anonymous_subs
 " unlet perl_no_subprototype_error
 
@@ -38,11 +38,6 @@ endif
 
 let s:cpo_save = &cpo
 set cpo&vim
-
-if exists('&regexpengine')
-  let s:regexpengine=&regexpengine
-  set regexpengine=1
-endif
 
 " POD starts with ^=<word> and ends with ^=cut
 
@@ -334,19 +329,24 @@ syn region perlQQ		matchgroup=perlStringStartEnd start=+\<\%(::\|'\|->\)\@<!qr\s
 " XXX Any statements after the identifier are in perlString colour (i.e.
 " 'if $a' in 'print <<EOF if $a'). This is almost impossible to get right it
 " seems due to the 'auto-extending nature' of regions.
+syn region perlHereDocStart	matchgroup=perlStringStartEnd start=+<<\z(\I\i*\)+  end=+$+     contains=@perlTop oneline
+syn region perlHereDocStart	matchgroup=perlStringStartEnd start=+<<\s*"\z([^\\"]*\%(\\.[^\\"]*\)*\)"+ end=+$+ contains=@perlTop oneline
+syn region perlHereDocStart	matchgroup=perlStringStartEnd start=+<<\s*'\z([^\\']*\%(\\.[^\\']*\)*\)'+ end=+$+ contains=@perlTop oneline
+syn region perlHereDocStart	matchgroup=perlStringStartEnd start=+<<\s*""+       end=+$+     contains=@perlTop oneline
+syn region perlHereDocStart	matchgroup=perlStringStartEnd start=+<<\s*''+       end=+$+     contains=@perlTop oneline
 if exists("perl_fold")
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\z(\I\i*\).*+    end=+^\z1$+ contains=@perlInterpDQ fold extend
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*"\z([^\\"]*\%(\\.[^\\"]*\)*\)"+ end=+^\z1$+ contains=@perlInterpDQ fold extend
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*'\z([^\\']*\%(\\.[^\\']*\)*\)'+ end=+^\z1$+ contains=@perlInterpSQ fold extend
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*""+           end=+^$+    contains=@perlInterpDQ,perlNotEmptyLine fold extend
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*''+           end=+^$+    contains=@perlInterpSQ,perlNotEmptyLine fold extend
+  syn region perlHereDoc	start=+<<\z(\I\i*\)+ matchgroup=perlStringStartEnd      end=+^\z1$+ contains=perlHereDocStart,@perlInterpDQ fold extend
+  syn region perlHereDoc	start=+<<\s*"\z([^\\"]*\%(\\.[^\\"]*\)*\)"+ matchgroup=perlStringStartEnd end=+^\z1$+ contains=perlHereDocStart,@perlInterpDQ fold extend
+  syn region perlHereDoc	start=+<<\s*'\z([^\\']*\%(\\.[^\\']*\)*\)'+ matchgroup=perlStringStartEnd end=+^\z1$+ contains=perlHereDocStart,@perlInterpSQ fold extend
+  syn region perlHereDoc	start=+<<\s*""+ matchgroup=perlStringStartEnd           end=+^$+    contains=perlHereDocStart,@perlInterpDQ,perlNotEmptyLine fold extend
+  syn region perlHereDoc	start=+<<\s*''+ matchgroup=perlStringStartEnd           end=+^$+    contains=perlHereDocStart,@perlInterpSQ,perlNotEmptyLine fold extend
   syn region perlAutoload	matchgroup=perlStringStartEnd start=+<<\s*\(['"]\=\)\z(END_\%(SUB\|OF_FUNC\|OF_AUTOLOAD\)\)\1+ end=+^\z1$+ contains=ALL fold extend
 else
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\z(\I\i*\).*+    end=+^\z1$+ contains=@perlInterpDQ
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*"\z([^\\"]*\%(\\.[^\\"]*\)*\)"+ end=+^\z1$+ contains=@perlInterpDQ
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*'\z([^\\']*\%(\\.[^\\']*\)*\)'+ end=+^\z1$+ contains=@perlInterpSQ
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*""+           end=+^$+    contains=@perlInterpDQ,perlNotEmptyLine
-  syn region perlHereDoc	matchgroup=perlStringStartEnd start=+<<\s*''+           end=+^$+    contains=@perlInterpSQ,perlNotEmptyLine
+  syn region perlHereDoc	start=+<<\z(\I\i*\)+ matchgroup=perlStringStartEnd      end=+^\z1$+ contains=perlHereDocStart,@perlInterpDQ
+  syn region perlHereDoc	start=+<<\s*"\z([^\\"]*\%(\\.[^\\"]*\)*\)"+ matchgroup=perlStringStartEnd end=+^\z1$+ contains=perlHereDocStart,@perlInterpDQ
+  syn region perlHereDoc	start=+<<\s*'\z([^\\']*\%(\\.[^\\']*\)*\)'+ matchgroup=perlStringStartEnd end=+^\z1$+ contains=perlHereDocStart,@perlInterpSQ
+  syn region perlHereDoc	start=+<<\s*""+ matchgroup=perlStringStartEnd           end=+^$+    contains=perlHereDocStart,@perlInterpDQ,perlNotEmptyLine
+  syn region perlHereDoc	start=+<<\s*''+ matchgroup=perlStringStartEnd           end=+^$+    contains=perlHereDocStart,@perlInterpSQ,perlNotEmptyLine
   syn region perlAutoload	matchgroup=perlStringStartEnd start=+<<\s*\(['"]\=\)\z(END_\%(SUB\|OF_FUNC\|OF_AUTOLOAD\)\)\1+ end=+^\z1$+ contains=ALL
 endif
 
@@ -360,21 +360,19 @@ syn keyword perlStatementPackage	package contained
 "       sub [name] [(prototype)] {
 "
 syn match perlSubError "[^[:space:];{#]" contained
-if v:version == 701 && !has('patch221')  " XXX I hope that's the right one
-    syn match perlSubAttributes ":" contained
+syn match perlSubAttributesCont "\h\w*\_s*\%(:\_s*\)\=" nextgroup=@perlSubAttrMaybe contained
+syn region perlSubAttributesCont matchgroup=perlSubAttributesCont start="\h\w*(" end=")\_s*\%(:\_s*\)\=" nextgroup=@perlSubAttrMaybe contained contains=@perlInterpSQ,perlParensSQ
+syn cluster perlSubAttrMaybe contains=perlSubAttributesCont,perlSubError,perlFakeGroup
+syn match perlSubAttributes "" contained nextgroup=perlSubError
+syn match perlSubAttributes ":\_s*" contained nextgroup=@perlSubAttrMaybe
+if get(g:, "perl_sub_signatures", 0)
+    syn match perlSignature +(\_[^)]*)\_s*+ nextgroup=perlSubAttributes,perlComment contained
 else
-    syn match perlSubAttributesCont "\h\w*\_s*\%(:\_s*\)\=" nextgroup=@perlSubAttrMaybe contained
-    syn region perlSubAttributesCont matchgroup=perlSubAttributesCont start="\h\w*(" end=")\_s*\%(:\_s*\)\=" nextgroup=@perlSubAttrMaybe contained contains=@perlInterpSQ,perlParensSQ
-    syn cluster perlSubAttrMaybe contains=perlSubAttributesCont,perlSubError,perlFakeGroup
-    syn match perlSubAttributes "" contained nextgroup=perlSubError
-    syn match perlSubAttributes ":\_s*" contained nextgroup=@perlSubAttrMaybe
-endif
-if !exists("perl_no_subprototype_error") " Set 1 if using signatures feature in perl5.19.9
     syn match perlSubPrototypeError "(\%(\_s*\%(\%(\\\%([$@%&*]\|\[[$@%&*]\+\]\)\|[$&*]\|[@%]\%(\_s*)\)\@=\|;\%(\_s*[)$@%&*\\]\)\@=\|_\%(\_s*[);]\)\@=\)\_s*\)*\)\@>\zs\_[^)]\+" contained
     syn match perlSubPrototype +(\_[^)]*)\_s*+ nextgroup=perlSubAttributes,perlComment contained contains=perlSubPrototypeError
 endif
 
-syn match perlSubName +\%(\h\|::\|'\w\)\%(\w\|::\|'\w\)*\_s*\|+ contained nextgroup=perlSubPrototype,perlSubAttributes,perlComment
+syn match perlSubName +\%(\h\|::\|'\w\)\%(\w\|::\|'\w\)*\_s*\|+ contained nextgroup=perlSubPrototype,perlSignature,perlSubAttributes,perlComment
 
 syn match perlFunction +\<sub\>\_s*+ nextgroup=perlSubName
 
@@ -414,9 +412,9 @@ if exists("perl_fold")
     syn region perlPackageFold start="^package \S\+;\s*\%(#.*\)\=$" end="^1;\=\s*\%(#.*\)\=$" end="\n\+package"me=s-1 transparent fold keepend
   endif
   if !exists("perl_nofold_subs")
-    if exists("perl_fold_anonymous_subs") && perl_fold_anonymous_subs
-      syn region perlSubFold     start="\<sub\>[^;]*{" end="}" transparent fold keepend extend
-      syn region perlSubFold     start="\<\%(BEGIN\|END\|CHECK\|INIT\)\>\s*{" end="}" transparent fold keepend
+    if get(g:, "perl_fold_anonymous_subs", 0)
+      syn region perlSubFold start="\<sub\>[^{]*{" end="}" transparent fold keepend extend
+      syn region perlSubFold start="\<\%(BEGIN\|END\|CHECK\|INIT\)\>\s*{" end="}" transparent fold keepend
     else
       syn region perlSubFold     start="^\z(\s*\)\<sub\>.*[^};]$" end="^\z1}\s*\%(#.*\)\=$" transparent fold keepend
       syn region perlSubFold start="^\z(\s*\)\<\%(BEGIN\|END\|CHECK\|INIT\|UNITCHECK\)\>.*[^};]$" end="^\z1}\s*$" transparent fold keepend
@@ -459,6 +457,7 @@ HiLink perlOperator		Operator
 HiLink perlFunction		Keyword
 HiLink perlSubName		Function
 HiLink perlSubPrototype		Type
+HiLink perlSignature		Type
 HiLink perlSubAttributes	PreProc
 HiLink perlSubAttributesCont	perlSubAttributes
 HiLink perlComment		Comment
@@ -579,11 +578,6 @@ syn sync match perlSyncPOD	grouphere perlPOD "^=item"
 syn sync match perlSyncPOD	grouphere NONE "^=cut"
 
 let b:current_syntax = "perl"
-
-if exists('&regexpengine')
-  let &regexpengine=s:regexpengine
-  unlet s:regexpengine
-endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
