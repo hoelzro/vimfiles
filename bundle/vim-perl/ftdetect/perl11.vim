@@ -20,7 +20,7 @@ function! s:DetectPerl6()
 
       if line =~ '^\s*\%(use\s\+\)\=v6\%(\.\d\%(\.\d\)\=\)\=;'
         set filetype=perl6 " we matched a 'use v6' declaration
-      elseif line =~ '^\s*\%(\%(my\|our\)\s\+\)\=\(module\|class\|role\|enum\|grammar\)'
+      elseif line =~ '^\s*\%(\%(my\|our\)\s\+\)\=\%(unit\s\+\)\=\(module\|class\|role\|enum\|grammar\)'
         set filetype=perl6 " we found a class, role, module, enum, or grammar declaration
       endif
 
@@ -31,4 +31,4 @@ function! s:DetectPerl6()
 endfunction
 
 autocmd BufReadPost *.pl,*.pm,*.t call s:DetectPerl6()
-autocmd BufNew,BufRead *.nqp setf perl6
+autocmd BufNew,BufNewFile,BufRead *.nqp setf perl6
