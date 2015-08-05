@@ -257,6 +257,10 @@ function! s:InsertDevJournalTemplate()
   let months   = split('Nothing January February March April May June July August September October November December', '\s\+')
   let suffixes = { 1: 'st', 21: 'st', 31: 'st', 2: 'nd', 22: 'nd', 3: 'rd', 23: 'rd' }
 
+  if ! <SID>IsFileEmpty()
+    return
+  endif
+
   let path = expand('%:p')
 
   if path !~ 'dev-journal'
