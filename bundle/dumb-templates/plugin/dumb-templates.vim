@@ -253,6 +253,27 @@ function! s:InsertJavaTemplate()
   call <SID>InsertTemplate(template)
 endfunction
 
+function! s:InsertDevJournalTemplate()
+  let months   = split('Nothing January February March April May June July August September October November December', '\s\+')
+  let suffixes = { 1: 'st', 21: 'st', 31: 'st', 2: 'nd', 22: 'nd', 3: 'rd', 23: 'rd' }
+
+  let path = expand('%:p')
+
+  if path !~ 'dev-journal'
+    return
+  endif
+
+  let filename             = expand('%:t')
+  let date_match           = matchlist(filename, '^\(\d\+\)-\(\d\+\)-\(\d\+\)')
+  let [ year, month, day ] = map(date_match[1:3], 'str2nr(substitute(v:val, "^0\\+", "", "g"))')
+
+  let template = [
+\   printf('# dev journal for %s %d%s, %d', months[month], day, get(suffixes, day, 'th'), year),
+\   ''
+\ ]
+  call <SID>InsertTemplate(template)
+endfunction
+
 augroup DumbTemplateInsertion
   autocmd!
 
@@ -260,6 +281,8 @@ augroup DumbTemplateInsertion
   autocmd FileType ruby    call <SID>InsertRubyTemplate()
   autocmd FileType vimwiki call <SID>InsertVimWikiTemplate()
   autocmd FileType java    call <SID>InsertJavaTemplate()
+
+  autocmd FileType markdown call <SID>InsertDevJournalTemplate()
 augroup END
 
 " vim:sw=2 sts=2
