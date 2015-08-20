@@ -152,3 +152,5 @@ endfunction
 inoremap <C-p> <C-r>=ForceCaseSensitiveCompletion()<CR><C-p>
 inoremap <C-n> <C-r>=ForceCaseSensitiveCompletion()<CR><C-n>
 inoremap <C-x> <C-r>=ForceCaseSensitiveCompletion()<CR><C-x>
+
+nnoremap ga :UnicodeName
