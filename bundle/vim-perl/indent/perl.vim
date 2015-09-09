@@ -121,6 +121,7 @@ function! GetPerlIndent()
         " bracket as the first character in the class.
         let braceclass = '[][(){}]'
         let bracepos = match(line, braceclass, matchend(line, '^\s*[])}]'))
+        let brace_level = 0
         while bracepos != -1
             let synid = synIDattr(synID(lnum, bracepos + 1, 0), "name")
             " If the brace is highlighted in one of those groups, indent it.
@@ -134,13 +135,16 @@ function! GetPerlIndent()
                         \ || synid =~ '^perl\(Sub\|Block\|Package\)Fold'
                 let brace = strpart(line, bracepos, 1)
                 if brace == '(' || brace == '{' || brace == '['
-                    let ind = ind + &sw
+                  let brace_level = brace_level + 1
                 else
-                    let ind = ind - &sw
+                  let brace_level = brace_level - 1
                 endif
             endif
             let bracepos = match(line, braceclass, bracepos + 1)
         endwhile
+        if brace_level > 0
+          let ind = ind + &sw
+        endif
         let bracepos = matchend(cline, '^\s*[])}]')
         if bracepos != -1
             let synid = synIDattr(synID(v:lnum, bracepos, 0), "name")
