@@ -141,6 +141,10 @@ function! ForceCaseSensitiveCompletion()
 endfunction
 
 function! RestoreOldCaseSensitivity()
+  if !has_key(b:, 'oldignorecase')
+    return
+  endif
+
   let &l:ignorecase=b:oldignorecase
   unlet b:oldignorecase
 
