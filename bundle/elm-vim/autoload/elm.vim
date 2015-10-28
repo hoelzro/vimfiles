@@ -78,8 +78,12 @@ fun! s:elmOracle(...)
 endf
 
 " Query elm-oracle and echo the type and docs for the word under the cursor.
-fun! elm#ShowDocs()
-		let response = s:elmOracle()
+fun! elm#ShowDocs(...)
+		if a:0 >= 1
+			let response = s:elmOracle(a:1)
+		else
+			let response = s:elmOracle()
+		endif
 		if len(response) > 0
 			let info = response[0]
 			redraws! | echohl Identifier | echon info.fullName | echohl None | echon " : " | echohl Function | echon info.signature | echohl None | echon "\n\n" . info.comment
