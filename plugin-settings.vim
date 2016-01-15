@@ -30,3 +30,7 @@ function! VimwikiLinkHandler(link)
 
   return 0
 endfunction
+
+" Markdown settings
+
+let g:markdown_folding = 1
