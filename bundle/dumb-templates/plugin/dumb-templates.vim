@@ -273,6 +273,8 @@ function! s:InsertDevJournalTemplate()
 
   let template = [
 \   printf('# dev journal for %s %d%s, %d', months[month], day, get(suffixes, day, 'th'), year),
+\   '',
+\   '**NOTE**: Remember to include your feelings and any TILs!',
 \   ''
 \ ]
   call <SID>InsertTemplate(template)
