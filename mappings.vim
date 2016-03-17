@@ -158,3 +158,9 @@ inoremap <C-n> <C-r>=ForceCaseSensitiveCompletion()<CR><C-n>
 inoremap <C-x> <C-r>=ForceCaseSensitiveCompletion()<CR><C-x>
 
 nnoremap ga :UnicodeName<CR>
+
+function! IfEmpty(value, default)
+  return empty(a:value) ? a:default : a:value
+endfunction
+
+nnoremap <C-g> :echo expand('%:p') . ' ' . IfEmpty(&filetype, '<no filetype>') . ' ' . IfEmpty(&fileencoding, '<no encoding>') . ' ' . IfEmpty(&fileformat, '<no format>')<CR>
