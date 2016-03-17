@@ -77,3 +77,45 @@ function! Page(command)
 endfunction
 
 command! -nargs=+ -complete=command Page call Page(<q-args>)
+
+function! FindGitRoot(path)
+  let path = system('cd ' . shellescape(a:path) . '; git rev-parse --show-toplevel 2>/dev/null')
+
+  if v:shell_error != 0
+    let path = ''
+  else
+    let path = substitute(path, '\n$', '', '')
+  endif
+
+  return path
+endfunction
+
+function Abs2Rel(path, ...)
+  if a:0
+    let parent = a:1
+
+    if parent[-1:] != '/'
+      let parent = parent . '/'
+    endif
+
+    if a:path[:strlen(parent)-1] == parent
+      return a:path[strlen(parent):]
+    else
+      return a:path
+    end
+  else
+    return fnamemodify(a:path, ':.')
+  endif
+endfunction
+
+function! ProjectRelativePath()
+  if !exists('b:relative_path')
+    let abs_path = expand('%:p')
+    let git_root = FindGitRoot(fnamemodify(abs_path, ':h'))
+    let path     = Abs2Rel(abs_path, git_root)
+
+    let b:relative_path = Abs2Rel(abs_path, git_root)
+  endif
+
+  return b:relative_path
+endfunction
