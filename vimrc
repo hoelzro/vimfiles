@@ -12,11 +12,17 @@ endif
 
 let old_verbose=&verbose
 let old_verbosefile=&verbosefile
+let old_runtimepath=&runtimepath
+let old_filetype=&filetype
 set all&
 let &verbose=old_verbose
 let &verbosefile=old_verbosefile
+let &runtimepath=old_runtimepath
+let &filetype=old_filetype
 unlet old_verbose
 unlet old_verbosefile
+unlet old_runtimepath
+unlet old_filetype
 
 call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
