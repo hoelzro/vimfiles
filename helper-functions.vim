@@ -90,7 +90,7 @@ function! FindGitRoot(path)
   return path
 endfunction
 
-function Abs2Rel(path, ...)
+function! Abs2Rel(path, ...)
   if a:0
     let parent = a:1
 
