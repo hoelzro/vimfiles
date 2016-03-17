@@ -163,4 +163,4 @@ function! IfEmpty(value, default)
   return empty(a:value) ? a:default : a:value
 endfunction
 
-nnoremap <C-g> :echo expand('%:p') . ' ' . IfEmpty(&filetype, '<no filetype>') . ' ' . IfEmpty(&fileencoding, '<no encoding>') . ' ' . IfEmpty(&fileformat, '<no format>')<CR>
+nnoremap <C-g> :echo expand('%:p') . ' ' . IfEmpty(&filetype, '<no filetype>') . ' ' . IfEmpty(&fileencoding, '<no encoding>') . ' ' . IfEmpty(&fileformat, '<no format>') . ' ' . line('$') . ' lines'<CR>
