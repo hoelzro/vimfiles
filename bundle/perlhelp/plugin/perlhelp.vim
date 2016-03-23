@@ -46,7 +46,7 @@ if exists('perlhelp_prog')
 else
     let s:perlhelp = 'perldoc'
 endif
-if !executable(s:perlhelp)
+if !exists('perlhelp_no_check') && !executable(s:perlhelp)
   echoe s:perlhelp . ' is not installed!'
   finish
 endif
