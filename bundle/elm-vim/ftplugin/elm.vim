@@ -19,7 +19,14 @@ if !exists("g:elm_make_show_warnings")
 	let g:elm_make_show_warnings = 0
 endif
 
+if !exists("g:elm_format_autosave")
+	let g:elm_format_autosave = 0
+endif
+
 setlocal omnifunc=elm#Complete
+
+setlocal comments=:--
+setlocal commentstring=--\ %s
 
 " Commands
 command -buffer -nargs=? -complete=file ElmMake call elm#Make(<f-args>)
@@ -29,6 +36,7 @@ command -buffer ElmRepl call elm#Repl()
 command -buffer ElmErrorDetail call elm#ErrorDetail()
 command -buffer -nargs=? ElmShowDocs call elm#ShowDocs()
 command -buffer ElmBrowseDocs call elm#BrowseDocs()
+command -buffer ElmFormat call elm#Format()
 
 " Mappings
 nnoremap <silent> <Plug>(elm-make) :<C-u>call elm#Make()<CR>
@@ -38,3 +46,28 @@ nnoremap <silent> <Plug>(elm-repl) :<C-u>call elm#Repl()<CR>
 nnoremap <silent> <Plug>(elm-error-detail) :<C-u>call elm#ErrorDetail()<CR>
 nnoremap <silent> <Plug>(elm-show-docs) :<C-u>call elm#ShowDocs()<CR>
 nnoremap <silent> <Plug>(elm-browse-docs) :<C-u>call elm#BrowseDocs()<CR>
+
+" Elm code formatting on save
+if get(g:, "elm_format_autosave", 1)
+	autocmd BufWritePre *.elm call elm#Format()
+endif
+
+" Enable go to file under cursor from module name
+" Based on: https://github.com/elixir-lang/vim-elixir/blob/bd66ed134319d1e390f3331e8c4d525109f762e8/ftplugin/elixir.vim#L22-L56
+function! GetElmFilename(word)
+  let word = a:word
+
+  " replace module dots with slash
+  let word = substitute(word,'\.','/','g')
+
+  return word
+endfunction
+
+let &l:path =
+      \ join([
+      \   getcwd().'/src',
+      \   getcwd().'/elm-stuff/packages/**/src',
+      \   &g:path
+      \ ], ',')
+setlocal includeexpr=GetElmFilename(v:fname)
+setlocal suffixesadd=.elm

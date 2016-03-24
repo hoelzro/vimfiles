@@ -19,9 +19,6 @@ syn match elmBacktick "`[A-Za-z][A-Za-z0-9_]*\('\)*`"
 " Types
 syn match elmType "\<[A-Z][0-9A-Za-z_'-]*"
 
-" Booleans
-syn keyword elmBoolean True False otherwise
-
 " Delimiters
 syn match elmDelimiter  "[(),;[\]{}]"
 
@@ -54,7 +51,6 @@ hi def link elmKeyword Keyword
 hi def link elmOperator Operator
 hi def link elmBacktick Operator
 hi def link elmTupleFunction Normal
-hi def link elmBoolean Boolean
 hi def link elmType Type
 hi def link elmTodo Todo
 hi def link elmLineComment Comment
