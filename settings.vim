@@ -38,7 +38,7 @@ set number
 set listchars=eol:¬,tab:▸\ 
 
 set laststatus=2
-let &statusline = '%{ProjectRelativePath()}%=%l,%c%V   %P'
+let &statusline = '%{ProjectRelativePath()} %m%=%l,%c%V   %P'
 
 if &t_Co > 1
     syntax enable
