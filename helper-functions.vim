@@ -119,3 +119,13 @@ function! ProjectRelativePath()
 
   return b:relative_path
 endfunction
+
+function! ReadZshCommandTime()
+  let line = getline('.')
+  let matches = matchlist(line, '^:\s*\(\d\+\)\s*:')
+  if empty(matches)
+    return ''
+  endif
+  let timestamp = matches[1]
+  return strftime('%c', timestamp)
+endfunction

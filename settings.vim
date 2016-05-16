@@ -38,7 +38,13 @@ set number
 set listchars=eol:¬,tab:▸\ 
 
 set laststatus=2
-let &statusline = '%{ProjectRelativePath()} %m%=%l,%c%V   %P'
+let &statusline = '%{ProjectRelativePath()}%=%l,%c%V   %P'
+
+augroup ZshHistory
+  autocmd!
+
+  autocmd BufRead .zsh_history let &statusline = '%{ProjectRelativePath()} %{ReadZshCommandTime()} %=%l,%c%V   %P'
+augroup END
 
 if &t_Co > 1
     syntax enable
