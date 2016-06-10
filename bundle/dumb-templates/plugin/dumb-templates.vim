@@ -128,7 +128,7 @@ function! s:InsertPSGITemplate()
 \ 'use strict;',
 \ 'use warnings;',
 \ '',
-\ 'sub {',
+\ nr2char(115) . 'ub {',
 \ '    my ( $env ) = @_',
 \ '↑',
 \ '};'
