@@ -146,7 +146,7 @@ function! s:InsertElmTemplate()
 \ 'type Msg = ...',
 \ '',
 \ 'init : (Model, Cmd Msg)',
-\ 'init _ = ...',
+\ 'init = ...',
 \ '',
 \ 'update : Msg -> Model -> (Model, Cmd, Msg)',
 \ 'update msg model = ...',
@@ -168,6 +168,7 @@ function! s:InsertElmTemplate()
   call <SID>InsertTemplate(template)
 endfunction
 
+" XXX make smarter
 function! s:InsertPerlTemplate()
   " this happens when Vim checks a buffer to
   " see if it's been modified.
