@@ -137,6 +137,37 @@ function! s:InsertPSGITemplate()
   call <SID>InsertTemplate(template)
 endfunction
 
+function! s:InsertElmTemplate()
+  let template = [
+\ 'import Html.App as App',
+\ 'import Html exposing (Html)',
+\ '↑',
+\ 'type Model = ...',
+\ 'type Msg = ...',
+\ '',
+\ 'init : (Model, Cmd Msg)',
+\ 'init _ = ...',
+\ '',
+\ 'update : Msg -> Model -> (Model, Cmd, Msg)',
+\ 'update msg model = ...',
+\ '',
+\ 'subscriptions : Model -> Sub Msg',
+\ 'subscriptions _ = ...',
+\ '',
+\ 'view : Model -> Html Msg',
+\ 'view model = ...',
+\ '',
+\ 'main : Html Program',
+\ 'main = App.program {',
+\ '    init = init,',
+\ '    update = update,',
+\ '    subscriptions = subscriptions,',
+\ '    view = view',
+\ '  }'
+\ ]
+  call <SID>InsertTemplate(template)
+endfunction
+
 function! s:InsertPerlTemplate()
   " this happens when Vim checks a buffer to
   " see if it's been modified.
@@ -287,6 +318,7 @@ augroup DumbTemplateInsertion
   autocmd FileType ruby    call <SID>InsertRubyTemplate()
   autocmd FileType vimwiki call <SID>InsertVimWikiTemplate()
   autocmd FileType java    call <SID>InsertJavaTemplate()
+  autocmd FileType elm     call <SID>InsertElmTemplate()
 
   autocmd FileType markdown call <SID>InsertDevJournalTemplate()
 augroup END
