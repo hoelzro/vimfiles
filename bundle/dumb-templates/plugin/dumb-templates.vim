@@ -138,6 +138,10 @@ function! s:InsertPSGITemplate()
 endfunction
 
 function! s:InsertElmTemplate()
+  if ! <SID>IsFileEmpty()
+    return
+  endif
+
   let template = [
 \ 'import Html.App as App',
 \ 'import Html exposing (Html)',
