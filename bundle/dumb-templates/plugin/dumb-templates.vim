@@ -157,7 +157,7 @@ function! s:InsertElmTemplate()
 \ 'view : Model -> Html Msg',
 \ 'view model = ...',
 \ '',
-\ 'main : Html Program',
+\ 'main : Program Never',
 \ 'main = App.program {',
 \ '    init = init,',
 \ '    update = update,',
