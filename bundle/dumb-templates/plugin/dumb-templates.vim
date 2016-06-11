@@ -148,7 +148,7 @@ function! s:InsertElmTemplate()
 \ 'init : (Model, Cmd Msg)',
 \ 'init = ...',
 \ '',
-\ 'update : Msg -> Model -> (Model, Cmd, Msg)',
+\ 'update : Msg -> Model -> (Model, Cmd Msg)',
 \ 'update msg model = ...',
 \ '',
 \ 'subscriptions : Model -> Sub Msg',
