@@ -35,6 +35,7 @@ set noerrorbells
 set t_vb=
 set viewoptions=folds,cursor
 set number
+set relativenumber
 set listchars=eol:¬,tab:▸\ 
 
 set laststatus=2
