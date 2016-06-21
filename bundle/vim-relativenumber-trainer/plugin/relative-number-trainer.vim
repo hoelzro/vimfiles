@@ -31,4 +31,4 @@ function! PerformRelativeLineNumberHeurstic(cmd)
 endfunction
 
 nnoremap <expr> <silent> gg PerformRelativeLineNumberHeurstic('gg')
-nnoremap <silent> G :call PerformRelativeLineNumberHeurstic('G')<CR>
+nnoremap <expr> <silent> G PerformRelativeLineNumberHeurstic('G')
