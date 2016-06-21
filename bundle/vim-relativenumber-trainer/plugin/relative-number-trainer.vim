@@ -5,7 +5,7 @@ endif
 let g:relativenumbertrainer_loaded = 1
 
 function! PerformRelativeLineNumberHeurstic(cmd)
-  if !&relativenumber
+  if !&relativenumber || v:count == 0
     return a:cmd
   endif
   " XXX wrapping screws up the range check, but it's close enough
