@@ -4,5 +4,4 @@ function! s:FixComments()
   endif
 endfunction
 
-"setlocal comments=sl:#\ XXX,mb:#,e:^@,b:#,fb:-
 au FileType * call <SID>FixComments()
