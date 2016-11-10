@@ -34,3 +34,8 @@ endfunction
 " Markdown settings
 
 let g:markdown_folding = 1
+
+" Split Navigate settings
+
+let g:splitnavigate_abort_key = '<Space>'
+let g:splitnavigate_start_current = 1
