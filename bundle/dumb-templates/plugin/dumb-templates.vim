@@ -143,7 +143,6 @@ function! s:InsertElmTemplate()
   endif
 
   let template = [
-\ 'import Html.App as App',
 \ 'import Html exposing (Html)',
 \ '↑',
 \ 'type Model = ...',
@@ -161,8 +160,8 @@ function! s:InsertElmTemplate()
 \ 'view : Model -> Html Msg',
 \ 'view model = ...',
 \ '',
-\ 'main : Program Never',
-\ 'main = App.program {',
+\ 'main : Program Never Model Msg',
+\ 'main = Html.program {',
 \ '    init = init,',
 \ '    update = update,',
 \ '    subscriptions = subscriptions,',
