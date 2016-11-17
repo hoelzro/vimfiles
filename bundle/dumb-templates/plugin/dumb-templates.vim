@@ -143,7 +143,7 @@ function! s:InsertElmTemplate()
   endif
 
   let template = [
-\ 'import Html exposing (Html)',
+\ 'import Html exposing (Html, text)',
 \ '↑',
 \ 'type Model = ...',
 \ 'type Msg = ...',
