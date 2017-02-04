@@ -73,7 +73,8 @@ function! s:InsertPerlScriptTemplate()
 \ '',
 \ 'use strict;',
 \ 'use warnings;',
-\ 'use feature qw(say);'
+\ 'use feature qw(say);',
+\ 'use experimental qw(signatures);'
 \ ]
   call <SID>InsertTemplate(template)
 endfunction
