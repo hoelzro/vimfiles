@@ -37,6 +37,7 @@ set viewoptions=folds,cursor
 set number
 set relativenumber
 set listchars=eol:¬,tab:▸\ 
+set tags=./tags;
 
 set laststatus=2
 let &statusline = '%{ProjectRelativePath()}%=%l,%c%V   %P'
