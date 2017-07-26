@@ -79,7 +79,7 @@ function! s:DisplayHandyMappings()
   endfor
 endfunction
 
-call <SID>DefineHandyMapping('n', ':set number!')
+call <SID>DefineHandyMapping('n', ':set number! <bar> :set relativenumber!')
 call <SID>DefineHandyMapping('l', ':set list!')
 call <SID>DefineHandyMapping('s', ':set spell!')
 call <SID>DefineHandyMapping('i', ':set ignorecase!')
