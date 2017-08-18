@@ -41,6 +41,8 @@ let perl_nofold_packages=1
 let perl_fold_anonymous_subs=1
 let perl_no_subprototype_error=1
 let perl_sub_signatures=1
+let g:ale_linters = get(g:, 'ale_linters', {})
+let g:ale_linters['perl'] = ['perl']
 
 " Python
 let python_highlight_space_errors=1
