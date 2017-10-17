@@ -174,3 +174,17 @@ function! StripBoundaryChars(s)
 endfunction
 
 inoremap <C-r>/ <C-r>=StripBoundaryChars(@/)<CR>
+
+function! ResolvePathToCurrentFile()
+  let path_to_current_file = expand('%:h')
+  echomsg path_to_current_file
+  if path_to_current_file != ''
+    return path_to_current_file
+  endif
+  return getcwd()
+endfunction
+
+cnoremap e<space> e <c-r>=ResolvePathToCurrentFile()<cr>/
+cnoremap tabnew<space> tabnew <c-r>=ResolvePathToCurrentFile()<cr>/
+cnoremap vnew<space> vnew <c-r>=ResolvePathToCurrentFile()<cr>/
+cnoremap new<space> new <c-r>=ResolvePathToCurrentFile()<cr>/

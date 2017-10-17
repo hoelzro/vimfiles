@@ -3,7 +3,6 @@ let $MANPAGER='less'
 filetype plugin indent on
 
 set showcmd
-set autochdir
 set softtabstop=4
 set tabstop=8
 set shiftwidth=4
