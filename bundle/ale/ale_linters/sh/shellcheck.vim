@@ -2,7 +2,7 @@
 " Description: This file adds support for using the shellcheck linter with
 "   shell scripts.
 
-" This global variable can be set with a string of comma-seperated error
+" This global variable can be set with a string of comma-separated error
 " codes to exclude from shellcheck. For example:
 "
 " let g:ale_sh_shellcheck_exclusions = 'SC2002,SC2004'
@@ -19,25 +19,36 @@ function! ale_linters#sh#shellcheck#GetExecutable(buffer) abort
     return ale#Var(a:buffer, 'sh_shellcheck_executable')
 endfunction
 
-function! s:GetDialectArgument() abort
-    if exists('b:is_bash') && b:is_bash
-        return '-s bash'
-    elseif exists('b:is_sh') && b:is_sh
-        return '-s sh'
-    elseif exists('b:is_kornshell') && b:is_kornshell
-        return '-s ksh'
+function! ale_linters#sh#shellcheck#GetDialectArgument(buffer) abort
+    let l:shell_type = ale#handlers#sh#GetShellType(a:buffer)
+
+    if !empty(l:shell_type)
+        return l:shell_type
+    endif
+
+    " If there's no hashbang, try using Vim's buffer variables.
+    if get(b:, 'is_bash')
+        return 'bash'
+    elseif get(b:, 'is_sh')
+        return 'sh'
+    elseif get(b:, 'is_kornshell')
+        return 'ksh'
     endif
 
     return ''
 endfunction
 
 function! ale_linters#sh#shellcheck#GetCommand(buffer) abort
+    let l:options = ale#Var(a:buffer, 'sh_shellcheck_options')
     let l:exclude_option = ale#Var(a:buffer, 'sh_shellcheck_exclusions')
+    let l:dialect = ale_linters#sh#shellcheck#GetDialectArgument(a:buffer)
 
-    return ale_linters#sh#shellcheck#GetExecutable(a:buffer)
-    \   . ' ' . ale#Var(a:buffer, 'sh_shellcheck_options')
-    \   . ' ' . (!empty(l:exclude_option) ? '-e ' . l:exclude_option : '')
-    \   . ' ' . s:GetDialectArgument() . ' -f gcc -'
+    return ale#path#BufferCdString(a:buffer)
+    \   . ale#Escape(ale_linters#sh#shellcheck#GetExecutable(a:buffer))
+    \   . (!empty(l:dialect) ? ' -s ' . l:dialect : '')
+    \   . (!empty(l:options) ? ' ' . l:options : '')
+    \   . (!empty(l:exclude_option) ? ' -e ' . l:exclude_option : '')
+    \   . ' -x -f gcc -'
 endfunction
 
 call ale#linter#Define('sh', {
