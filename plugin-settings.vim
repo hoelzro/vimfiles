@@ -39,3 +39,6 @@ let g:markdown_folding = 1
 
 let g:splitnavigate_abort_key = '<Space>'
 let g:splitnavigate_start_current = 1
+
+" netrw settings
+let g:netrw_silent = 1
