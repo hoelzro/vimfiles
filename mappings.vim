@@ -184,7 +184,4 @@ function! ResolvePathToCurrentFile()
   return getcwd()
 endfunction
 
-cnoremap e<space> e <c-r>=ResolvePathToCurrentFile()<cr>/
-cnoremap tabnew<space> tabnew <c-r>=ResolvePathToCurrentFile()<cr>/
-cnoremap vnew<space> vnew <c-r>=ResolvePathToCurrentFile()<cr>/
-cnoremap new<space> new <c-r>=ResolvePathToCurrentFile()<cr>/
+cnoremap <c-r>~ <c-r>=ResolvePathToCurrentFile()<cr>/
