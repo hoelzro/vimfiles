@@ -1,3 +1,8 @@
+" ALE
+
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 1
+
 let g:Perl_Support_Root_Dir = $HOME . '/.vim/bundle/perl-support'
 
 " perl helper program
