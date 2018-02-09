@@ -12,7 +12,7 @@ set background=dark
 set directory=~/.vim/swaps/,/var/tmp
 set expandtab
 set smarttab
-set formatoptions=cqort
+set formatoptions=cqortj
 set mouse=
 set foldminlines=3
 set foldmethod=syntax
