@@ -14,6 +14,9 @@ let c_fold_blocks=1
 let load_doxygen_syntax=1
 let doxygen_enhanced_color=1
 
+" Elm
+autocmd FileType elm :ALEEnable
+
 " Haskell
 let hs_highlight_types = 1
 let hs_highlight_more_types = 1
@@ -43,6 +46,8 @@ let perl_no_subprototype_error=1
 let perl_sub_signatures=1
 let g:ale_linters = get(g:, 'ale_linters', {})
 let g:ale_linters['perl'] = ['perl']
+
+autocmd FileType perl :ALEEnable
 
 " Python
 let python_highlight_space_errors=1

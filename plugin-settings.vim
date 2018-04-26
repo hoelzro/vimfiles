@@ -2,6 +2,7 @@
 
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_save = 1
+let g:ale_enabled = 0
 
 let g:Perl_Support_Root_Dir = $HOME . '/.vim/bundle/perl-support'
 
