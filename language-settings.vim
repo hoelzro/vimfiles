@@ -10,6 +10,8 @@ let c_curly_error=1
 let c_syntax_for_h=1
 let c_fold_blocks=1
 
+autocmd FileType c :ALEEnable
+
 " Doxygen
 let load_doxygen_syntax=1
 let doxygen_enhanced_color=1
