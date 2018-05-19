@@ -74,3 +74,6 @@ let g:omni_sql_no_default_maps=1
 
 " TeX
 let tex_fold_enabled=1
+
+" TypeScript
+autocmd FileType typescript :ALEEnable
