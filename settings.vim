@@ -19,7 +19,6 @@ set foldmethod=syntax
 set modeline
 set hls
 set incsearch
-set infercase
 set ruler
 set showmatch
 set ignorecase
