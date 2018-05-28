@@ -15,7 +15,7 @@ setlocal nolisp		" Make sure lisp indenting doesn't supersede us
 setlocal autoindent	" indentexpr isn't much help otherwise
 
 setlocal indentexpr=GetPythonIndent(v:lnum)
-setlocal indentkeys+=<:>,=elif,=except
+setlocal indentkeys+=<:>,=elif,=except,0),0],0}
 
 " Only define the function once.
 if exists("*GetPythonIndent")
@@ -82,6 +82,10 @@ function GetPythonIndent(lnum)
 	  \ . " synIDattr(synID(line('.'), col('.'), 1), 'name')"
 	  \ . " =~ '\\(Comment\\|Todo\\|String\\)$'")
   if p > 0
+    if getline(a:lnum) =~ '^\s*[]})]'
+      return indent(p)
+    endif
+
     if p == plnum
       " When the start is inside parenthesis, only indent one 'shiftwidth'.
       let pp = searchpair('(\|{\|\[', '', ')\|}\|\]', 'bW',
