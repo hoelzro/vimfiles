@@ -32,19 +32,22 @@ syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
 syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo
 syn match   javaScriptCommentSkip      "^[ \t]*\*\($\|[ \t]\+\)"
 syn match   javaScriptSpecial	       "\\\d\d\d\|\\."
-syn region  javaScriptStringD	       start=+"+  skip=+\\\\\|\\"+  end=+"\|$+  contains=javaScriptSpecial,@htmlPreproc
-syn region  javaScriptStringS	       start=+'+  skip=+\\\\\|\\'+  end=+'\|$+  contains=javaScriptSpecial,@htmlPreproc
+syn region  javaScriptStringD	       start=+"+  skip=+\\\\\|\\"+  end=+"\|$+	contains=javaScriptSpecial,@htmlPreproc
+syn region  javaScriptStringS	       start=+'+  skip=+\\\\\|\\'+  end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 
 syn match   javaScriptSpecialCharacter "'\\.'"
 syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
-syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gi]\{0,2\}\s*$+ end=+/[gi]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline
+syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gim]\{0,2\}\s*$+ end=+/[gim]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline
+
+syntax region javaScriptTemplateLiteral start=+`+ end=+`+ skip=+\\\\|\\`+ contains=javaScriptTemplateInterpolation
+syntax region javaScriptTemplateInterpolation start=+${+ end=+}+ contains=ALL
 
 syn keyword javaScriptConditional	if else switch
-syn keyword javaScriptRepeat		while for do in
+syn keyword javaScriptRepeat		while for do in of
 syn keyword javaScriptBranch		break continue
 syn keyword javaScriptOperator		new delete instanceof typeof
 syn keyword javaScriptType		Array Boolean Date Function Number Object String RegExp
-syn keyword javaScriptStatement		return with
+syn keyword javaScriptStatement		await return with yield
 syn keyword javaScriptBoolean		true false
 syn keyword javaScriptNull		null undefined
 syn keyword javaScriptIdentifier	arguments this var let
@@ -54,10 +57,10 @@ syn keyword javaScriptMessage		alert confirm prompt status
 syn keyword javaScriptGlobal		self window top parent
 syn keyword javaScriptMember		document event location
 syn keyword javaScriptDeprecated	escape unescape
-syn keyword javaScriptReserved		abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile 
+syn keyword javaScriptReserved		abstract async boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
 
 if exists("javaScript_fold")
-    syn match	javaScriptFunction      "\<function\>"
+    syn match	javaScriptFunction	"\<function\>"
     syn region	javaScriptFunctionFold	start="^\z(\s*\).*\<function\>.*[^};]$" end="^\z1}" transparent fold keepend
     syn region  javaScriptComment       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo fold keepend
 
@@ -111,6 +114,7 @@ if version >= 508 || !exists("did_javascript_syn_inits")
   HiLink javaScriptNull			Keyword
   HiLink javaScriptBoolean		Boolean
   HiLink javaScriptRegexpString		String
+  HiLink javaScriptTemplateLiteral	String
 
   HiLink javaScriptIdentifier		Identifier
   HiLink javaScriptLabel		Label
