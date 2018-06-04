@@ -94,19 +94,20 @@ function! python_fold#GetPythonFold(lnum)
     return "="
   endif
 
-  " Python programmers love their readable code, so they're usually
-  " going to have blank lines at the ends of functions or classes
-  " If the next line isn't blank, we probably don't need to end a fold
-  if nnum == a:lnum + 1
-    return "="
-  endif
-
   " If next line has less indentation we end a fold.
   " This ends folds that aren't there a lot of the time, and this sometimes
   " confuses vim.  Luckily only rarely.
   let nind = indent(nnum)
   if nind < ind
-    return "<" . (nind / &sw + 1)
+    let expected_indent = (nind / &sw + 1)
+    let current_indent = foldlevel(pnum) " pnum is guaranteed to be > 0, because we check above
+                                         " also, I know it's weird we're
+                                         " recursing, but in practice vim has
+                                         " determined the fold level for
+                                         " previous lines
+    if expected_indent <= current_indent || current_indent < 0
+      return "<" . expected_indent
+    endif
   endif
 
   " If none of the above apply, keep the indentation
