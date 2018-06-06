@@ -57,6 +57,7 @@ let python_highlight_all=1
 let pyindent_continue='&shiftwidth'
 let pyindent_open_paren='&shiftwidth'
 let pyindent_nested_paren='&shiftwidth'
+let g:SimpylFold_fold_import = 0
 
 " Ruby
 let ruby_space_errors=1
