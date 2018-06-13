@@ -15,6 +15,8 @@ augroup Custom
   autocmd InsertEnter * let b:old_fold=&foldmethod | set foldmethod=manual
   autocmd InsertLeave * let &foldmethod=b:old_fold
 
+  " works in concert with some insert mappings in mappings.vim
+  autocmd CompleteDone * call RestoreOldCaseSensitivity()
 augroup END
 
 " open help windows in their own tabs
