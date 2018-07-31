@@ -10,14 +10,9 @@ let c_curly_error=1
 let c_syntax_for_h=1
 let c_fold_blocks=1
 
-autocmd FileType c :ALEEnable
-
 " Doxygen
 let load_doxygen_syntax=1
 let doxygen_enhanced_color=1
-
-" Elm
-autocmd FileType elm :ALEEnable
 
 " Haskell
 let hs_highlight_types = 1
@@ -49,7 +44,6 @@ let perl_sub_signatures=1
 let g:ale_linters = get(g:, 'ale_linters', {})
 let g:ale_linters['perl'] = ['perl']
 
-autocmd FileType perl :ALEEnable
 
 " Python
 let python_highlight_space_errors=1
@@ -76,5 +70,13 @@ let g:omni_sql_no_default_maps=1
 " TeX
 let tex_fold_enabled=1
 
-" TypeScript
-autocmd FileType typescript :ALEEnable
+if exists(':ALEEnable')
+  augroup ALEOptIn
+    autocmd!
+
+    autocmd FileType c :ALEEnable
+    autocmd FileType elm :ALEEnable
+    autocmd FileType perl :ALEEnable
+    autocmd FileType typescript :ALEEnable
+  augroup END
+endif
