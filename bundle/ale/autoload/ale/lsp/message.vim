@@ -24,12 +24,15 @@ function! ale#lsp#message#GetNextVersionID() abort
     return l:id
 endfunction
 
-function! ale#lsp#message#Initialize(root_path) abort
+function! ale#lsp#message#Initialize(root_path, initialization_options) abort
     " TODO: Define needed capabilities.
+    " NOTE: rootPath is deprecated in favour of rootUri
     return [0, 'initialize', {
     \   'processId': getpid(),
     \   'rootPath': a:root_path,
     \   'capabilities': {},
+    \   'initializationOptions': a:initialization_options,
+    \   'rootUri': ale#path#ToURI(a:root_path),
     \}]
 endfunction
 
@@ -53,7 +56,7 @@ function! ale#lsp#message#DidOpen(buffer, language_id) abort
     \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
     \       'languageId': a:language_id,
     \       'version': ale#lsp#message#GetNextVersionID(),
-    \       'text': join(l:lines, "\n"),
+    \       'text': join(l:lines, "\n") . "\n",
     \   },
     \}]
 endfunction
@@ -67,7 +70,7 @@ function! ale#lsp#message#DidChange(buffer) abort
     \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
     \       'version': ale#lsp#message#GetNextVersionID(),
     \   },
-    \   'contentChanges': [{'text': join(l:lines, "\n")}]
+    \   'contentChanges': [{'text': join(l:lines, "\n") . "\n"}]
     \}]
 endfunction
 
@@ -84,5 +87,54 @@ function! ale#lsp#message#DidClose(buffer) abort
     \   'textDocument': {
     \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
     \   },
+    \}]
+endfunction
+
+let s:COMPLETION_TRIGGER_INVOKED = 1
+let s:COMPLETION_TRIGGER_CHARACTER = 2
+
+function! ale#lsp#message#Completion(buffer, line, column, trigger_character) abort
+    let l:message = [0, 'textDocument/completion', {
+    \   'textDocument': {
+    \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
+    \   },
+    \   'position': {'line': a:line - 1, 'character': a:column},
+    \}]
+
+    if !empty(a:trigger_character)
+        let l:message[2].context = {
+        \   'triggerKind': s:COMPLETION_TRIGGER_CHARACTER,
+        \   'triggerCharacter': a:trigger_character,
+        \}
+    endif
+
+    return l:message
+endfunction
+
+function! ale#lsp#message#Definition(buffer, line, column) abort
+    return [0, 'textDocument/definition', {
+    \   'textDocument': {
+    \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
+    \   },
+    \   'position': {'line': a:line - 1, 'character': a:column},
+    \}]
+endfunction
+
+function! ale#lsp#message#References(buffer, line, column) abort
+    return [0, 'textDocument/references', {
+    \   'textDocument': {
+    \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
+    \   },
+    \   'position': {'line': a:line - 1, 'character': a:column},
+    \   'context': {'includeDeclaration': v:false},
+    \}]
+endfunction
+
+function! ale#lsp#message#Hover(buffer, line, column) abort
+    return [0, 'textDocument/hover', {
+    \   'textDocument': {
+    \       'uri': ale#path#ToURI(expand('#' . a:buffer . ':p')),
+    \   },
+    \   'position': {'line': a:line - 1, 'character': a:column},
     \}]
 endfunction

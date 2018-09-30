@@ -1,12 +1,13 @@
 " Author: Lucas Kolstad <lkolstad@uw.edu>
 " Description: gcc linter for asm files
 
-let g:ale_asm_gcc_options = get(g:, 'ale_asm_gcc_options', '-Wall')
+call ale#Set('asm_gcc_executable', 'gcc')
+call ale#Set('asm_gcc_options', '-Wall')
 
 function! ale_linters#asm#gcc#GetCommand(buffer) abort
-    return 'gcc -x assembler -fsyntax-only '
-    \    . '-iquote ' . ale#Escape(fnamemodify(bufname(a:buffer), ':p:h'))
-    \    . ' ' . ale#Var(a:buffer, 'asm_gcc_options') . ' -'
+    return '%e -x assembler -fsyntax-only '
+    \   . '-iquote ' . ale#Escape(fnamemodify(bufname(a:buffer), ':p:h'))
+    \   . ' ' . ale#Var(a:buffer, 'asm_gcc_options') . ' -'
 endfunction
 
 function! ale_linters#asm#gcc#Handle(buffer, lines) abort
@@ -27,7 +28,7 @@ endfunction
 call ale#linter#Define('asm', {
 \    'name': 'gcc',
 \    'output_stream': 'stderr',
-\    'executable': 'gcc',
+\    'executable_callback': ale#VarFunc('asm_gcc_executable'),
 \    'command_callback': 'ale_linters#asm#gcc#GetCommand',
 \    'callback': 'ale_linters#asm#gcc#Handle',
 \})

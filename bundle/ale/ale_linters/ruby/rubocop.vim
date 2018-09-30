@@ -1,13 +1,13 @@
 " Author: ynonp - https://github.com/ynonp, Eddie Lebow https://github.com/elebow
 " Description: RuboCop, a code style analyzer for Ruby files
 
-function! ale_linters#ruby#rubocop#GetCommand(buffer) abort
-    let l:executable = ale#handlers#rubocop#GetExecutable(a:buffer)
-    let l:exec_args = l:executable =~? 'bundle$'
-    \   ? ' exec rubocop'
-    \   : ''
+call ale#Set('ruby_rubocop_executable', 'rubocop')
+call ale#Set('ruby_rubocop_options', '')
 
-    return ale#Escape(l:executable) . l:exec_args
+function! ale_linters#ruby#rubocop#GetCommand(buffer) abort
+    let l:executable = ale#Var(a:buffer, 'ruby_rubocop_executable')
+
+    return ale#handlers#ruby#EscapeExecutable(l:executable, 'rubocop')
     \   . ' --format json --force-exclusion '
     \   . ale#Var(a:buffer, 'ruby_rubocop_options')
     \   . ' --stdin ' . ale#Escape(expand('#' . a:buffer . ':p'))
@@ -34,7 +34,8 @@ function! ale_linters#ruby#rubocop#Handle(buffer, lines) abort
         \   'lnum': l:error['location']['line'] + 0,
         \   'col': l:start_col,
         \   'end_col': l:start_col + l:error['location']['length'] - 1,
-        \   'text': printf('%s [%s]', l:error['message'], l:error['cop_name']),
+        \   'code': l:error['cop_name'],
+        \   'text': l:error['message'],
         \   'type': ale_linters#ruby#rubocop#GetType(l:error['severity']),
         \})
     endfor
@@ -54,7 +55,7 @@ endfunction
 
 call ale#linter#Define('ruby', {
 \   'name': 'rubocop',
-\   'executable_callback': 'ale#handlers#rubocop#GetExecutable',
+\   'executable_callback': ale#VarFunc('ruby_rubocop_executable'),
 \   'command_callback': 'ale_linters#ruby#rubocop#GetCommand',
 \   'callback': 'ale_linters#ruby#rubocop#Handle',
 \})

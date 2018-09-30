@@ -2,7 +2,7 @@
 " Description: Fixing Python files with yapf.
 
 call ale#Set('python_yapf_executable', 'yapf')
-call ale#Set('python_yapf_use_global', 0)
+call ale#Set('python_yapf_use_global', get(g:, 'ale_use_global_executables', 0))
 
 function! ale#fixers#yapf#Fix(buffer) abort
     let l:executable = ale#python#FindExecutable(
@@ -11,7 +11,7 @@ function! ale#fixers#yapf#Fix(buffer) abort
     \   ['yapf'],
     \)
 
-    if !ale#python#IsExecutable(l:executable)
+    if !executable(l:executable)
         return 0
     endif
 

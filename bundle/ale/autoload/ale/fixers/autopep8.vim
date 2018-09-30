@@ -2,7 +2,7 @@
 " Description: Fixing files with autopep8.
 
 call ale#Set('python_autopep8_executable', 'autopep8')
-call ale#Set('python_autopep8_use_global', 0)
+call ale#Set('python_autopep8_use_global', get(g:, 'ale_use_global_executables', 0))
 call ale#Set('python_autopep8_options', '')
 
 function! ale#fixers#autopep8#Fix(buffer) abort
@@ -12,7 +12,7 @@ function! ale#fixers#autopep8#Fix(buffer) abort
     \   ['autopep8'],
     \)
 
-    if !ale#python#IsExecutable(l:executable)
+    if !executable(l:executable)
         return 0
     endif
 
