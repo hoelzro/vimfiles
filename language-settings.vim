@@ -76,6 +76,7 @@ if exists(':ALEEnable')
 
     autocmd FileType c :ALEEnable
     autocmd FileType elm :ALEEnable
+    autocmd FileType lua :ALEEnable
     autocmd FileType perl :ALEEnable
     autocmd FileType typescript :ALEEnable
   augroup END
