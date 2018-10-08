@@ -174,6 +174,7 @@ function! StripBoundaryChars(s)
 endfunction
 
 inoremap <C-r>/ <C-r>=StripBoundaryChars(@/)<CR>
+cnoremap <C-r>/ <C-r>=StripBoundaryChars(@/)<CR>
 
 function! ResolvePathToCurrentFile()
   let path_to_current_file = expand('%:h')
