@@ -18,5 +18,6 @@ function! k8shelp#KubernetesHelp()
   let api_version = <SID>GetAPIVersion(expand('%'))
   let object_kind = <SID>GetObjectKind(expand('%'))
   let full_path = tolower(object_kind) . '.' . object_path
-  echomsg full_path
+
+  execute '!kubectl explain ' . full_path
 endfunction
