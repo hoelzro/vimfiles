@@ -7,27 +7,20 @@ function! s:GetAPIVersion(filename)
     throw "Couldn't find buffer for " . a:filename
   endif
 
-  let current_buffer = bufnr('.')
+  let buffer_lines = getbufline(buffer, 1, '$')
+  let line_no = 1
 
-  if buffer != current_buffer
-    throw 'Slow path of getting API version from non-current buffer NYI'
-  endif
+  for line in buffer_lines
+    let matches = matchlist(line, '^\s*apiVersion\s*:\s*\(\S\+\)')
 
-  let [_, lnum, col, off] = getpos('.')
+    if !empty(matches)
+      return matches[1]
+    endif
 
-  " start the search at the beginning of the file
-  call cursor(1, 1, 0)
+    let line_no += 1
+  endfor
 
-  let api_version_line_no = search('^\s*apiVersion\s*:', 'n')
-
-  let api_version_line = getline(api_version_line_no)
-
-  " restore the cursor to where it was pre-search
-  call cursor(lnum, col, off)
-
-  let api_version = matchlist(api_version_line, '^\s*apiVersion\s*:\s*\(\S\+\)')[1]
-
-  return api_version
+  throw 'Unable to find apiVersion'
 endfunction
 
 function! s:GetObjectKind(filename)
@@ -37,29 +30,20 @@ function! s:GetObjectKind(filename)
     throw "Couldn't find buffer for " . a:filename
   endif
 
-  let current_buffer = bufnr('.')
+  let buffer_lines = getbufline(buffer, 1, '$')
+  let line_no = 1
 
-  if buffer != current_buffer
-    throw 'Slow path of getting API version from non-current buffer NYI'
-  endif
+  for line in buffer_lines
+    let matches = matchlist(line, '^\s*kind\s*:\s*\(\S\+\)')
 
-  let [_, lnum, col, off] = getpos('.')
+    if !empty(matches)
+      return matches[1]
+    endif
 
-  " start the search at the beginning of the file
-  call cursor(1, 1, 0)
+    let line_no += 1
+  endfor
 
-  let kind_line_no = search('^\s*kind\s*:', 'n')
-
-  let kind_line = getline(kind_line_no)
-
-  " restore the cursor to where it was pre-search
-  call cursor(lnum, col, off)
-
-  let kind = matchlist(kind_line, '^\s*kind\s*:\s*\(\S\+\)')[1]
-
-  echomsg kind
-
-  return kind
+  throw 'Unable to find kind'
 endfunction
 
 function! s:GetYAMLPath(filename, line, column)
