@@ -45,5 +45,5 @@ function! k8shelp#KubernetesHelp()
   let object_kind = <SID>GetObjectKind(expand('%'))
   let full_path = tolower(object_kind) . '.' . object_path
 
-  execute '!kubectl explain ' . full_path
+  execute '!kubectl --api-version=' . api_version . ' explain ' . full_path
 endfunction
