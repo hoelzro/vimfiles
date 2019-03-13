@@ -31,7 +31,35 @@ function! s:GetAPIVersion(filename)
 endfunction
 
 function! s:GetObjectKind(filename)
-  return 'Pod'
+  let buffer = bufnr(a:filename)
+
+  if buffer == -1
+    throw "Couldn't find buffer for " . a:filename
+  endif
+
+  let current_buffer = bufnr('.')
+
+  if buffer != current_buffer
+    throw 'Slow path of getting API version from non-current buffer NYI'
+  endif
+
+  let [_, lnum, col, off] = getpos('.')
+
+  " start the search at the beginning of the file
+  call cursor(1, 1, 0)
+
+  let kind_line_no = search('^\s*kind\s*:', 'n')
+
+  let kind_line = getline(kind_line_no)
+
+  " restore the cursor to where it was pre-search
+  call cursor(lnum, col, off)
+
+  let kind = matchlist(kind_line, '^\s*kind\s*:\s*\(\S\+\)')[1]
+
+  echomsg kind
+
+  return kind
 endfunction
 
 function! s:GetYAMLPath(filename, line, column)
