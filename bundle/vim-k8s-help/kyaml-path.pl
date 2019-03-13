@@ -36,7 +36,7 @@ while(<>) {
         my @path_components = ($ident_under_cursor);
 
         for my $preceding_line (@previous_lines) {
-            my ( $indent, $key ) = $preceding_line =~ /^(\s*)(?:[-]\s*)?($YAML_IDENTIFIER+)/;
+            my ( $indent, $key ) = $preceding_line =~ /^(\s*(?:[-]\s*)?)($YAML_IDENTIFIER+)/;
 
             $indent = length($indent);
 
