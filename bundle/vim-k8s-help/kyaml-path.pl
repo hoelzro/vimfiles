@@ -5,6 +5,7 @@ use warnings;
 use feature qw(say);
 use experimental qw(signatures);
 
+use List::Util qw(min);
 
 my $YAML_IDENTIFIER = qr/\w/;
 
@@ -20,9 +21,9 @@ while(<>) {
 
     if($line_no == $.) {
         my $before = substr $_, 0, $column;
-        my $after = substr $_, $column;
+        my $after = substr $_, min(length($_), $column);
         my $prefix;
-        ( $prefix, $before ) = $before =~ /^(.*?)($YAML_IDENTIFIER+)$/;
+        ( $prefix, $before ) = $before =~ /^(.*?)($YAML_IDENTIFIER*)$/;
         ( $after )  = $after  =~ /^($YAML_IDENTIFIER*)/;
         my $ident_under_cursor = $before . $after;
 
