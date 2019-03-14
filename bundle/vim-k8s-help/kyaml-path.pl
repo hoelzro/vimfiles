@@ -5,7 +5,6 @@ use warnings;
 use feature qw(say);
 use experimental qw(signatures);
 
-use Data::Printer;
 
 my $YAML_IDENTIFIER = qr/\w/;
 
