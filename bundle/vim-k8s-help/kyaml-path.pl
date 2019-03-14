@@ -23,7 +23,7 @@ while(<>) {
         my $after = substr $_, $column;
         my $prefix;
         ( $prefix, $before ) = $before =~ /^(.*?)($YAML_IDENTIFIER+)$/;
-        ( $after )  = $after  =~ /^($YAML_IDENTIFIER+)/;
+        ( $after )  = $after  =~ /^($YAML_IDENTIFIER*)/;
         my $ident_under_cursor = $before . $after;
 
         die "assumption: cursor is over YAML dictionary key" if $prefix =~ /$YAML_IDENTIFIER/;
