@@ -57,5 +57,13 @@ function! k8shelp#KubernetesHelp()
   let object_kind = <SID>GetObjectKind(expand('%'))
   let full_path = tolower(object_kind) . '.' . object_path
 
-  execute '!kubectl --api-version=' . api_version . ' explain ' . full_path
+  new
+
+  execute 'r! kubectl --api-version=' . api_version . ' explain ' . full_path
+  normal gg
+  normal dd
+
+  setlocal nomodifiable
+  setlocal hidden
+  setlocal noswapfile
 endfunction
