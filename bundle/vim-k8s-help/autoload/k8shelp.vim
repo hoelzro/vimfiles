@@ -47,7 +47,34 @@ function! s:GetObjectKind(filename)
 endfunction
 
 function! s:GetYAMLPath(filename, line, column)
-  return systemlist(s:helper_script . ' ' . a:line . ' ' . a:column . ' ' . shellescape(a:filename))[0]
+  " XXX handle ---
+  "     handle the List kind
+  let current_line = getline(a:line)
+  let matches = matchlist(current_line, '^\(\s*\%(-\s*\)\?\)\(\i*\%' . a:column . 'c\i\+\)')
+  if len(matches) == 0
+    return
+  endif
+  let current_indent = len(matches[1])
+  let ident_user_cursor = matches[2]
+  let path_components = [ident_user_cursor]
+
+  for line_no in range(a:line - 1, 1, -1)
+    let preceding_line = getline(line_no)
+    if preceding_line =~ '^\s*$'
+      continue
+    endif
+
+    let matches = matchlist(preceding_line, '^\(\s*\%(-\s*\)\?\)\(\i*\)')
+    let indent = len(matches[1])
+    let key = matches[2]
+
+    if indent < current_indent
+      call add(path_components, key)
+      let current_indent = indent
+    endif
+  endfor
+
+  return join(reverse(path_components), '.')
 endfunction
 
 function! k8shelp#KubernetesHelp()
