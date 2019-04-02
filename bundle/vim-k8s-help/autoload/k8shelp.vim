@@ -63,6 +63,7 @@ function! k8shelp#KubernetesHelp()
   normal gg
   normal dd
 
+  setlocal nomodified
   setlocal nomodifiable
   setlocal hidden
   setlocal noswapfile
