@@ -43,6 +43,8 @@ if g:terraform_fold_sections
       return ">1"
     elseif match(thisline, '^locals') >= 0
       return ">1"
+    elseif match(thisline, '^}') >= 0
+      return "<1"
     else
       return "="
     endif
