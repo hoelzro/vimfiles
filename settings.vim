@@ -16,6 +16,7 @@ set formatoptions=cqortj
 set mouse=
 set foldminlines=3
 set foldmethod=syntax
+set nomodeline
 set hls
 set incsearch
 set infercase
