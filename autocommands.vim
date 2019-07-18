@@ -17,6 +17,9 @@ augroup Custom
 
   " works in concert with some insert mappings in mappings.vim
   autocmd CompleteDone * call RestoreOldCaseSensitivity()
+
+  " works with ProjectRelativePath and &statusline
+  autocmd BufFilePost * unlet! b:relative_path
 augroup END
 
 " open help windows in their own tabs
