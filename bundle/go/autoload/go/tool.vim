@@ -1,179 +1,147 @@
-function! go#tool#Files()
-    if IsWin()
-        let command = 'go list -f "{{range $f := .GoFiles}}{{$.Dir}}\{{$f}}{{printf \"\n\"}}{{end}}"'
-    else
-        " let command = "go list -f $'{{range $f := .GoFiles}}{{$.Dir}}/{{$f}}\n{{end}}'"
-        let command = "go list -f '{{range $f := .GoFiles}}{{$.Dir}}/{{$f}}{{printf \"\\n\"}}{{end}}'"
-    endif
-    let out = go#tool#ExecuteInDir(command)
-    return split(out, '\n')
+" don't spam the user when Vim is started in Vi compatibility mode
+let s:cpo_save = &cpo
+set cpo&vim
+
+" From "go list -h".
+function! go#tool#ValidFiles(...)
+  let l:list = ["GoFiles", "CgoFiles", "IgnoredGoFiles", "CFiles", "CXXFiles",
+    \ "MFiles", "HFiles", "FFiles", "SFiles", "SwigFiles", "SwigCXXFiles",
+    \ "SysoFiles", "TestGoFiles", "XTestGoFiles"]
+
+  " Used as completion
+  if len(a:000) > 0
+    let l:list = filter(l:list, 'strpart(v:val, 0, len(a:1)) == a:1')
+  endif
+
+  return l:list
 endfunction
 
-function! go#tool#Deps()
-    if IsWin()
-        let command = 'go list -f "{{range $f := .Deps}}{{$f}}{{printf \"\n\"}}{{end}}"'
-    else
-        let command = "go list -f $'{{range $f := .Deps}}{{$f}}\n{{end}}'"
+function! go#tool#Files(...) abort
+  if len(a:000) > 0
+    let source_files = a:000
+  else
+    let source_files = ['GoFiles']
+  endif
+
+  let combined = ''
+  for sf in source_files
+    " Strip dot in case people used ":GoFiles .GoFiles".
+    let sf = substitute(sf, '^\.', '', '')
+
+    " Make sure the passed options are valid.
+    if index(go#tool#ValidFiles(), sf) == -1
+      echoerr "unknown source file variable: " . sf
     endif
-    let out = go#tool#ExecuteInDir(command)
-    return split(out, '\n')
+
+    if go#util#IsWin()
+      let combined .= '{{range $f := .' . sf . '}}{{$.Dir}}\{{$f}}{{printf \"\n\"}}{{end}}{{range $f := .CgoFiles}}{{$.Dir}}\{{$f}}{{printf \"\n\"}}{{end}}'
+    else
+      let combined .= "{{range $f := ." . sf . "}}{{$.Dir}}/{{$f}}{{printf \"\\n\"}}{{end}}{{range $f := .CgoFiles}}{{$.Dir}}/{{$f}}{{printf \"\\n\"}}{{end}}"
+    endif
+  endfor
+
+  let [l:out, l:err] = go#util#ExecInDir(['go', 'list', '-tags', go#config#BuildTags(), '-f', l:combined])
+  return split(l:out, '\n')
 endfunction
 
-function! go#tool#Imports()
-    let imports = {}
-    if IsWin()
-        let command = 'go list -f "{{range $f := .Imports}}{{$f}}{{printf \"\n\"}}{{end}}"'
-    else
-        let command = "go list -f $'{{range $f := .Imports}}{{$f}}\n{{end}}'"
-    endif
-    let out = go#tool#ExecuteInDir(command)
-    if v:shell_error
-        echo out
-        return imports
-    endif
+function! go#tool#Deps() abort
+  if go#util#IsWin()
+    let format = '{{range $f := .Deps}}{{$f}}{{printf \"\n\"}}{{end}}'
+  else
+    let format = "{{range $f := .Deps}}{{$f}}\n{{end}}"
+  endif
+  let [l:out, l:err] = go#util#ExecInDir(['go', 'list', '-tags', go#config#BuildTags(), '-f', l:format])
+  return split(l:out, '\n')
+endfunction
 
-    for package_path in split(out, '\n')
-        let package_name = fnamemodify(package_path, ":t")
-        let imports[package_name] = package_path
-    endfor
-
+function! go#tool#Imports() abort
+  let imports = {}
+  if go#util#IsWin()
+    let format = '{{range $f := .Imports}}{{$f}}{{printf \"\n\"}}{{end}}'
+  else
+    let format = "{{range $f := .Imports}}{{$f}}{{printf \"\\n\"}}{{end}}"
+  endif
+  let [l:out, l:err] = go#util#ExecInDir(['go', 'list', '-tags', go#config#BuildTags(), '-f', l:format])
+  if l:err != 0
+    echo out
     return imports
+  endif
+
+  for package_path in split(out, '\n')
+    let [l:out, l:err] = go#util#ExecInDir(['go', 'list', '-tags', go#config#BuildTags(), '-f', '{{.Name}}', l:package_path])
+    if l:err != 0
+      echo out
+      return imports
+    endif
+    let package_name = substitute(l:out, '\n$', '', '')
+    let imports[package_name] = package_path
+  endfor
+
+  return imports
 endfunction
 
-function! go#tool#ShowErrors(out)
-    let errors = []
-    for line in split(a:out, '\n')
-        let tokens = matchlist(line, '^\s*\(.\{-}\):\(\d\+\):\s*\(.*\)')
-        if !empty(tokens)
-            call add(errors, {"filename" : expand("%:p:h:") . "/" . tokens[1],
-                        \"lnum":     tokens[2],
-                        \"text":     tokens[3]})
-        elseif !empty(errors)
-            " Preserve indented lines.
-            " This comes up especially with multi-line test output.
-            if match(line, '^\s') >= 0
-                call add(errors, {"text": line})
-            endif
-        endif
-    endfor
-
-    if !empty(errors)
-        call setqflist(errors, 'r')
-        return
-    endif
-
-    if empty(errors)
-        " Couldn't detect error format, output errors
-        echo a:out
-    endif
+function! go#tool#Info(showstatus) abort
+  let l:mode = go#config#InfoMode()
+  if l:mode == 'gocode'
+    call go#complete#Info(a:showstatus)
+  elseif l:mode == 'guru'
+    call go#guru#DescribeInfo(a:showstatus)
+  elseif l:mode == 'gopls'
+    call go#lsp#Info(a:showstatus)
+  else
+    call go#util#EchoError('go_info_mode value: '. l:mode .' is not valid. Valid values are: [gocode, guru, gopls]')
+  endif
 endfunction
 
-function! go#tool#ExecuteInDir(cmd) abort
-    let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd ' : 'cd '
-    let dir = getcwd()
-    try
-        execute cd.'`=expand("%:p:h")`'
-        let out = system(a:cmd)
-    finally
-        execute cd.'`=dir`'
-    endtry
-    return out
+function! go#tool#PackageName() abort
+  let [l:out, l:err] = go#util#ExecInDir(['go', 'list', '-tags', go#config#BuildTags(), '-f', '{{.Name}}'])
+  if l:err != 0
+      return -1
+  endif
+
+  return split(out, '\n')[0]
 endfunction
 
 " Exists checks whether the given importpath exists or not. It returns 0 if
 " the importpath exists under GOPATH.
-function! go#tool#Exists(importpath)
-    let command = "go list ". a:importpath
-    let out = go#tool#ExecuteInDir(command)
-
-    if v:shell_error
+function! go#tool#Exists(importpath) abort
+    let [l:out, l:err] = go#util#ExecInDir(['go', 'list', a:importpath])
+    if l:err != 0
         return -1
     endif
 
     return 0
 endfunction
 
-" BinPath checks whether the given binary exists or not and returns the path
-" of the binary. It returns an empty string doesn't exists.
-function! go#tool#BinPath(binpath)
-    " remove whitespaces if user applied something like 'goimports   '
-    let binpath = substitute(a:binpath, '^\s*\(.\{-}\)\s*$', '\1', '')
+function! go#tool#DescribeBalloon()
+  let l:fname = fnamemodify(bufname(v:beval_bufnr), ':p')
 
-    " if it's in PATH just return it
-    if executable(binpath) 
-        return binpath
-    endif
+  let l:winid = win_getid()
 
+  call win_gotoid(bufwinid(v:beval_bufnr))
 
-    " just get the basename
-    let basename = fnamemodify(binpath, ":t")
+  let [l:line, l:col] = go#lsp#lsp#Position(v:beval_lnum, v:beval_col)
+  call go#lsp#Hover(l:fname, l:line, l:col, funcref('s:balloon', []))
 
-    " check if we have an appropriate bin_path
-    let go_bin_path = GetBinPath()
-    if empty(go_bin_path)
-        echo "vim-go: could not find '" . basename . "'. Run :GoInstallBinaries to fix it."
-        return ""
-    endif
-
-    " append our GOBIN and GOPATH paths and be sure they can be found there...
-    " let us search in our GOBIN and GOPATH paths
-    let old_path = $PATH
-    let $PATH = $PATH . ":" .go_bin_path
-
-    if !executable(binpath) 
-        echo "vim-go: could not find '" . basename . "'. Run :GoInstallBinaries to fix it."
-        return ""
-    endif
-
-    " restore back!
-    if go_bin_path
-        let $PATH = old_path
-    endif
-
-    return go_bin_path . '/' . basename
+  call win_gotoid(l:winid)
+  return ''
 endfunction
 
-" following two functions are from: https://github.com/mattn/gist-vim 
-" thanks  @mattn
-function! s:get_browser_command()
-    let go_play_browser_command = get(g:, 'go_play_browser_command', '')
-    if go_play_browser_command == ''
-        if IsWin()
-            let go_play_browser_command = '!start rundll32 url.dll,FileProtocolHandler %URL%'
-        elseif has('mac') || has('macunix') || has('gui_macvim') || system('uname') =~? '^darwin'
-            let go_play_browser_command = 'open %URL%'
-        elseif executable('xdg-open')
-            let go_play_browser_command = 'xdg-open %URL%'
-        elseif executable('firefox')
-            let go_play_browser_command = 'firefox %URL% &'
-        else
-            let go_play_browser_command = ''
-        endif
-    endif
-    return go_play_browser_command
-endfunction
-
-function! go#tool#OpenBrowser(url)
-    let cmd = s:get_browser_command()
-    if len(cmd) == 0
-        redraw
-        echohl WarningMsg
-        echo "It seems that you don't have general web browser. Open URL below."
-        echohl None
-        echo a:url
-        return
-    endif
-    if cmd =~ '^!'
-        let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
-        silent! exec cmd
-    elseif cmd =~ '^:[A-Z]'
-        let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
-        exec cmd
+function! s:balloon(msg)
+  let l:msg = a:msg
+  if has('balloon_eval')
+    if has('balloon_multiline')
+      let l:msg = join(a:msg, "\n")
     else
-        let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
-        call system(cmd)
+      let l:msg = substitute(join(map(deepcopy(a:msg), 'substitute(v:val, "\t", "", "")'), '; '), '{;', '{', '')
     endif
+  endif
+
+  call balloon_show(l:msg)
 endfunction
 
+" restore Vi compatibility settings
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
-" vim:ts=4:sw=4:et
+" vim: sw=2 ts=2 et
