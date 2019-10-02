@@ -39,6 +39,9 @@ highlight Annoyance ctermbg=236
 " I hate end of line whitespace...highlight it
 match Annoyance /\s\+$/
 
+" Fix the underlining for CursorLineNr that was introduced in 8.1.2029
+highlight CursorLineNr cterm=bold ctermfg=11 gui=bold guifg=Yellow
+
 " up arrow (↑)
 digraph -^ 8593
 " combining acute accent
