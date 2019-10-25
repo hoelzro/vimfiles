@@ -165,7 +165,12 @@ endfunction
 
 nnoremap <C-g> :echo expand('%:p') . ' ' . IfEmpty(&filetype, '<no filetype>') . ' ' . IfEmpty(&fileencoding, '<no encoding>') . ' ' . IfEmpty(&fileformat, '<no format>') . ' ' . line('$') . ' lines'<CR>
 
-function! StripBoundaryChars(s)
+function! StripBoundaryCharsUnlessSearch(s)
+  " don't strip the boundary characters if you're inserting this into a search
+  if getcmdtype() == '/' || getcmdtype() == '?'
+    return a:s
+  endif
+
   let matches = matchlist(a:s, '^\\<\(.*\)\\>$')
   if !empty(matches)
     return matches[1]
@@ -173,8 +178,8 @@ function! StripBoundaryChars(s)
   return a:s
 endfunction
 
-inoremap <C-r>/ <C-r>=StripBoundaryChars(@/)<CR>
-cnoremap <C-r>/ <C-r>=StripBoundaryChars(@/)<CR>
+inoremap <C-r>/ <C-r>=StripBoundaryCharsUnlessSearch(@/)<CR>
+cnoremap <C-r>/ <C-r>=StripBoundaryCharsUnlessSearch(@/)<CR>
 
 function! ResolvePathToCurrentFile()
   let path_to_current_file = expand('%:h')
