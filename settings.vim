@@ -38,6 +38,9 @@ set relativenumber
 set listchars=eol:¬,tab:▸\ 
 set tags=./tags;
 set isfname-==
+set linebreak
+set breakindent
+set breakindentopt=shift:2
 
 set laststatus=2
 let &statusline = '%{ProjectRelativePath()}%=%l,%c%V   %P'
