@@ -32,7 +32,7 @@ function! go#cmd#Build(bang, ...) abort
         \ map(copy(a:000), "expand(v:val)") +
         \ [".", "errors"]
 
-  " Vim and Neovim async.
+  " Vim and Neovim async
   if go#util#has_job()
     call s:cmd_job({
           \ 'cmd': ['go'] + args,
@@ -41,8 +41,15 @@ function! go#cmd#Build(bang, ...) abort
           \ 'statustype': 'build'
           \})
 
-  " Vim 7.4 without async
+  " Vim without async
   else
+    let l:status = {
+          \ 'desc': 'current status',
+          \ 'type': 'build',
+          \ 'state': "started",
+          \ }
+    call go#statusline#Update(expand('%:p:h'), l:status)
+
     let default_makeprg = &makeprg
     let &makeprg = "go " . join(go#util#Shelllist(args), ' ')
 
@@ -68,10 +75,16 @@ function! go#cmd#Build(bang, ...) abort
     call go#list#Window(l:listtype, len(errors))
     if !empty(errors) && !a:bang
       call go#list#JumpToFirst(l:listtype)
+      let l:status.state = 'failed'
     else
-      call go#util#EchoSuccess("[build] SUCCESS")
+      let l:status.state = 'success'
+      if go#config#EchoCommandInfo()
+        call go#util#EchoSuccess("[build] SUCCESS")
+      endif
     endif
+    call go#statusline#Update(expand('%:p:h'), l:status)
   endif
+
 endfunction
 
 
@@ -104,16 +117,15 @@ endfunction
 
 " Run runs the current file (and their dependencies if any) in a new terminal.
 function! go#cmd#RunTerm(bang, mode, files) abort
-  let cmd = "go run "
-  let tags = go#config#BuildTags()
-  if len(tags) > 0
-    let cmd .= "-tags " . go#util#Shellescape(tags) . " "
+  let cmd = ["go", "run"]
+  if len(go#config#BuildTags()) > 0
+    call extend(cmd, ["-tags", go#config#BuildTags()])
   endif
 
   if empty(a:files)
-    let cmd .= go#util#Shelljoin(go#tool#Files())
+    call extend(cmd, go#tool#Files())
   else
-    let cmd .= go#util#Shelljoin(map(copy(a:files), "expand(v:val)"), 1)
+    call extend(cmd, map(copy(a:files), "expand(v:val)"))
   endif
   call go#term#newmode(a:bang, cmd, s:runerrorformat(), a:mode)
 endfunction
@@ -123,7 +135,7 @@ endfunction
 " suitable for long running apps, because vim is blocking by default and
 " calling long running apps will block the whole UI.
 function! go#cmd#Run(bang, ...) abort
-  if has('nvim')
+  if go#config#TermEnabled()
     call go#cmd#RunTerm(a:bang, '', a:000)
     return
   endif
@@ -134,61 +146,101 @@ function! go#cmd#Run(bang, ...) abort
     " anything. Once this is implemented we're going to make :GoRun async
   endif
 
-  let cmd = "go run "
-  let tags = go#config#BuildTags()
-  if len(tags) > 0
-    let cmd .= "-tags " . go#util#Shellescape(tags) . " "
+  let l:status = {
+        \ 'desc': 'current status',
+        \ 'type': 'run',
+        \ 'state': "started",
+        \ }
+
+  call go#statusline#Update(expand('%:p:h'), l:status)
+
+  let l:cmd = ['go', 'run']
+  let l:tags = go#config#BuildTags()
+  if len(l:tags) > 0
+    let l:cmd = l:cmd + ['-tags', l:tags]
   endif
 
+  if a:0 == 0
+    let l:files = go#tool#Files()
+  else
+    let l:files = map(copy(a:000), "expand(v:val)")
+  endif
+
+  let l:cmd = l:cmd + l:files
+
+  let l:cd = exists('*haslocaldir') && haslocaldir() ? 'lcd ' : 'cd '
+  let l:dir = getcwd()
+
   if go#util#IsWin()
-    if a:0 == 0
-      exec '!' . cmd . go#util#Shelljoin(go#tool#Files(), 1)
-    else
-      exec '!' . cmd . go#util#Shelljoin(map(copy(a:000), "expand(v:val)"), 1)
-    endif
+    try
+      if go#util#HasDebug('shell-commands')
+        call go#util#EchoInfo('shell command: ' . l:cmd)
+      endif
 
+      execute l:cd . fnameescape(expand("%:p:h"))
+      exec printf('!%s', go#util#Shelljoin(l:cmd, 1))
+    finally
+      execute l:cd . fnameescape(l:dir)
+    endtry
+
+    let l:status.state = 'success'
     if v:shell_error
-      redraws! | echon "vim-go: [run] " | echohl ErrorMsg | echon "FAILED"| echohl None
+      let l:status.state = 'failed'
+      if go#config#EchoCommandInfo()
+        redraws!
+        call go#util#EchoError('[run] FAILED')
+      endif
     else
-      redraws! | echon "vim-go: [run] " | echohl Function | echon "SUCCESS"| echohl None
+      if go#config#EchoCommandInfo()
+        redraws!
+        call go#util#EchoSuccess('[run] SUCCESS')
+      endif
     endif
 
+    call go#statusline#Update(expand('%:p:h'), l:status)
     return
   endif
 
   " :make expands '%' and '#' wildcards, so they must also be escaped
-  let default_makeprg = &makeprg
-  if a:0 == 0
-    let &makeprg = cmd . go#util#Shelljoin(go#tool#Files(), 1)
-  else
-    let &makeprg = cmd . go#util#Shelljoin(map(copy(a:000), "expand(v:val)"), 1)
-  endif
+  let l:default_makeprg = &makeprg
+  let &makeprg = go#util#Shelljoin(l:cmd, 1)
 
   let l:listtype = go#list#Type("GoRun")
 
-  try
+  let l:status.state = 'success'
 
+  try
     " backup user's errorformat, will be restored once we are finished
     let l:old_errorformat = &errorformat
     let &errorformat = s:runerrorformat()
+
+    if go#util#HasDebug('shell-commands')
+      call go#util#EchoInfo('shell command: ' . l:cmd)
+    endif
+
+    execute l:cd . fnameescape(expand("%:p:h"))
     if l:listtype == "locationlist"
       exe 'lmake!'
     else
       exe 'make!'
     endif
   finally
-    "restore errorformat
+    "restore the working directory, errformat, and makeprg
+    execute cd . fnameescape(l:dir)
     let &errorformat = l:old_errorformat
-    let &makeprg = default_makeprg
+    let &makeprg = l:default_makeprg
   endtry
 
   let l:errors = go#list#Get(l:listtype)
 
   call go#list#Window(l:listtype, len(l:errors))
-  if !empty(l:errors) && !a:bang
-    call go#list#JumpToFirst(l:listtype)
+  if !empty(l:errors)
+    let l:status.state = 'failed'
+    if !a:bang
+      call go#list#JumpToFirst(l:listtype)
+    endif
   endif
-
+  call go#statusline#Update(expand('%:p:h'), l:status)
 endfunction
 
 " Install installs the package by simple calling 'go install'. If any argument
@@ -255,9 +307,18 @@ function! go#cmd#Generate(bang, ...) abort
     let &makeprg = "go generate " . goargs . ' ' . gofiles
   endif
 
-  let l:listtype = go#list#Type("GoGenerate")
+  let l:status = {
+        \ 'desc': 'current status',
+        \ 'type': 'generate',
+        \ 'state': "started",
+        \ }
+  call go#statusline#Update(expand('%:p:h'), l:status)
 
-  echon "vim-go: " | echohl Identifier | echon "generating ..."| echohl None
+  if go#config#EchoCommandInfo()
+    call go#util#EchoProgress('generating ...')
+  endif
+
+  let l:listtype = go#list#Type("GoGenerate")
 
   try
     if l:listtype == "locationlist"
@@ -273,13 +334,18 @@ function! go#cmd#Generate(bang, ...) abort
   let errors = go#list#Get(l:listtype)
   call go#list#Window(l:listtype, len(errors))
   if !empty(errors)
+    let l:status.status = 'failed'
     if !a:bang
       call go#list#JumpToFirst(l:listtype)
     endif
   else
-    redraws! | echon "vim-go: " | echohl Function | echon "[generate] SUCCESS"| echohl None
+    let l:status.status = 'success'
+    if go#config#EchoCommandInfo()
+      redraws!
+      call go#util#EchoSuccess('[generate] SUCCESS')
+    endif
   endif
-
+  call go#statusline#Update(expand(':%:p:h'), l:status)
 endfunction
 
 function! s:runerrorformat()

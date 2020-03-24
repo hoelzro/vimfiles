@@ -47,7 +47,7 @@ func! Test_Jump_leaves_lists() abort
 
     let l:expected = [{'lnum': 10, 'bufnr': bufnr('%'), 'col': 1, 'valid': 1, 'vcol': 0, 'nr': -1, 'type': '', 'pattern': '', 'text': 'quux'}]
 
-    call setloclist(winnr(), copy(l:expected), 'r' )
+    call setloclist(0, copy(l:expected), 'r' )
     call setqflist(copy(l:expected), 'r' )
 
     let l:bufnr = bufnr('%')
@@ -67,7 +67,7 @@ func! Test_Jump_leaves_lists() abort
       sleep 100m
     endwhile
 
-    let l:actual = getloclist(winnr())
+    let l:actual = getloclist(0)
     call gotest#assert_quickfix(l:actual, l:expected)
 
     let l:actual = getqflist()
@@ -77,7 +77,7 @@ func! Test_Jump_leaves_lists() abort
   endtry
 endfunc
 
-func! Test_DefJump_gopls_simple() abort
+func! Test_DefJump_gopls_simple_first() abort
   if !go#util#has_job()
     return
   endif
@@ -85,8 +85,8 @@ func! Test_DefJump_gopls_simple() abort
   try
     let g:go_def_mode = 'gopls'
 
-    let l:tmp = gotest#write_file('simple/position/position.go', [
-          \ 'package position',
+    let l:tmp = gotest#write_file('simple/firstposition/firstposition.go', [
+          \ 'package firstposition',
           \ '',
           \ 'func Example() {',
           \ "\tid := " . '"foo"',
@@ -112,7 +112,7 @@ func! Test_DefJump_gopls_simple() abort
   endtry
 endfunc
 
-func! Test_DefJump_gopls_MultipleCodeUnit() abort
+func! Test_DefJump_gopls_simple_last() abort
   if !go#util#has_job()
     return
   endif
@@ -120,12 +120,82 @@ func! Test_DefJump_gopls_MultipleCodeUnit() abort
   try
     let g:go_def_mode = 'gopls'
 
-    let l:tmp = gotest#write_file('multiplecodeunit/position/position.go', [
-          \ 'package position',
+    let l:tmp = gotest#write_file('simple/lastposition/lastposition.go', [
+          \ 'package lastposition',
+          \ '',
+          \ 'func Example() {',
+          \ "\tid := " . '"foo"',
+          \ "\tprintln(" . '"id:", id)',
+          \ '}',
+          \ ] )
+
+    let l:expected = [0, 4, 2, 0]
+
+    call assert_notequal(l:expected, getpos('.'))
+
+    call go#def#Jump('', 0)
+
+    let l:start = reltime()
+    while getpos('.') != l:expected && reltimefloat(reltime(l:start)) < 10
+      sleep 100m
+    endwhile
+
+    call assert_equal(l:expected, getpos('.'))
+  finally
+    call delete(l:tmp, 'rf')
+    unlet g:go_def_mode
+  endtry
+endfunc
+
+func! Test_DefJump_gopls_MultipleCodeUnit_first() abort
+  if !go#util#has_job()
+    return
+  endif
+
+  try
+    let g:go_def_mode = 'gopls'
+
+    let l:tmp = gotest#write_file('multiplecodeunit/firstposition/firstposition.go', [
+          \ 'package firstposition',
           \ '',
           \ 'func Example() {',
           \ "\t𐐀, id := " . '"foo", "bar"',
           \ "\tprintln(" . '"(𐐀, id):", 𐐀, id)',
+          \ '}',
+          \ ] )
+
+    let l:expected = [0, 4, 8, 0]
+    call assert_notequal(l:expected, getpos('.'))
+
+    call go#def#Jump('', 0)
+
+    let l:start = reltime()
+    while getpos('.') != l:expected && reltimefloat(reltime(l:start)) < 10
+      sleep 100m
+    endwhile
+
+    call assert_equal(l:expected, getpos('.'))
+  finally
+    call delete(l:tmp, 'rf')
+    unlet g:go_def_mode
+  endtry
+endfunc
+
+
+func! Test_DefJump_gopls_MultipleCodeUnit_last() abort
+  if !go#util#has_job()
+    return
+  endif
+
+  try
+    let g:go_def_mode = 'gopls'
+
+    let l:tmp = gotest#write_file('multiplecodeunit/lastposition/lastposition.go', [
+          \ 'package lastposition',
+          \ '',
+          \ 'func Example() {',
+          \ "\t𐐀, id := " . '"foo", "bar"',
+          \ "\tprintln(" . '"(𐐀, id):", 𐐀, id)',
           \ '}',
           \ ] )
 

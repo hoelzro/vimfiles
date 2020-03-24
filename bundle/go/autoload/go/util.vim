@@ -36,15 +36,9 @@ function! go#util#Join(...) abort
 endfunction
 
 " IsWin returns 1 if current OS is Windows or 0 otherwise
+" Note that has('win32') is always 1 when has('win64') is 1, so has('win32') is enough.
 function! go#util#IsWin() abort
-  let win = ['win16', 'win32', 'win64', 'win95']
-  for w in win
-    if (has(w))
-      return 1
-    endif
-  endfor
-
-  return 0
+  return has('win32')
 endfunction
 
 " IsMac returns 1 if current OS is macOS or 0 otherwise.
@@ -68,18 +62,7 @@ endfunction
 " The (optional) first parameter can be added to indicate the 'cwd' or 'env'
 " parameters will be used, which wasn't added until a later version.
 function! go#util#has_job(...) abort
-  if has('nvim')
-    return 1
-  endif
-
-  " cwd and env parameters to job_start was added in this version.
-  if a:0 > 0 && a:1 is 1
-    return has('job') && has("patch-8.0.0902")
-  endif
-
-  " job was introduced in 7.4.xxx however there are multiple bug fixes and one
-  " of the latest is 8.0.0087 which is required for a stable async API.
-  return has('job') && has("patch-8.0.0087")
+  return has('job') || has('nvim')
 endfunction
 
 let s:env_cache = {}
@@ -177,6 +160,13 @@ function! s:system(cmd, ...) abort
 
   if !go#util#IsWin() && executable('/bin/sh')
       set shell=/bin/sh shellredir=>%s\ 2>&1 shellcmdflag=-c
+  endif
+
+  if go#util#IsWin()
+    if executable($COMSPEC)
+      let &shell = $COMSPEC
+      set shellcmdflag=/C
+    endif
   endif
 
   try
@@ -562,16 +552,130 @@ function! go#util#SetEnv(name, value) abort
   call execute('let $' . a:name . " = '" . a:value . "'")
 
   if l:remove
-    function! s:remove(name) abort
-      call execute('unlet $' . a:name)
-    endfunction
-    return function('s:remove', [a:name], l:state)
+    return function('s:unset', [a:name], l:state)
   endif
 
   return function('go#util#SetEnv', [a:name, l:oldvalue], l:state)
 endfunction
 
+function! go#util#ClearHighlights(group) abort
+  if has('textprop')
+    " the property type may not exist when syntax highlighting is not enabled.
+    if empty(prop_type_get(a:group))
+      return
+    endif
+    if !has('patch-8.1.1035')
+      return prop_remove({'type': a:group, 'all': 1}, 1, line('$'))
+    endif
+    return prop_remove({'type': a:group, 'all': 1})
+  endif
+
+  if exists("*matchaddpos")
+    return s:clear_group_from_matches(a:group)
+  endif
+endfunction
+
+function! s:clear_group_from_matches(group) abort
+  let l:cleared = 0
+
+  let m = getmatches()
+  for item in m
+    if item['group'] == a:group
+      call matchdelete(item['id'])
+      let l:cleared = 1
+    endif
+  endfor
+
+  return l:cleared
+endfunction
+
+function! s:unset(name) abort
+  try
+    " unlet $VAR was introducted in Vim 8.0.1832, which is newer than the
+    " minimal version that vim-go supports. Set the environment variable to
+    " the empty string in that case. It's not perfect, but it will work fine
+    " for most things, and is really the best alternative that's available.
+    if !has('patch-8.0.1832')
+      call go#util#SetEnv(a:name, '')
+      return
+    endif
+
+    call execute('unlet $' . a:name)
+  catch
+    call go#util#EchoError(printf('could not unset $%s: %s', a:name, v:exception))
+  endtry
+endfunction
+
 function! s:noop(...) abort dict
+endfunction
+
+" go#util#HighlightPositions highlights using text properties if possible and
+" falls back to matchaddpos() if necessary. It works around matchaddpos()'s
+" limit of only 8 positions per call by calling matchaddpos() with no more
+" than 8 positions per call.
+"
+" pos should be a list of 3 element lists. The lists should be [line, col,
+" length] as used by matchaddpos().
+function! go#util#HighlightPositions(group, pos) abort
+  if has('textprop')
+    for l:pos in a:pos
+      " use a single line prop by default
+      let l:prop = {'type': a:group, 'length': l:pos[2]}
+
+      let l:line = getline(l:pos[0])
+
+      " l:max is the 1-based index within the buffer of the first character after l:pos.
+      let l:max = line2byte(l:pos[0]) + l:pos[1] + l:pos[2] - 1
+      if has('patch-8.2.115')
+        " Use byte2line as long as 8.2.115 (which resolved
+        " https://github.com/vim/vim/issues/5334) is available.
+        let l:end_lnum = byte2line(l:max)
+
+        " specify end line and column if needed.
+        if l:pos[0] != l:end_lnum
+          let l:end_col = l:max - line2byte(l:end_lnum)
+          let l:prop = {'type': a:group, 'end_lnum': l:end_lnum, 'end_col': l:end_col}
+        endif
+      elseif l:pos[1] + l:pos[2] - 1 > len(l:line)
+        let l:end_lnum = l:pos[0]
+        while line2byte(l:end_lnum+1) < l:max
+          let l:end_lnum += 1
+        endwhile
+
+        " l:end_col is the full length - the byte position of l:end_lnum +
+        " the number of newlines (number of newlines is l:end_lnum -
+        " l:pos[0].
+        let l:end_col = l:max - line2byte(l:end_lnum) + l:end_lnum - l:pos[0]
+        let l:prop = {'type': a:group, 'end_lnum': l:end_lnum, 'end_col': l:end_col}
+      endif
+      call prop_add(l:pos[0], l:pos[1], l:prop)
+    endfor
+    return
+  endif
+
+  if exists('*matchaddpos')
+    return s:matchaddpos(a:group, a:pos)
+  endif
+endfunction
+
+" s:matchaddpos works around matchaddpos()'s limit of only 8 positions per
+" call by calling matchaddpos() with no more than 8 positions per call.
+function! s:matchaddpos(group, pos) abort
+  let l:partitions = []
+  let l:partitionsIdx = 0
+  let l:posIdx = 0
+  for l:pos in a:pos
+    if l:posIdx % 8 == 0
+      let l:partitions = add(l:partitions, [])
+      let l:partitionsIdx = len(l:partitions) - 1
+    endif
+    let l:partitions[l:partitionsIdx] = add(l:partitions[l:partitionsIdx], l:pos)
+    let l:posIdx = l:posIdx + 1
+  endfor
+
+  for l:positions in l:partitions
+    call matchaddpos(a:group, l:positions)
+  endfor
 endfunction
 
 " restore Vi compatibility settings

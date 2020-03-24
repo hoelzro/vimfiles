@@ -41,7 +41,12 @@ endfunction
 "     the current window will be the window that was hosting the buffer when
 "     the job was started. After it returns, the current window will be
 "     restored to what it was before the function was called.
-
+"   'preserveerrors':
+"     A function that will be passed one value, the list type. It should
+"     return a boolean value that indicates whether any errors encountered
+"     should be consider additive to the existing set of errors. This is
+"     mostly useful for a set of commands that are run via autocmds.
+"
 " The return value is a dictionary with these keys:
 "   'callback':
 "     A function suitable to be passed as a job callback handler. See
@@ -61,7 +66,7 @@ function! go#job#Options(args)
   let state = {
         \ 'winid': win_getid(winnr()),
         \ 'dir': getcwd(),
-        \ 'jobdir': fnameescape(expand("%:p:h")),
+        \ 'jobdir': expand("%:p:h"),
         \ 'messages': [],
         \ 'bang': 0,
         \ 'for': "_job",
@@ -69,12 +74,10 @@ function! go#job#Options(args)
         \ 'exit_status': 0,
         \ 'closed': 0,
         \ 'errorformat': &errorformat,
-        \ 'statustype' : ''
+        \ 'statustype' : '',
       \ }
 
-  if has("patch-8.0.0902") || has('nvim')
-    let cbs.cwd = state.jobdir
-  endif
+  let cbs.cwd = state.jobdir
 
   if has_key(a:args, 'bang')
     let state.bang = a:args.bang
@@ -90,6 +93,10 @@ function! go#job#Options(args)
 
   if has_key(a:args, 'errorformat')
     let state.errorformat = a:args.errorformat
+  endif
+
+  if has_key(a:args, 'preserveerrors')
+    let state.preserveerrors = a:args.preserveerrors
   endif
 
   function state.complete(job, exit_status, data)
@@ -177,16 +184,26 @@ function! go#job#Options(args)
     call win_gotoid(self.winid)
 
     let l:listtype = go#list#Type(self.for)
+
+    let l:preserveerrors = 0
+    if has_key(self, 'preserveerrors')
+      let l:preserveerrors = self.preserveerrors(l:listtype)
+    endif
+
     if a:exit_status == 0
-      call go#list#Clean(l:listtype)
-      call win_gotoid(l:winid)
+      if !l:preserveerrors
+        call go#list#Clean(l:listtype)
+        call win_gotoid(l:winid)
+      endif
       return
     endif
 
     let l:listtype = go#list#Type(self.for)
     if len(a:data) == 0
-      call go#list#Clean(l:listtype)
-      call win_gotoid(l:winid)
+      if !l:preserveerrors
+        call go#list#Clean(l:listtype)
+        call win_gotoid(l:winid)
+      endif
       return
     endif
 
@@ -195,8 +212,8 @@ function! go#job#Options(args)
     let l:cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
     try
       " parse the errors relative to self.jobdir
-      execute l:cd self.jobdir
-      call go#list#ParseFormat(l:listtype, self.errorformat, out, self.for)
+      execute l:cd fnameescape(self.jobdir)
+      call go#list#ParseFormat(l:listtype, self.errorformat, out, self.for, l:preserveerrors)
       let errors = go#list#Get(l:listtype)
     finally
       execute l:cd fnameescape(self.dir)
@@ -295,11 +312,6 @@ function! go#job#Start(cmd, options)
     let l:manualcd = 1
     let dir = getcwd()
     execute l:cd fnameescape(filedir)
-  elseif !(has("patch-8.0.0902") || has('nvim'))
-    let l:manualcd = 1
-    let l:dir = l:options.cwd
-    execute l:cd fnameescape(l:dir)
-    call remove(l:options, 'cwd')
   endif
 
   if has_key(l:options, '_start')

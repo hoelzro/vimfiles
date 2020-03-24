@@ -117,7 +117,7 @@ if go#config#HighlightFormatStrings()
         \@<=%[-#0 +]*\
         \%(\%(\%(\[\d\+\]\)\=\*\)\|\d\+\)\=\
         \%(\.\%(\%(\%(\[\d\+\]\)\=\*\)\|\d\+\)\=\)\=\
-        \%(\[\d\+\]\)\=[vTtbcdoqxXUeEfFgGsp]/ contained containedin=goString,goRawString
+        \%(\[\d\+\]\)\=[vTtbcdoqxXUeEfFgGspw]/ contained containedin=goString,goRawString
   hi def link     goFormatSpecifier   goSpecialString
 endif
 
@@ -162,15 +162,23 @@ endif
 syn match       goSingleDecl        /\%(import\|var\|const\) [^(]\@=/ contains=goImport,goVar,goConst
 
 " Integers
-syn match       goDecimalInt        "\<-\=\d\+\%([Ee][-+]\=\d\+\)\=\>"
-syn match       goHexadecimalInt    "\<-\=0[xX]\x\+\>"
-syn match       goOctalInt          "\<-\=0\o\+\>"
-syn match       goOctalError        "\<-\=0\o*[89]\d*\>"
+syn match       goDecimalInt        "\<-\=\(0\|[1-9]_\?\(\d\|\d\+_\?\d\+\)*\)\%([Ee][-+]\=\d\+\)\=\>"
+syn match       goDecimalError      "\<-\=\(_\(\d\+_*\)\+\|\([1-9]\d*_*\)\+__\(\d\+_*\)\+\|\([1-9]\d*_*\)\+_\+\)\%([Ee][-+]\=\d\+\)\=\>"
+syn match       goHexadecimalInt    "\<-\=0[xX]_\?\(\x\+_\?\)\+\>"
+syn match       goHexadecimalError  "\<-\=0[xX]_\?\(\x\+_\?\)*\(\([^ \t0-9A-Fa-f_]\|__\)\S*\|_\)\>"
+syn match       goOctalInt          "\<-\=0[oO]\?_\?\(\o\+_\?\)\+\>"
+syn match       goOctalError        "\<-\=0[0-7oO_]*\(\([^ \t0-7oOxX_/)\]\}\:]\|[oO]\{2,\}\|__\)\S*\|_\|[oOxX]\)\>"
+syn match       goBinaryInt         "\<-\=0[bB]_\?\([01]\+_\?\)\+\>"
+syn match       goBinaryError       "\<-\=0[bB]_\?[01_]*\([^ \t01_]\S*\|__\S*\|_\)\>"
 
 hi def link     goDecimalInt        Integer
+hi def link     goDecimalError      Error
 hi def link     goHexadecimalInt    Integer
+hi def link     goHexadecimalError  Error
 hi def link     goOctalInt          Integer
 hi def link     goOctalError        Error
+hi def link     goBinaryInt         Integer
+hi def link     goBinaryError       Error
 hi def link     Integer             Number
 
 " Floating point
@@ -382,6 +390,31 @@ hi def link goCoverageNormalText Comment
 
 function! s:hi()
   hi def link goSameId Search
+  hi def link goDiagnosticError SpellBad
+  hi def link goDiagnosticWarning SpellRare
+
+  " TODO(bc): is it appropriate to define text properties in a syntax file?
+  " The highlight groups need to be defined before the text properties types
+  " are added, and when users have syntax enabled in their vimrc after
+  " filetype plugin on, the highlight groups won't be defined when
+  " ftplugin/go.vim is executed when the first go file is opened.
+  " See https://github.com/fatih/vim-go/issues/2658.
+  if has('textprop')
+    if empty(prop_type_get('goSameId'))
+      call prop_type_add('goSameId', {'highlight': 'goSameId'})
+    endif
+    if empty(prop_type_get('goDiagnosticError'))
+      call prop_type_add('goDiagnosticError', {'highlight': 'goDiagnosticError'})
+    endif
+    if empty(prop_type_get('goDiagnosticWarning'))
+      call prop_type_add('goDiagnosticWarning', {'highlight': 'goDiagnosticWarning'})
+    endif
+  endif
+
+  hi def link goDeclsFzfKeyword        Keyword
+  hi def link goDeclsFzfFunction       Function
+  hi def link goDeclsFzfSpecialComment SpecialComment
+  hi def link goDeclsFzfComment        Comment
 
   " :GoCoverage commands
   hi def      goCoverageCovered    ctermfg=green guifg=#A6E22E

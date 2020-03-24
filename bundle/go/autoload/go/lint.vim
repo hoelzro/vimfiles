@@ -11,18 +11,19 @@ function! go#lint#Gometa(bang, autosave, ...) abort
 
   let l:metalinter = go#config#MetalinterCommand()
 
-  if l:metalinter == 'gometalinter' || l:metalinter == 'golangci-lint'
-    let cmd = s:metalintercmd(l:metalinter)
+  let cmd = []
+  if l:metalinter == 'golangci-lint'
+    let linters = a:autosave ? go#config#MetalinterAutosaveEnabled() : go#config#MetalinterEnabled()
+    let cmd = s:metalintercmd(l:metalinter, len(linters) != 0)
     if empty(cmd)
       return
     endif
 
-    " linters
-    let linters = a:autosave ? go#config#MetalinterAutosaveEnabled() : go#config#MetalinterEnabled()
+    " add linters to cmd
     for linter in linters
       let cmd += ["--enable=".linter]
     endfor
-  else
+  elseif l:metalinter != 'gopls'
     " the user wants something else, let us use it.
     let cmd = split(go#config#MetalinterCommand(), " ")
   endif
@@ -32,14 +33,7 @@ function! go#lint#Gometa(bang, autosave, ...) abort
     " will be cleared
     redraw
 
-    if l:metalinter == "gometalinter"
-      " Include only messages for the active buffer for autosave.
-      let include = [printf('--include=^%s:.*$', fnamemodify(expand('%:p'), ":."))]
-      if go#util#has_job()
-        let include = [printf('--include=^%s:.*$', expand('%:p:t'))]
-      endif
-      let cmd += include
-    elseif l:metalinter == "golangci-lint"
+    if l:metalinter == "golangci-lint"
       let goargs[0] = expand('%:p:h')
     endif
   endif
@@ -52,25 +46,41 @@ function! go#lint#Gometa(bang, autosave, ...) abort
 
   let cmd += goargs
 
-  if l:metalinter == "gometalinter"
-    " Gometalinter can output one of the two, so we look for both:
-    "   <file>:<line>:<column>:<severity>: <message> (<linter>)
-    "   <file>:<line>::<severity>: <message> (<linter>)
-    " This can be defined by the following errorformat:
-    let errformat = "%f:%l:%c:%t%*[^:]:\ %m,%f:%l::%t%*[^:]:\ %m"
+  let errformat = s:errorformat(l:metalinter)
+
+  if l:metalinter == 'gopls'
+    if a:autosave
+      let l:messages = go#lsp#AnalyzeFile(expand('%:p'))
+    else
+      let l:import_paths = l:goargs
+      if len(l:import_paths) == 0
+        let l:pkg = go#package#ImportPath()
+        if l:pkg == -1
+          call go#util#EchoError('could not determine package name')
+          return
+        endif
+
+        let l:import_paths = [l:pkg]
+      endif
+      let l:messages = call('go#lsp#Diagnostics', l:import_paths)
+    endif
+
+    let l:err = len(l:messages)
   else
-    " Golangci-lint can output the following:
-    "   <file>:<line>:<column>: <message> (<linter>)
-    " This can be defined by the following errorformat:
-    let errformat = "%f:%l:%c:\ %m"
-  endif
+    if go#util#has_job()
+      if a:autosave
+        let l:for = 'GoMetaLinterAutoSave'
+      else
+        let l:for = 'GoMetaLinter'
+      endif
 
-  if go#util#has_job()
-    call s:lint_job({'cmd': cmd, 'statustype': l:metalinter, 'errformat': errformat}, a:bang, a:autosave)
-    return
-  endif
+      call s:lint_job(l:metalinter, {'cmd': cmd, 'statustype': l:metalinter, 'errformat': errformat, 'for': l:for}, a:bang, a:autosave)
+      return
+    endif
 
-  let [l:out, l:err] = go#util#Exec(cmd)
+    let [l:out, l:err] = go#util#Exec(cmd)
+    let l:messages = split(out, "\n")
+  endif
 
   if a:autosave
     let l:listtype = go#list#Type("GoMetaLinterAutoSave")
@@ -79,56 +89,116 @@ function! go#lint#Gometa(bang, autosave, ...) abort
   endif
 
   if l:err == 0
-    call go#list#Clean(l:listtype)
-    echon "vim-go: " | echohl Function | echon "[metalinter] PASS" | echohl None
+    if !s:preserveerrors(a:autosave, l:listtype)
+      call go#list#Clean(l:listtype)
+    endif
+    call go#util#EchoSuccess('[metalinter] PASS')
   else
     let l:winid = win_getid(winnr())
     " Parse and populate our location list
 
-    let l:messages = split(out, "\n")
-
     if a:autosave
-      call s:metalinterautosavecomplete(fnamemodify(expand('%:p'), ":."), 0, 1, l:messages)
+      call s:metalinterautosavecomplete(l:metalinter, fnamemodify(expand('%:p'), ":."), 0, 1, l:messages)
     endif
-    call go#list#ParseFormat(l:listtype, errformat, l:messages, 'GoMetaLinter')
+    call go#list#ParseFormat(l:listtype, errformat, l:messages, 'GoMetaLinter', s:preserveerrors(a:autosave, l:listtype))
 
     let errors = go#list#Get(l:listtype)
     call go#list#Window(l:listtype, len(errors))
 
     if a:autosave || a:bang
       call win_gotoid(l:winid)
+    else
+      call go#list#JumpToFirst(l:listtype)
+    endif
+  endif
+endfunction
+
+function! go#lint#Diagnostics(bang, ...) abort
+  if a:0 == 0
+    let l:pkg = go#package#ImportPath()
+    if l:pkg == -1
+      call go#util#EchoError('could not determine package name')
       return
     endif
-    call go#list#JumpToFirst(l:listtype)
+
+    let l:import_paths = [l:pkg]
+  else
+    let l:import_paths = a:000
+  endif
+
+  let errformat = s:errorformat('gopls')
+
+  let l:messages = call('go#lsp#Diagnostics', l:import_paths)
+
+  let l:listtype = go#list#Type("GoDiagnostics")
+
+  if len(l:messages) == 0
+    call go#list#Clean(l:listtype)
+    call go#util#EchoSuccess('[diagnostics] PASS')
+  else
+    " Parse and populate the quickfix list
+    let l:winid = win_getid(winnr())
+    call go#list#ParseFormat(l:listtype, errformat, l:messages, 'GoDiagnostics', 0)
+
+    let errors = go#list#Get(l:listtype)
+    call go#list#Window(l:listtype, len(errors))
+
+    if a:bang
+      call win_gotoid(l:winid)
+    else
+      call go#list#JumpToFirst(l:listtype)
+    endif
   endif
 endfunction
 
 " Golint calls 'golint' on the current directory. Any warnings are populated in
 " the location list
 function! go#lint#Golint(bang, ...) abort
+  call go#cmd#autowrite()
+
+  let l:type = 'golint'
+  let l:status = {
+        \ 'desc': 'current status',
+        \ 'type': l:type,
+        \ 'state': "started",
+        \ }
+  if go#config#EchoCommandInfo()
+    call go#util#EchoProgress(printf('[%s] analyzing...', l:type))
+  endif
+  call go#statusline#Update(expand('%:p:h'), l:status)
+
   if a:0 == 0
     let [l:out, l:err] = go#util#Exec([go#config#GolintBin(), expand('%:p:h')])
   else
     let [l:out, l:err] = go#util#Exec([go#config#GolintBin()] + a:000)
   endif
 
-  if empty(l:out)
-    call go#util#EchoSuccess('[lint] PASS')
-    return
+  let l:status.state = 'success'
+  let l:state = 'PASS'
+  if !empty(l:out)
+    let l:status.state = 'failed'
+    let l:state = 'FAIL'
+
+    let l:winid = win_getid(winnr())
+    let l:listtype = go#list#Type("GoLint")
+    call go#list#Parse(l:listtype, l:out, "GoLint", 0)
+    let l:errors = go#list#Get(l:listtype)
+    call go#list#Window(l:listtype, len(l:errors))
+
+    if a:bang
+      call win_gotoid(l:winid)
+    else
+      call go#list#JumpToFirst(l:listtype)
+    endif
+    if go#config#EchoCommandInfo()
+      call go#util#EchoError(printf('[%s] %s', l:type, l:state))
+    endif
+  else
+    if go#config#EchoCommandInfo()
+      call go#util#EchoSuccess(printf('[%s] %s', l:type, l:state))
+    endif
   endif
-
-  let l:winid = win_getid(winnr())
-  let l:listtype = go#list#Type("GoLint")
-  call go#list#Parse(l:listtype, l:out, "GoLint")
-  let l:errors = go#list#Get(l:listtype)
-  call go#list#Window(l:listtype, len(l:errors))
-
-  if a:bang
-    call win_gotoid(l:winid)
-    return
-  endif
-
-  call go#list#JumpToFirst(l:listtype)
+  call go#statusline#Update(expand('%:p:h'), l:status)
 endfunction
 
 " Vet calls 'go vet' on the current directory. Any warnings are populated in
@@ -136,59 +206,127 @@ endfunction
 function! go#lint#Vet(bang, ...) abort
   call go#cmd#autowrite()
 
-  if go#config#EchoCommandInfo()
-    call go#util#EchoProgress('calling vet...')
+  let l:cmd = ['go', 'vet']
+
+  let buildtags = go#config#BuildTags()
+  if buildtags isnot ''
+    let l:cmd += ['-tags', buildtags]
   endif
 
   if a:0 == 0
-    let [l:out, l:err] = go#util#Exec(['go', 'vet', go#package#ImportPath()])
+    let l:import_path = go#package#ImportPath()
+    if l:import_path == -1
+      call go#util#EchoError('could not determine package')
+      return
+    endif
+    let l:cmd = add(l:cmd, l:import_path)
   else
-    let [l:out, l:err] = go#util#ExecInDir(['go', 'tool', 'vet'] + a:000)
+    let l:cmd = extend(l:cmd, a:000)
   endif
+
+  let l:type = 'go vet'
+  if go#config#EchoCommandInfo()
+    call go#util#EchoProgress(printf('[%s] analyzing...', l:type))
+  endif
+  let l:status = {
+        \ 'desc': 'current status',
+        \ 'type': l:type,
+        \ 'state': "started",
+        \ }
+  call go#statusline#Update(expand('%:p:h'), l:status)
+
+  let [l:out, l:err] = go#util#ExecInDir(l:cmd)
+
+  let l:status.state = 'success'
+  let l:state = 'PASS'
 
   let l:listtype = go#list#Type("GoVet")
   if l:err != 0
+    let l:status.state = 'failed'
+    let l:state = 'FAIL'
+
     let l:winid = win_getid(winnr())
-    let errorformat = "%-Gexit status %\\d%\\+," . &errorformat
-    call go#list#ParseFormat(l:listtype, l:errorformat, out, "GoVet")
-    let errors = go#list#Get(l:listtype)
-    call go#list#Window(l:listtype, len(errors))
-    if !empty(errors) && !a:bang
+    let l:errorformat = "%-Gexit status %\\d%\\+," . &errorformat
+    call go#list#ParseFormat(l:listtype, l:errorformat, out, "GoVet", 0)
+    let l:errors = go#list#Get(l:listtype)
+
+    if empty(l:errors)
+      call go#util#EchoError(l:out)
+      return
+    endif
+
+    call go#list#Window(l:listtype, len(l:errors))
+    if !empty(l:errors) && !a:bang
       call go#list#JumpToFirst(l:listtype)
     else
       call win_gotoid(l:winid)
     endif
+
+    if go#config#EchoCommandInfo()
+      call go#util#EchoError(printf('[%s] %s', l:type, l:state))
+    endif
   else
     call go#list#Clean(l:listtype)
-    call go#util#EchoSuccess('[vet] PASS')
+    if go#config#EchoCommandInfo()
+      call go#util#EchoSuccess(printf('[%s] %s', l:type, l:state))
+    endif
   endif
+  call go#statusline#Update(expand('%:p:h'), l:status)
 endfunction
 
 " ErrCheck calls 'errcheck' for the given packages. Any warnings are populated in
 " the location list
 function! go#lint#Errcheck(bang, ...) abort
-  if a:0 == 0
-    let l:import_path = go#package#ImportPath()
-    if import_path == -1
-      call go#util#EchoError('package is not inside GOPATH src')
-      return
-    endif
-  else
-    let l:import_path = join(a:000, ' ')
+  call go#cmd#autowrite()
+
+  let l:cmd = [go#config#ErrcheckBin(), '-abspath']
+
+  let buildtags = go#config#BuildTags()
+  if buildtags isnot ''
+    let l:cmd += ['-tags', buildtags]
   endif
 
-  call go#util#EchoProgress('[errcheck] analysing ...')
+  if a:0 == 0
+    let l:import_path = go#package#ImportPath()
+    if l:import_path == -1
+      call go#util#EchoError('could not determine package')
+      return
+    endif
+    let l:cmd = add(l:cmd, l:import_path)
+  else
+    let l:cmd = extend(l:cmd, a:000)
+  endif
+
+  let l:type = 'errcheck'
+  if go#config#EchoCommandInfo()
+    call go#util#EchoProgress(printf('[%s] analyzing...', l:type))
+  endif
+  let l:status = {
+        \ 'desc': 'current status',
+        \ 'type': l:type,
+        \ 'state': "started",
+        \ }
   redraw
 
-  let [l:out, l:err] = go#util#Exec([go#config#ErrcheckBin(), '-abspath', l:import_path])
+  call go#statusline#Update(expand('%:p:h'), l:status)
+
+  let [l:out, l:err] = go#util#ExecInDir(l:cmd)
+
+  let l:status.state = 'success'
+  let l:state = 'PASS'
 
   let l:listtype = go#list#Type("GoErrCheck")
   if l:err != 0
-    let l:winid = win_getid(winnr())
-    let errformat = "%f:%l:%c:\ %m, %f:%l:%c\ %#%m"
+    let l:status.state = 'failed'
+    let l:state = 'FAIL'
 
-    " Parse and populate our location list
-    call go#list#ParseFormat(l:listtype, errformat, split(out, "\n"), 'Errcheck')
+    let l:winid = win_getid(winnr())
+
+    if l:err == 1
+      let l:errformat = "%f:%l:%c:\ %m,%f:%l:%c\ %#%m"
+      " Parse and populate our location list
+      call go#list#ParseFormat(l:listtype, l:errformat, split(out, "\n"), 'Errcheck', 0)
+    endif
 
     let l:errors = go#list#Get(l:listtype)
     if empty(l:errors)
@@ -197,18 +335,24 @@ function! go#lint#Errcheck(bang, ...) abort
     endif
 
     if !empty(errors)
-      call go#list#Populate(l:listtype, errors, 'Errcheck')
-      call go#list#Window(l:listtype, len(errors))
+      call go#list#Populate(l:listtype, l:errors, 'Errcheck')
+      call go#list#Window(l:listtype, len(l:errors))
       if !a:bang
         call go#list#JumpToFirst(l:listtype)
       else
         call win_gotoid(l:winid)
       endif
     endif
+    if go#config#EchoCommandInfo()
+      call go#util#EchoError(printf('[%s] %s', l:type, l:state))
+    endif
   else
     call go#list#Clean(l:listtype)
-    call go#util#EchoSuccess('[errcheck] PASS')
+    if go#config#EchoCommandInfo()
+      call go#util#EchoSuccess(printf('[%s] %s', l:type, l:state))
+    endif
   endif
+  call go#statusline#Update(expand('%:p:h'), l:status)
 endfunction
 
 function! go#lint#ToggleMetaLinterAutoSave() abort
@@ -222,17 +366,19 @@ function! go#lint#ToggleMetaLinterAutoSave() abort
   call go#util#EchoProgress("auto metalinter enabled")
 endfunction
 
-function! s:lint_job(args, bang, autosave)
+function! s:lint_job(metalinter, args, bang, autosave)
   let l:opts = {
         \ 'statustype': a:args.statustype,
         \ 'errorformat': a:args.errformat,
         \ 'for': "GoMetaLinter",
         \ 'bang': a:bang,
-        \ }
+      \ }
 
   if a:autosave
     let l:opts.for = "GoMetaLinterAutoSave"
-    let l:opts.complete = funcref('s:metalinterautosavecomplete', [expand('%:p:t')])
+    " s:metalinterautosavecomplete is really only needed for golangci-lint
+    let l:opts.complete = funcref('s:metalinterautosavecomplete', [a:metalinter, expand('%:p:t')])
+    let l:opts.preserveerrors = function('s:preserveerrors')
   endif
 
   " autowrite is not enabled for jobs
@@ -241,60 +387,70 @@ function! s:lint_job(args, bang, autosave)
   call go#job#Spawn(a:args.cmd, l:opts)
 endfunction
 
-function! s:metalintercmd(metalinter)
+function! s:metalintercmd(metalinter, haslinter)
   let l:cmd = []
   let bin_path = go#path#CheckBinPath(a:metalinter)
   if !empty(bin_path)
-    if a:metalinter == "gometalinter"
-      let l:cmd = s:gometalintercmd(bin_path)
-    elseif a:metalinter == "golangci-lint"
-      let l:cmd = s:golangcilintcmd(bin_path)
+    if a:metalinter == "golangci-lint"
+      let l:cmd = s:golangcilintcmd(bin_path, a:haslinter)
     endif
   endif
 
   return cmd
 endfunction
 
-function! s:gometalintercmd(bin_path)
-  let cmd = [a:bin_path]
-  let cmd += ["--disable-all"]
-
-  " gometalinter has a --tests flag to tell its linters whether to run
-  " against tests. While not all of its linters respect this flag, for those
-  " that do, it means if we don't pass --tests, the linter won't run against
-  " test files. One example of a linter that will not run against tests if
-  " we do not specify this flag is errcheck.
-  let cmd += ["--tests"]
-  return cmd
-endfunction
-
-function! s:golangcilintcmd(bin_path)
+function! s:golangcilintcmd(bin_path, haslinter)
   let cmd = [a:bin_path]
   let cmd += ["run"]
   let cmd += ["--print-issued-lines=false"]
   let cmd += ['--build-tags', go#config#BuildTags()]
-  let cmd += ["--disable-all"]
   " do not use the default exclude patterns, because doing so causes golint
   " problems about missing doc strings to be ignored and other things that
   " golint identifies.
   let cmd += ["--exclude-use-default=false"]
 
+  if a:haslinter
+    let cmd += ["--disable-all"]
+  endif
+
   return cmd
 endfunction
 
-function! s:metalinterautosavecomplete(filepath, job, exit_code, messages)
+function! s:metalinterautosavecomplete(metalinter, filepath, job, exit_code, messages)
+  if a:metalinter != 'golangci-lint'
+    return
+  endif
+
   if len(a:messages) == 0
     return
   endif
 
-  let l:file = expand('%:p:t')
   let l:idx = len(a:messages) - 1
   while l:idx >= 0
-    if a:messages[l:idx] !~# '^' . a:filepath . ':'
+    " leave in any messages that report errors about a:filepath or that report
+    " more general problems that prevent golangci-lint from linting
+    " a:filepath.
+    if a:messages[l:idx] !~# '^' . a:filepath . ':' && a:messages[l:idx] !~# '^level='
       call remove(a:messages, l:idx)
     endif
     let l:idx -= 1
   endwhile
+endfunction
+
+function! s:errorformat(metalinter) abort
+  if a:metalinter == 'golangci-lint'
+    " Golangci-lint can output the following:
+    "   <file>:<line>:<column>: <message> (<linter>)
+    " This can be defined by the following errorformat:
+    return 'level=%tarning\ msg="%m:\ [%f:%l:%c:\ %.%#]",level=%tarning\ msg="%m",level=%trror\ msg="%m:\ [%f:%l:%c:\ %.%#]",level=%trror\ msg="%m",%f:%l:%c:\ %m,%f:%l\ %m'
+  elseif a:metalinter == 'gopls'
+    return '%f:%l:%c:%t:\ %m,%f:%l:%c::\ %m'
+  endif
+
+endfunction
+
+function! s:preserveerrors(listtype) abort
+  return a:listtype == go#list#Type("GoFmt") && go#config#FmtAutosave() && isdirectory(expand('%:p:h'))
 endfunction
 
 " restore Vi compatibility settings

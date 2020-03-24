@@ -7,7 +7,7 @@ scriptencoding utf-8
 let s:lspfactory = {}
 
 function! s:lspfactory.get() dict abort
-  if !has_key(self, 'current') || empty(self.current) || !has_key(self.current, 'job') || empty(self.current.job)
+  if empty(get(self, 'current', {})) || empty(get(self.current, 'job', {}))
     let self.current = s:newlsp()
   endif
 
@@ -21,19 +21,6 @@ function! s:lspfactory.reset() dict abort
 endfunction
 
 function! s:newlsp() abort
-  if !go#util#has_job()
-    let l:oldshortmess=&shortmess
-    if has('nvim')
-      set shortmess-=F
-    endif
-    call go#util#EchoWarning('Features that rely on gopls will not work without either Vim 8.0.0087 or newer with +job or Neovim')
-    " Sleep one second to make sure people see the message. Otherwise it is
-    " often immediately overwritten by an async message.
-    sleep 1
-    let &shortmess=l:oldshortmess
-    return {'sendMessage': funcref('s:noop')}
-  endif
-
   " job is the job used to talk to the backing instance of gopls.
   " ready is 0 until the initialize response has been received. 1 afterwards.
   " queue is messages to send after initialization
@@ -47,6 +34,18 @@ function! s:newlsp() abort
   "   * handleResult takes a single argument, the result message received from gopls
   "   * error takes a single argument, the error message received from gopls.
   "     The error method is optional.
+  " workspaceDirectories is an array of named workspaces.
+  " wd is the working directory for gopls
+  " diagnostics is a dictionary whose keys are filenames and each value is a
+  "   list of diagnostic messages for the file.
+  " diagnosticsQueue is a queue of diagnostics notifications that have been
+  "   received, but not yet processed.
+  " fileVersions is a dictionary of filenames to versions.
+  " notificationQueue is a dictionary of filenames to functions. For a given
+  "   filename, each notification will call the first function in the list of
+  "   function values and remove it from the list. The functions should accept
+  "   two arguments: an absolute path and a list of diagnotics messages for
+  "   the file.
   let l:lsp = {
         \ 'job':  '',
         \ 'ready': 0,
@@ -56,7 +55,29 @@ function! s:newlsp() abort
         \ 'handlers': {},
         \ 'workspaceDirectories': [],
         \ 'wd' : '',
+        \ 'diagnosticsQueue': [],
+        \ 'diagnostics': {},
+        \ 'fileVersions': {},
+        \ 'notificationQueue': {},
         \ }
+
+  if !go#config#GoplsEnabled()
+    let l:lsp.sendMessage = funcref('s:noop')
+    return l:lsp
+  endif
+
+  if !go#util#has_job()
+    let l:oldshortmess=&shortmess
+    if has('nvim')
+      set shortmess-=F
+    endif
+    call go#util#EchoWarning('Features that rely on gopls will not work without either Vim 8.0.0087 or newer with +job or Neovim')
+    " Sleep one second to make sure people see the message. Otherwise it is
+    " often immediately overwritten by an async message.
+    sleep 1
+    let &shortmess=l:oldshortmess
+    return l:lsp
+  endif
 
   function! l:lsp.readMessage(data) dict abort
     let l:responses = []
@@ -129,15 +150,21 @@ function! s:newlsp() abort
 
   function! l:lsp.handleRequest(req) dict abort
     if a:req.method == 'workspace/workspaceFolders'
-      let l:resp = go#lsp#message#workspaceFolders(self.workspaceDirectories)
+      let l:resp = go#lsp#message#WorkspaceFoldersResult(self.workspaceDirectories)
+    elseif a:req.method == 'workspace/configuration' && has_key(a:req, 'params') && has_key(a:req.params, 'items')
+      let l:resp = go#lsp#message#ConfigurationResult(a:req.params.items)
+    elseif a:req.method == 'client/registerCapability' && has_key(a:req, 'params') && has_key(a:req.params, 'registrations')
+      let l:resp = v:null
+    else
+      return
     endif
 
-    let l:msg = self.newResponse(l:resp)
-    call self.write(l:msg)
-  endfunction
+    if get(self, 'exited', 0)
+      return
+    endif
 
-  function! l:lsp.handleNotification(req) dict abort
-      " TODO(bc): handle notifications (e.g. window/showMessage).
+    let l:msg = self.newResponse(a:req.id, l:resp)
+    call self.write(l:msg)
   endfunction
 
   function! l:lsp.handleResponse(resp) dict abort
@@ -181,6 +208,87 @@ function! s:newlsp() abort
     endif
   endfunction
 
+  function! l:lsp.handleNotification(req) dict abort
+      " TODO(bc): handle more notifications (e.g. window/showMessage).
+      if a:req.method == 'textDocument/publishDiagnostics'
+        call self.handleDiagnostics(a:req.params)
+      endif
+  endfunction
+
+  function! l:lsp.handleDiagnostics(data) dict abort
+    let self.diagnosticsQueue = add(self.diagnosticsQueue, a:data)
+    call self.updateDiagnostics()
+  endfunction
+
+  " TODO(bc): process the queue asynchronously
+  function! l:lsp.updateDiagnostics() dict abort
+    for l:data in self.diagnosticsQueue
+      call remove(self.diagnosticsQueue, 0)
+
+      try
+        let l:diagnostics = []
+        let l:errorMatches = []
+        let l:warningMatches = []
+        let l:fname = go#path#FromURI(l:data.uri)
+
+        " get the buffer name relative to the current directory, because
+        " Vim says that a buffer name can't be an absolute path.
+        let l:bufname = fnamemodify(l:fname, ':.')
+
+        if len(l:data.diagnostics) > 0 && (go#config#DiagnosticsEnabled() || bufnr(l:bufname) == bufnr(''))
+          " make sure the buffer is listed and loaded before calling getbufline() on it
+          if !bufexists(l:bufname)
+            "let l:starttime = reltime()
+            call bufadd(l:bufname)
+          endif
+
+          if !bufloaded(l:bufname)
+            "let l:starttime = reltime()
+            call bufload(l:bufname)
+          endif
+
+          for l:diag in l:data.diagnostics
+            " TODO(bc): cache the raw diagnostics when they're not for the
+            " current buffer so that they can be processed when it is the
+            " current buffer and highlight the areas of concern.
+            let [l:error, l:matchpos] = s:errorFromDiagnostic(l:diag, l:bufname, l:fname)
+            let l:diagnostics = add(l:diagnostics, l:error)
+
+            if empty(l:matchpos)
+              continue
+            endif
+
+            if l:diag.severity == 1
+              let l:errorMatches = add(l:errorMatches, l:matchpos)
+            elseif l:diag.severity == 2
+              let l:warningMatches = add(l:warningMatches, l:matchpos)
+            endif
+          endfor
+        endif
+
+        if bufnr(l:bufname) == bufnr('')
+          " only apply highlighting when the diagnostics are for the current
+          " version.
+          let l:lsp = s:lspfactory.get()
+          let l:version = get(l:lsp.fileVersions, l:fname, 0)
+          " it's tempting to only highlight matches when they are for the
+          " current version of the buffer, but that causes problems when the
+          " version number has been updated and the content has not. In such a
+          " case, the diagnostics may not be sent for later versions.
+          call s:highlightMatches(l:errorMatches, l:warningMatches)
+        endif
+
+        let self.diagnostics[l:fname] = l:diagnostics
+        if has_key(self.notificationQueue, l:fname) && len(self.notificationQueue[l:fname]) > 0
+          call call(self.notificationQueue[l:fname][0], copy(l:diagnostics))
+          call remove(self.notificationQueue[l:fname], 0)
+        endif
+      catch
+        call go#util#EchoError(printf('%s: %s', v:throwpoint, v:exception))
+      endtry
+    endfor
+  endfunction
+
   function! l:lsp.handleInitializeResult(result) dict abort
     if go#config#EchoCommandInfo()
       call go#util#EchoProgress("initialized gopls")
@@ -193,7 +301,8 @@ function! s:newlsp() abort
     call go#statusline#Update(self.wd, status)
 
     let self.ready = 1
-    " TODO(bc): send initialized message to the server?
+    let  l:msg = self.newMessage(go#lsp#message#Initialized())
+    call self.write(l:msg)
 
     " send messages queued while waiting for ready.
     for l:item in self.queue
@@ -233,6 +342,7 @@ function! s:newlsp() abort
 
       let l:state = s:newHandlerState('')
       let l:state.handleResult = funcref('self.handleInitializeResult', [], l:self)
+
       let self.handlers[l:msg.id] = l:state
 
       call l:state.start()
@@ -279,9 +389,15 @@ function! s:newlsp() abort
           \ 'id': a:id,
           \ 'result': a:result,
         \ }
+
+    return l:msg
   endfunction
 
   function! l:lsp.write(msg) dict abort
+    if empty(get(self, 'job', {}))
+      return
+    endif
+
     let l:body = json_encode(a:msg)
     let l:data = 'Content-Length: ' . strlen(l:body) . "\r\n\r\n" . l:body
 
@@ -295,16 +411,38 @@ function! s:newlsp() abort
     call ch_sendraw(self.job, l:data)
   endfunction
 
-  function! l:lsp.exit_cb(job, exit_status) dict abort
+  function! l:lsp.exit_cb(job, exit_status) dict
+    let self.exited = 1
+    if !get(self, 'restarting', 0)
+      return
+    endif
+
+    let l:queue = self.queue
+
+    let l:workspaces = self.workspaceDirectories
+
     call s:lspfactory.reset()
+    let l:lsp = s:lspfactory.get()
+
+    " restore workspaces
+    call call('go#lsp#AddWorkspaceDirectory', l:workspaces)
+    " * send DidOpen messages for all buffers that have b:did_lsp_open set
+    " TODO(bc): check modifiable and filetype, too?
+    bufdo if get(b:, 'go_lsp_did_open', 0) | if &modified | call go#lsp#DidOpen(expand('%:p')) | else | call go#lsp#DidChange(expand('%:p')) | endif | endif
+    let l:lsp.queue = extend(l:lsp.queue, l:queue)
+    return
   endfunction
-  " explicitly bind close_cb to state so that within it, self will always refer
 
   function! l:lsp.close_cb(ch) dict abort
-    " TODO(bc): does anything need to be done here?
+    " TODO(bc): remove the buffer variables that indicate that gopls has been
+    " informed that the file is open
   endfunction
 
   function! l:lsp.err_cb(ch, msg) dict abort
+    if a:msg =~ '^\d\{4}/\d\d/\d\d\ \d\d:\d\d:\d\d debug server listening on port \d\+$' && !get(self, 'debugport', 0)
+      let self.debugport = substitute(a:msg, '\d\{4}/\d\d/\d\d\ \d\d:\d\d:\d\d debug server listening on port \(\d\+\).*$', '\1', '')
+    endif
+
     call s:debug('stderr', a:msg)
   endfunction
 
@@ -324,12 +462,30 @@ function! s:newlsp() abort
 
   let l:bin_path = go#path#CheckBinPath("gopls")
   if empty(l:bin_path)
-    return
+    return l:lsp
   endif
 
-  " TODO(bc): output a message indicating which directory lsp is going to
-  " start in.
-  let l:lsp.job = go#job#Start([l:bin_path], l:opts)
+  let l:cmd = [l:bin_path]
+  let l:cmdopts = go#config#GoplsOptions()
+
+  if go#util#HasDebug('lsp')
+    " debugging can be enabled either with g:go_debug or with
+    " g:go_gopls_options; use g:go_gopls_options if it's given in case users
+    " are running the gopls debug server on a known port.
+    let l:needsDebug = 1
+
+    for l:item in l:cmdopts
+      let l:idx = stridx(l:item, '-debug')
+      if l:idx == 0 || l:idx == 1
+        let l:needsDebug = 0
+      endif
+    endfor
+    if l:needsDebug
+      let l:cmd = extend(l:cmd, ['-debug', 'localhost:0'])
+    endif
+  endif
+
+  let l:lsp.job = go#job#Start(l:cmd+l:cmdopts, l:opts)
 
   return l:lsp
 endfunction
@@ -342,6 +498,7 @@ function! s:newHandlerState(statustype) abort
         \ 'winid': win_getid(winnr()),
         \ 'statustype': a:statustype,
         \ 'jobdir': getcwd(),
+        \ 'handleResult': funcref('s:noop'),
       \ }
 
   " explicitly bind requestComplete to state so that within it, self will
@@ -457,9 +614,19 @@ function! go#lsp#DidOpen(fname) abort
   endif
 
   let l:lsp = s:lspfactory.get()
-  let l:msg = go#lsp#message#DidOpen(fnamemodify(a:fname, ':p'), join(go#util#GetLines(), "\n") . "\n")
+  let l:fname = fnamemodify(a:fname, ':p')
+
+  if !has_key(l:lsp.notificationQueue, l:fname)
+    let l:lsp.notificationQueue[l:fname] = []
+  endif
+
+  if !has_key(l:lsp.fileVersions, l:fname)
+    let l:lsp.fileVersions[l:fname] = 0
+  endif
+  let l:lsp.fileVersions[l:fname] = l:lsp.fileVersions[l:fname] + 1
+
+  let l:msg = go#lsp#message#DidOpen(l:fname, join(go#util#GetLines(), "\n") . "\n", l:lsp.fileVersions[l:fname])
   let l:state = s:newHandlerState('')
-  let l:state.handleResult = funcref('s:noop')
 
   " TODO(bc): setting a buffer level variable here assumes that a:fname is the
   " current buffer. Change to a:fname first before setting it and then change
@@ -484,9 +651,15 @@ function! go#lsp#DidChange(fname) abort
   call go#lsp#DidOpen(a:fname)
 
   let l:lsp = s:lspfactory.get()
-  let l:msg = go#lsp#message#DidChange(fnamemodify(a:fname, ':p'), join(go#util#GetLines(), "\n") . "\n")
+
+  let l:fname = fnamemodify(a:fname, ':p')
+  if !has_key(l:lsp.fileVersions, l:fname)
+    let l:lsp.fileVersions[l:fname] = 0
+  endif
+  let l:lsp.fileVersions[l:fname] = l:lsp.fileVersions[l:fname] + 1
+
+  let l:msg = go#lsp#message#DidChange(l:fname, join(go#util#GetLines(), "\n") . "\n", l:lsp.fileVersions[l:fname])
   let l:state = s:newHandlerState('')
-  let l:state.handleResult = funcref('s:noop')
   return l:lsp.sendMessage(l:msg, l:state)
 endfunction
 
@@ -502,7 +675,6 @@ function! go#lsp#DidClose(fname) abort
   let l:lsp = s:lspfactory.get()
   let l:msg = go#lsp#message#DidClose(fnamemodify(a:fname, ':p'))
   let l:state = s:newHandlerState('')
-  let l:state.handleResult = funcref('s:noop')
   " TODO(bc): setting a buffer level variable here assumes that a:fname is the
   " current buffer. Change to a:fname first before setting it and then change
   " back to active buffer.
@@ -562,6 +734,125 @@ function! s:completionErrorHandler(next, error) abort dict
   call call(a:next, [-1, []])
 endfunction
 
+" go#lsp#SameIDs calls gopls to get the references to the identifier at line
+" and col in fname. handler should be a dictionary function that takes a list
+" of strings in the form 'file:line:col: message'. handler will be attached to
+" a dictionary that manages state (statuslines, sets the winid, etc.). handler
+" should take three arguments: an exit_code, a JSON object encoded to a string
+" that mimics guru's ouput for `what`, and third mode parameter that only
+" exists for compatibility with the guru implementation of SameIDs.
+" TODO(bc): refactor to not need the guru adapter.
+function! go#lsp#SameIDs(showstatus, fname, line, col, handler) abort
+  call go#lsp#DidChange(a:fname)
+
+  let l:lsp = s:lspfactory.get()
+  let l:msg = go#lsp#message#References(a:fname, a:line, a:col)
+
+  if a:showstatus
+    let l:state = s:newHandlerState('same ids')
+  else
+    let l:state = s:newHandlerState('')
+  endif
+
+  let l:state.handleResult = funcref('s:sameIDsHandler', [function(a:handler, [], l:state)], l:state)
+  let l:state.error = funcref('s:noop')
+  return l:lsp.sendMessage(l:msg, l:state)
+endfunction
+
+function! s:sameIDsHandler(next, msg) abort dict
+  let l:furi = go#path#ToURI(expand('%:p'))
+
+  let l:result = {
+        \ 'sameids': [],
+        \ 'enclosing': [],
+      \ }
+
+  let l:msg = a:msg
+  if a:msg is v:null
+    let l:msg = []
+  endif
+
+  for l:loc in l:msg
+    if l:loc.uri !=# l:furi
+      continue
+    endif
+
+    if len(l:result.enclosing) == 0
+      let l:result.enclosing = [{
+            \ 'desc': 'identifier',
+            \ 'start': l:loc.range.start.character+1,
+            \ 'end': l:loc.range.end.character+1,
+          \ }]
+    endif
+
+    let l:result.sameids = add(l:result.sameids, printf('%s:%s:%s', go#path#FromURI(l:loc.uri), l:loc.range.start.line+1, l:loc.range.start.character+1))
+  endfor
+
+  call call(a:next, [0, json_encode(l:result), ''])
+endfunction
+
+" go#lsp#Referrers calls gopls to get the references to the identifier at line
+" and col in fname. handler should be a dictionary function that takes a list
+" of strings in the form 'file:line:col: message'. handler will be attached to
+" a dictionary that manages state (statuslines, sets the winid, etc.). handler
+" should take three arguments: an exit_code, a JSON object encoded to a string
+" that mimics guru's ouput for `what`, and third mode parameter that only
+" exists for compatibility with the guru implementation of SameIDs.
+" TODO(bc): refactor to not need the guru adapter.
+function! go#lsp#Referrers(fname, line, col, handler) abort
+  call go#lsp#DidChange(a:fname)
+
+  let l:lsp = s:lspfactory.get()
+  let l:msg = go#lsp#message#References(a:fname, a:line, a:col)
+
+  let l:state = s:newHandlerState('referrers')
+
+  let l:state.handleResult = funcref('s:referencesHandler', [function(a:handler, [], l:state)], l:state)
+  let l:state.error = funcref('s:noop')
+  return l:lsp.sendMessage(l:msg, l:state)
+endfunction
+
+function! s:referencesHandler(next, msg) abort dict
+  let l:result = []
+
+  let l:msg = a:msg
+
+  if l:msg is v:null
+    let l:msg = []
+  endif
+
+  call sort(l:msg, funcref('s:compareLocations'))
+
+  for l:loc in l:msg
+    let l:fname = go#path#FromURI(l:loc.uri)
+    let l:line = l:loc.range.start.line+1
+    let l:bufnr = bufnr(l:fname)
+    let l:bufinfo = getbufinfo(l:fname)
+
+    try
+      if l:bufnr == -1 || len(l:bufinfo) == 0 || l:bufinfo[0].loaded == 0
+        let l:filecontents = readfile(l:fname, '', l:line)
+      else
+        let l:filecontents = getbufline(l:fname, l:line)
+      endif
+
+      if len(l:filecontents) == 0
+        continue
+      endif
+
+      let l:content = l:filecontents[-1]
+    catch
+      call go#util#EchoError(printf('%s (line %s): %s at %s', l:fname, l:line, v:exception, v:throwpoint))
+    endtry
+
+    let l:item = printf('%s:%s:%s: %s', go#path#FromURI(l:loc.uri), l:line, go#lsp#lsp#PositionOf(l:content, l:loc.range.start.character), l:content)
+
+    let l:result = add(l:result, l:item)
+  endfor
+
+  call call(a:next, [0, l:result, ''])
+endfunction
+
 function! go#lsp#Hover(fname, line, col, handler) abort
   call go#lsp#DidChange(a:fname)
 
@@ -574,15 +865,19 @@ function! go#lsp#Hover(fname, line, col, handler) abort
 endfunction
 
 function! s:hoverHandler(next, msg) abort dict
-  let l:content = split(a:msg.contents.value, '; ')
-  if len(l:content) > 1
-    let l:curly = stridx(l:content[0], '{')
-    let l:content = extend([l:content[0][0:l:curly]], map(extend([l:content[0][l:curly+1:]], l:content[1:]), '"\t" . v:val'))
-    let l:content[len(l:content)-1] = '}'
-  endif
+  try
+    let l:content = split(a:msg.contents.value, '; ')
+    if len(l:content) > 1
+      let l:curly = stridx(l:content[0], '{')
+      let l:content = extend([l:content[0][0:l:curly]], map(extend([l:content[0][l:curly+1:]], l:content[1:]), '"\t" . v:val'))
+      let l:content[len(l:content)-1] = '}'
+    endif
 
-  let l:args = [l:content]
-  call call(a:next, l:args)
+    let l:args = [l:content]
+    call call(a:next, l:args)
+  catch
+    " TODO(bc): log the message and/or show an error message.
+  endtry
 endfunction
 
 function! go#lsp#Info(showstatus)
@@ -626,6 +921,10 @@ endfunction
 
 function! s:infoDefinitionHandler(next, showstatus, msg) abort dict
   " gopls returns a []Location; just take the first one.
+  if a:msg is v:null || len(a:msg) == 0
+    return
+  endif
+
   let l:msg = a:msg[0]
 
   let l:fname = go#path#FromURI(l:msg.uri)
@@ -663,16 +962,6 @@ function! s:infoFromHoverContent(content) abort
 
   let l:content = a:content[0]
 
-  " strip godoc summary
-  " Hover content with godoc summary will have the godoc summary in the first
-  " line, and the second line will not have leading whitespace. When there is
-  " leading whitespace on the second line, then the hover content is for a
-  " struct or interface without godoc.
-  let l:lines = split(l:content, '\n')
-  if len(l:lines) > 1 && (l:lines[1] !~# '^\s')
-    let l:content = substitute(l:content, '^[^\n]\+\n', '', '')
-  endif
-
   " strip off the method set and fields of structs and interfaces.
   if l:content =~# '^\(type \)\?[^ ]\+ \(struct\|interface\)'
     let l:content = substitute(l:content, '{.*', '', '')
@@ -681,10 +970,12 @@ function! s:infoFromHoverContent(content) abort
   return l:content
 endfunction
 
-function! go#lsp#AddWorkspace(...) abort
+function! go#lsp#AddWorkspaceDirectory(...) abort
   if a:0 == 0
     return
   endif
+
+  call go#lsp#CleanWorkspaces()
 
   let l:workspaces = []
   for l:dir in a:000
@@ -698,16 +989,103 @@ function! go#lsp#AddWorkspace(...) abort
 
   let l:lsp = s:lspfactory.get()
   let l:state = s:newHandlerState('')
-  let l:state.handleResult = funcref('s:noop')
   let l:lsp.workspaceDirectories = extend(l:lsp.workspaceDirectories, l:workspaces)
-  let l:msg = go#lsp#message#AddWorkspaces(l:workspaces)
+  let l:msg = go#lsp#message#ChangeWorkspaceFolders(l:workspaces, [])
   call l:lsp.sendMessage(l:msg, l:state)
 
   return 0
 endfunction
 
-function! s:debug(event, data) abort
+function! go#lsp#CleanWorkspaces() abort
+  let l:workspaces = []
+
+  let l:lsp = s:lspfactory.get()
+
+  let l:i = 0
+  let l:missing = []
+  for l:dir in l:lsp.workspaceDirectories
+    if !isdirectory(l:dir)
+      let l:missing = add(l:missing, l:dir)
+      call remove(l:lsp.workspaceDirectories, l:i)
+      continue
+    endif
+    let l:i += 1
+  endfor
+
+  if len(l:missing) == 0
+    return 0
+  endif
+
+  let l:state = s:newHandlerState('')
+  let l:msg = go#lsp#message#ChangeWorkspaceFolders([], l:missing)
+  call l:lsp.sendMessage(l:msg, l:state)
+
+  return 0
+endfunction
+
+" go#lsp#ResetWorkspaceDiretories removes and then re-adds all workspace
+" folders to cause gopls to send configuration requests for all of them again.
+" This is useful, for instance, when build tags have been added and gopls
+" needs to use them.
+function! go#lsp#ResetWorkspaceDirectories() abort
+  call go#lsp#CleanWorkspaces()
+
+  let l:lsp = s:lspfactory.get()
+
+  let l:state = s:newHandlerState('')
+  let l:msg = go#lsp#message#ChangeWorkspaceFolders(l:lsp.workspaceDirectories, l:lsp.workspaceDirectories)
+  call l:lsp.sendMessage(l:msg, l:state)
+
+  return 0
+endfunction
+
+function! go#lsp#DebugBrowser() abort
+  let l:lsp = s:lspfactory.get()
+  let l:port = get(l:lsp, 'debugport', 0)
+  if !l:port
+    call go#util#EchoError("gopls was not started with debugging enabled. See :help g:go_debug.")
+    return
+  endif
+
+  call go#util#OpenBrowser(printf('http://localhost:%d', l:port))
+endfunction
+
+function! go#lsp#Exit() abort
+  call s:exit(0)
+endfunction
+
+function! go#lsp#Restart() abort
+  call s:exit(1)
+endfunction
+
+function! s:exit(restart) abort
+  if !go#util#has_job() || len(s:lspfactory) == 0 || !has_key(s:lspfactory, 'current')
+    return
+  endif
+
+  let l:lsp = s:lspfactory.get()
+
+  " reset the factory so that future requests don't use the same instance of
+  " gopls.
+  call s:lspfactory.reset()
+
+  let l:lsp.restarting = a:restart
+
+  let l:state = s:newHandlerState('exit')
+
+  let l:msg = go#lsp#message#Shutdown()
+  let l:retval = l:lsp.sendMessage(l:msg, l:state)
+
+  let l:msg = go#lsp#message#Exit()
+  let l:retval = l:lsp.sendMessage(l:msg, l:state)
+
+  return l:retval
+endfunction
+
+let s:log = []
+function! s:debugasync(timer) abort
   if !go#util#HasDebug('lsp')
+    let s:log = []
     return
   endif
 
@@ -726,11 +1104,15 @@ function! s:debug(event, data) abort
 
   try
     setlocal modifiable
-    if getline(1) == ''
-      call setline('$', printf('%s: %s', a:event, a:data))
-    else
-      call append('$', printf('%s: %s', a:event, a:data))
-    endif
+    for [l:event, l:data] in s:log
+      call remove(s:log, 0)
+      if getline(1) == ''
+        call setline('$', printf('===== %s =====', l:event))
+      else
+        call append('$', printf('===== %s =====', l:event))
+      endif
+      call append('$', split(l:data, "\r\n"))
+    endfor
     normal! G
     setlocal nomodifiable
   finally
@@ -738,6 +1120,279 @@ function! s:debug(event, data) abort
   endtry
 endfunction
 
+function! s:debug(event, data, ...) abort
+  let l:shouldStart = len(s:log) > 0
+  let s:log = add(s:log, [a:event, a:data])
+
+  if l:shouldStart
+    call timer_start(10, function('s:debugasync', []))
+  endif
+endfunction
+
+function! s:compareLocations(left, right) abort
+  if a:left.uri < a:right.uri
+    return -1
+  endif
+
+  if a:left.uri == a:right.uri && a:left.range.start.line < a:right.range.start.line
+    return -1
+  endif
+
+  if a:left.uri == a:right.uri && a:left.range.start.line == a:right.range.start.line && a:left.range.start.character < a:right.range.start.character
+    return -1
+  endif
+
+  if a:left.uri == a:right.uri && a:left.range.start.line == a:right.range.start.line && a:left.range.start.character == a:right.range.start.character
+    return 0
+  endif
+
+  return 1
+endfunction
+
+function! go#lsp#Diagnostics(...) abort
+  if a:0 == 0
+    return []
+  endif
+
+  let l:dirsToPackages = {}
+
+  let l:lsp = s:lspfactory.get()
+
+  let l:diagnostics = []
+  for [l:key, l:val] in items(l:lsp.diagnostics)
+    let l:dir = fnamemodify(l:key, ':h')
+
+    if !has_key(l:dirsToPackages, l:dir)
+      let l:pkg = go#package#FromPath(l:dir)
+      let l:dirsToPackages[l:dir] = l:pkg
+    else
+      let l:pkg = l:dirsToPackages[l:dir]
+    endif
+
+    if type(l:pkg) == type(0)
+      continue
+    endif
+
+    for l:arg in a:000
+      if l:arg == l:pkg || l:arg == 'all'
+        let l:diagnostics = extend(l:diagnostics, l:val)
+      endif
+    endfor
+  endfor
+
+  return sort(l:diagnostics)
+endfunction
+
+function! go#lsp#AnalyzeFile(fname) abort
+  if !filereadable(a:fname)
+    return []
+  endif
+
+  let l:lsp = s:lspfactory.get()
+  let l:fname = fnamemodify(a:fname, ':p')
+
+  let l:version = l:lsp.fileVersions[l:fname]
+
+  call go#lsp#DidChange(a:fname)
+
+  let l:diagnostics = go#promise#New(function('s:setDiagnostics', []), 10000, get(l:lsp.diagnostics, l:fname, []))
+  let l:lsp.notificationQueue[l:fname] = add(l:lsp.notificationQueue[l:fname], l:diagnostics.wrapper)
+  return l:diagnostics.await()
+endfunction
+
+function! s:setDiagnostics(...) abort
+  return a:000
+endfunction
+
+" s:processDiagnostic converts a diagnostic into an error string. It returns
+" the errors string and the match position described in the diagnostic. The
+" match position will be an empty list when bufname is not a valid name for
+" the current buffer.
+function! s:errorFromDiagnostic(diagnostic, bufname, fname) abort
+  let l:range = a:diagnostic.range
+
+  let l:line = l:range.start.line + 1
+  let l:col = go#lsp#lsp#PositionOf(getbufline(a:bufname, l:line)[0], l:range.start.character)
+  let l:error = printf('%s:%s:%s:%s: %s', a:fname, l:line, l:col, go#lsp#lsp#SeverityToErrorType(a:diagnostic.severity), a:diagnostic.message)
+
+  if !(a:diagnostic.severity == 1 || a:diagnostic.severity == 2)
+    return [l:error, []]
+  endif
+
+  " return when the diagnostic is not for the current buffer.
+  if bufnr(a:bufname) != bufnr('')
+    return [l:error, []]
+  end
+
+  let l:endline = l:range.end.line + 1
+  " don't bother trying to highlight errors or warnings that span
+  " the whole file (e.g when there's missing package documentation).
+  if l:line == 1 && (l:endline) == line('$')
+    return [l:error, []]
+  endif
+  let l:endcol = go#lsp#lsp#PositionOf(getline(l:endline), l:range.end.character)
+
+  " the length of the match is the number of bytes between the start of
+  " the match and the end of the match.
+  let l:matchLength = line2byte(l:endline) + l:endcol - (line2byte(l:line) + l:col)
+  let l:pos = [l:line, l:col, l:matchLength]
+
+  return [l:error, l:pos]
+endfunction
+
+function! s:highlightMatches(errorMatches, warningMatches) abort
+  " set buffer variables for errors and warnings to zero values
+  let b:go_diagnostic_matches = {'errors': [], 'warnings': []}
+
+  if hlexists('goDiagnosticError')
+    " clear the old matches just before adding the new ones to keep flicker
+    " to a minimum.
+    call go#util#ClearHighlights('goDiagnosticError')
+    if go#config#HighlightDiagnosticErrors()
+      let b:go_diagnostic_matches.errors = copy(a:errorMatches)
+      call go#util#HighlightPositions('goDiagnosticError', a:errorMatches)
+    endif
+  endif
+
+  if hlexists('goDiagnosticWarning')
+    " clear the old matches just before adding the new ones to keep flicker
+    " to a minimum.
+    call go#util#ClearHighlights('goDiagnosticWarning')
+    if go#config#HighlightDiagnosticWarnings()
+      let b:go_diagnostic_matches.warnings = copy(a:warningMatches)
+      call go#util#HighlightPositions('goDiagnosticWarning', a:warningMatches)
+    endif
+  endif
+
+  " re-apply matches at the time the buffer is displayed in a new window or
+  " redisplayed in an existing window: e.g. :edit,
+  augroup vim-go-diagnostics
+    autocmd! * <buffer>
+    autocmd BufDelete <buffer> autocmd! vim-go-diagnostics * <buffer=abuf>
+    if has('textprop')
+      autocmd BufReadPost <buffer> nested call s:highlightMatches(b:go_diagnostic_matches.errors, b:go_diagnostic_matches.warnings)
+    else
+      autocmd BufWinEnter <buffer> nested call s:highlightMatches(b:go_diagnostic_matches.errors, b:go_diagnostic_matches.warnings)
+    endif
+  augroup end
+endfunction
+
+" ClearDiagnosticHighlights removes all goDiagnosticError and
+" goDiagnosticWarning matches.
+function! go#lsp#ClearDiagnosticHighlights() abort
+  call go#util#ClearHighlights('goDiagnosticError')
+  call go#util#ClearHighlights('goDiagnosticWarning')
+endfunction
+
+" Format formats the current buffer.
+function! go#lsp#Format() abort
+  let l:fname = expand('%:p')
+  " send the current file so that TextEdits will be relative to the current
+  " state of the buffer.
+  call go#lsp#DidChange(l:fname)
+
+  let l:lsp = s:lspfactory.get()
+
+  let l:state = s:newHandlerState('format')
+  let l:formatHandler = go#promise#New(function('s:formatHandler', [], l:state), 10000, '')
+  let l:state.handleResult = l:formatHandler.wrapper
+  let l:state.error = l:formatHandler.wrapper
+  let l:state.handleError = function('s:handleFormatError', [l:fname], l:state)
+  let l:msg = go#lsp#message#Format(l:fname)
+  call l:lsp.sendMessage(l:msg, l:state)
+
+  " await the result to avoid any race conditions among autocmds (e.g.
+  " BufWritePre and BufWritePost)
+  call formatHandler.await()
+endfunction
+
+function! s:formatHandler(msg) abort dict
+  if a:msg is v:null
+    return
+  endif
+
+  if type(a:msg) is type('')
+    call self.handleError(a:msg)
+    return
+  endif
+
+  " process the TextEdit list in reverse order, because the positions are
+  " based on the current line numbers; processing in forward order would
+  " require keeping track of how the proper position of each TextEdit would be
+  " affected by all the TextEdits that came before.
+  call reverse(sort(a:msg, function('s:textEditLess')))
+  for l:msg in a:msg
+    let l:startline = l:msg.range.start.line+1
+    let l:endline = l:msg.range.end.line+1
+    let l:text = l:msg.newText
+
+    " handle the deletion of whole lines
+    if len(l:text) == 0 && l:msg.range.start.character == 0 && l:msg.range.end.character == 0 && l:startline < l:endline
+      call deletebufline('', l:startline, l:endline-1)
+      continue
+    endif
+
+    let l:startcontent = getline(l:startline)
+    let l:preSliceEnd = 0
+    if l:msg.range.start.character > 0
+      let l:preSliceEnd = go#lsp#lsp#PositionOf(l:startcontent, l:msg.range.start.character-1) - 1
+    endif
+
+    let l:endcontent = getline(l:endline)
+    let l:postSliceStart = 0
+    if l:msg.range.end.character > 0
+      let l:postSliceStart = go#lsp#lsp#PositionOf(l:endcontent, l:msg.range.end.character-1)
+    endif
+
+    " There isn't an easy way to replace the text in a byte or character
+    " range, so append any text on l:endline starting from l:tailidx to l:text,
+    " prepend any text on l:startline prior to l:prelen to l:text, and
+    " finally replace the lines with a delete followed by and append.
+    let l:text = printf('%s%s%s', l:startcontent[:l:preSliceEnd], l:text, l:endcontent[(l:postSliceStart):])
+
+    " TODO(bc): deal with the undo file
+    " TODO(bc): deal with folds
+
+    call execute(printf('%d,%d d_', l:startline, l:endline))
+    call append(l:startline-1, l:text)
+  endfor
+
+  call go#lsp#DidChange(expand('%:p'))
+  return
+endfunction
+
+function! s:handleFormatError(filename, msg) abort dict
+  if !go#config#FmtFailSilently()
+    let l:errors = split(a:msg, '\n')
+    let l:errors = map(l:errors, printf('substitute(v:val, ''^'', ''%s:'', '''')', a:filename))
+    let l:errors = join(l:errors, "\n")
+    call go#fmt#ShowErrors(l:errors)
+  endif
+endfunction
+
+function! s:textEditLess(left, right) abort
+  " TextEdits in a TextEdit[] never overlap and Vim's sort() is stable.
+  if a:left.range.start.line < a:right.range.start.line
+    return -1
+  endif
+
+  if a:left.range.start.line > a:right.range.start.line
+    return 1
+  endif
+
+  if a:left.range.start.line == a:right.range.start.line
+    if a:left.range.start.character < a:right.range.start.character
+      return -1
+    endif
+
+    if a:left.range.start.character > a:right.range.start.character
+      return 1
+    endif
+  endif
+
+  " return 0, because a:left an a:right refer to the same position.
+  return 0
+endfunction
 " restore Vi compatibility settings
 let &cpo = s:cpo_save
 unlet s:cpo_save
