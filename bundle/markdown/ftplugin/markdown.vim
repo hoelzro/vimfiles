@@ -38,6 +38,12 @@ function! MarkdownFold()
     return ">2"
   endif
 
+  let nextnonblank = nextnonblank(v:lnum)
+
+  if nextnonblank > v:lnum
+    return -1
+  endif
+
   return "="
 endfunction
 
