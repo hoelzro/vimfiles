@@ -14,6 +14,11 @@ let c_fold_blocks=1
 let load_doxygen_syntax=1
 let doxygen_enhanced_color=1
 
+" Go
+let g:go_auto_type_info = 1
+let g:go_doc_popup_window = 1
+let g:go_template_autocreate = 0
+
 " Haskell
 let hs_highlight_types = 1
 let hs_highlight_more_types = 1
