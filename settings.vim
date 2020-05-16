@@ -14,6 +14,7 @@ set expandtab
 set smarttab
 set formatoptions=cqortj
 set mouse=
+set foldlevelstart=3
 set foldminlines=3
 set foldmethod=syntax
 set nomodeline
