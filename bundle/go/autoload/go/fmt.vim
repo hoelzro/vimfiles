@@ -20,10 +20,24 @@ set cpo&vim
 function! go#fmt#Format(withGoimport) abort
   let l:bin_name = go#config#FmtCommand()
   if a:withGoimport == 1
-    let l:bin_name = "goimports"
+    let l:mode = go#config#ImportsMode()
+    if l:mode == 'gopls'
+      if !go#config#GoplsEnabled()
+        call go#util#EchoError("go_imports_mode is 'gopls', but gopls is disabled")
+        return
+      endif
+      call go#lsp#Imports()
+      return
+    endif
+
+    let l:bin_name = 'goimports'
   endif
 
   if l:bin_name == 'gopls'
+    if !go#config#GoplsEnabled()
+      call go#util#EchoError("go_def_mode is 'gopls', but gopls is disabled")
+      return
+    endif
     call go#lsp#Format()
     return
   endif
@@ -128,18 +142,7 @@ function! go#fmt#update_file(source, target)
   let &fileformat = old_fileformat
   let &syntax = &syntax
 
-  let l:listtype = go#list#Type("GoFmt")
-
-  " clean up previous list
-  if l:listtype == "quickfix"
-    let l:list_title = getqflist({'title': 1})
-  else
-    let l:list_title = getloclist(0, {'title': 1})
-  endif
-
-  if has_key(l:list_title, "title") && l:list_title['title'] == "Format"
-    call go#list#Clean(l:listtype)
-  endif
+  call go#fmt#CleanErrors()
 endfunction
 
 " run runs the gofmt/goimport command for the given source file and returns
@@ -179,6 +182,21 @@ function! s:replace_filename(filename, content) abort
 
   let l:errors = map(l:errors, printf('substitute(v:val, ''^.\{-}:'', ''%s:'', '''')', a:filename))
   return join(l:errors, "\n")
+endfunction
+
+function! go#fmt#CleanErrors() abort
+  let l:listtype = go#list#Type("GoFmt")
+
+  " clean up previous list
+  if l:listtype == "quickfix"
+    let l:list_title = getqflist({'title': 1})
+  else
+    let l:list_title = getloclist(0, {'title': 1})
+  endif
+
+  if has_key(l:list_title, 'title') && (l:list_title['title'] == 'Format' || l:list_title['title'] == 'GoMetaLinterAutoSave')
+    call go#list#Clean(l:listtype)
+  endif
 endfunction
 
 " show_errors opens a location list and shows the given errors. If errors is
