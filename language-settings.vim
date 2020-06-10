@@ -19,6 +19,7 @@ let g:go_auto_type_info = 1
 let g:go_doc_popup_window = 1
 let g:go_template_autocreate = 0
 let g:go_alternate_mode = 'botright vnew'
+let g:go_fmt_command = 'gopls'
 
 " Haskell
 let hs_highlight_types = 1
