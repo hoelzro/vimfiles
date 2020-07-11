@@ -71,7 +71,7 @@ let no_rust_conceal=1
 let is_bash=1
 
 " SQL
-let sql_type_default='mysql'
+let sql_type_default='sqlite'
 let g:omni_sql_no_default_maps=1
 
 " Terraform
