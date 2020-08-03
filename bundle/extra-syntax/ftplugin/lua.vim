@@ -2,14 +2,18 @@ setlocal softtabstop=2
 setlocal shiftwidth=2
 runtime indent/lua.vim
 
-function! s:RunEqualsOperator(op)
+function! s:RunEqualsOperator()
   let current_line = getline('.')
-  let lhs_expr = substitute(current_line, '^\s\+\|\s\+$', '', 'g')
-  return '= ' . lhs_expr . ' ' . a:op . ' '
+  let m = matchlist(current_line, '^\s*\([a-zA-Z0-9_.]\+\)\s*\([-+*/]\|\.\.\)')
+  if empty(m)
+    return '='
+  endif
+
+  let [lhs_expr, operator] = m[1:2]
+
+  return repeat('', strlen(operator)) . '= ' . lhs_expr . ' ' . operator . ' '
 endfunction
 
-inoremap <buffer> <silent> <expr> +=  <SID>RunEqualsOperator('+')
-inoremap <buffer> <silent> <expr> -=  <SID>RunEqualsOperator('-')
-inoremap <buffer> <silent> <expr> *=  <SID>RunEqualsOperator('*')
-inoremap <buffer> <silent> <expr> /=  <SID>RunEqualsOperator('/')
-inoremap <buffer> <silent> <expr> ..= <SID>RunEqualsOperator('..')
+imapclear <buffer>
+
+inoremap <buffer> <silent> <expr> = <SID>RunEqualsOperator()
