@@ -17,7 +17,9 @@ set mouse=
 set foldlevelstart=3
 set foldminlines=3
 set foldmethod=syntax
-set nomodeline
+if !has('patch-8.1.1365')
+  set nomodeline
+endif
 set hls
 set incsearch
 set infercase
