@@ -45,7 +45,6 @@ set linebreak
 set breakindent
 set breakindentopt=shift:2
 set showbreak=↳\ 
-set nowrapscan
 
 set laststatus=2
 let &statusline = '%{ProjectRelativePath()}%=%l,%c%V   %P'
