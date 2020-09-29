@@ -23,7 +23,18 @@ function! WrapScalion(new_search, key)
     endif
 
     if empty(search_start_location)
-      " XXX panic!
+      " Chances are one of the following is true:
+      "
+      "   * We're in a different buffer than the one we started in
+      "   * We just fired up Vim and we're repeating the search from the last
+      "     session that was preserved via viminfo
+      "   * We did something like 'vim file.txt +/search-term'
+      "
+      " In this case, just mark the current cursor position as the search
+      " start and proceed
+      let [buf_no, line, column, offset] = getpos('.')
+      call prop_add(line, column, {'type': 'search_start'})
+      let search_start_location = {'lnum': line, 'col': column}
     endif
 
     let search_start_line = search_start_location['lnum']
