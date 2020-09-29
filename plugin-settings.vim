@@ -48,3 +48,6 @@ let g:splitnavigate_start_current = 1
 
 " netrw settings
 let g:netrw_silent = 1
+
+" vim-bling settings
+let g:bling_no_map=1
