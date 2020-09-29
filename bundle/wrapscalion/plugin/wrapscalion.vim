@@ -50,7 +50,7 @@ function! WrapScalion(new_search, key)
     else
       execute 'normal! ' . a:key
     endif
-    " XXX invoke other things like vim-bling if we moved
+    call BlingHighight()
   endif
 endfunction
 
