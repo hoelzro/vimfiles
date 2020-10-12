@@ -7,55 +7,58 @@
 "   - SearchPrevPre - Before you move to the previous search result (opposite the direction of v:searchforward)
 "   - SearchPrevPost - After you move to the previous search result (opposite the direction of v:searchforward)
 
-function! PostEnter(cmd_type)
+function! s:PostEnter(cmd_type)
   let b:search_operator = a:cmd_type
   doautocmd <nomodeline> User SearchNew
 endfunction
 
-function! HandleEnter()
+function! s:HandleEnter()
   let cmd_type = getcmdtype()
 
+  let post_enter_fn = substitute(substitute(expand('<sfile>'), 'HandleEnter$', 'PostEnter', ''), 'function\s\+', '', '')
   if cmd_type == '/' || cmd_type == '?'
     " XXX if there are no results, PostEnter doesn't get called =/
-    return "\<CR>:call PostEnter('" . cmd_type . "')\<CR>"
+    return printf("\<CR>:call %s('%s')\<CR>", post_enter_fn, cmd_type)
   endif
   " XXX dispatch other events
   return "\<CR>"
 endfunction
 
-function! HandleStar()
-  return "*:call PostEnter('*')\<CR>"
+function! s:HandleStar()
+  let post_enter_fn = substitute(substitute(expand('<sfile>'), 'HandleStar$', 'PostEnter', ''), 'function\s\+', '', '')
+  return printf("*:call %s('*')\<CR>", post_enter_fn)
 endfunction
 
-function! HandlePound()
-  return "#:call PostEnter('#')\<CR>"
+function! s:HandlePound()
+  let post_enter_fn = substitute(substitute(expand('<sfile>'), 'HandlePound$', 'PostEnter', ''), 'function\s\+', '', '')
+  return printf("#:call %s('#')\<CR>", post_enter_fn)
 endfunction
 
-function! HandleLowerN()
+function! s:HandleLowerN()
   doautocmd <nomodeline> User SearchNextPre
   normal! n
   doautocmd <nomodeline> User SearchNextPost
 endfunction
 
-function! HandleUpperN()
+function! s:HandleUpperN()
   doautocmd <nomodeline> User SearchNextPre
   normal! N
   doautocmd <nomodeline> User SearchNextPost
 endfunction
 
-cnoremap <silent> <expr> <Enter> HandleEnter()
-nnoremap <silent> <expr> * HandleStar()
-nnoremap <silent> <expr> # HandlePound()
-nnoremap <silent> n :call HandleLowerN()<CR>
-nnoremap <silent> N :call HandleUpperN()<CR>
+cnoremap <silent> <expr> <Enter> <SID>HandleEnter()
+nnoremap <silent> <expr> * <SID>HandleStar()
+nnoremap <silent> <expr> # <SID>HandlePound()
+nnoremap <silent> n :call <SID>HandleLowerN()<CR>
+nnoremap <silent> N :call <SID>HandleUpperN()<CR>
 
-function! NoOp()
+function! s:NoOp()
 endfunction
 
 augroup SearchDummies
-  autocmd User SearchNew call NoOp()
-  autocmd User SearchNextPre call NoOp()
-  autocmd User SearchNextPost call NoOp()
-  autocmd User SearchPrevPre call NoOp()
-  autocmd User SearchPrevPost call NoOp()
+  autocmd User SearchNew call <SID>NoOp()
+  autocmd User SearchNextPre call <SID>NoOp()
+  autocmd User SearchNextPost call <SID>NoOp()
+  autocmd User SearchPrevPre call <SID>NoOp()
+  autocmd User SearchPrevPost call <SID>NoOp()
 augroup END
