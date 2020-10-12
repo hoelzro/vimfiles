@@ -92,3 +92,6 @@ if exists(':ALEEnable')
     autocmd FileType typescript :ALEEnable
   augroup END
 endif
+
+" Vim
+let g:vimsyn_folding = 'f'
