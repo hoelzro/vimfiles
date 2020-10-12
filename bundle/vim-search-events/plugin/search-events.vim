@@ -48,3 +48,14 @@ nnoremap <silent> <expr> * HandleStar()
 nnoremap <silent> <expr> # HandlePound()
 nnoremap <silent> n :call HandleLowerN()<CR>
 nnoremap <silent> N :call HandleUpperN()<CR>
+
+function! NoOp()
+endfunction
+
+augroup SearchDummies
+  autocmd User SearchNew call NoOp()
+  autocmd User SearchNextPre call NoOp()
+  autocmd User SearchNextPost call NoOp()
+  autocmd User SearchPrevPre call NoOp()
+  autocmd User SearchPrevPost call NoOp()
+augroup END
