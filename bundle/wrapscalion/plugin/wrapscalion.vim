@@ -1,4 +1,4 @@
-function! WrapScalionNext(key)
+function! WrapScalionNext()
   let search_string = getreg('/')
   let search_flags = 'nw' " do (n)ot move the cursor & (w)rap around the end of the file
   if v:searchforward == 0
@@ -23,7 +23,7 @@ function! WrapScalionNext(key)
     "
     " In this case, just mark the current cursor position as the search
     " start and proceed
-    let [buf_no, line, column, offset] = getpos('.')
+    let [buf_no, line, column, offset] = getpos('.') " XXX incorrect, you might not be at a search result position
     call prop_add(line, column, {'type': 'search_start'})
     let search_start_location = {'lnum': line, 'col': column}
   endif
@@ -36,12 +36,12 @@ function! WrapScalionNext(key)
     " XXX other choices - next buffer, next tab, next window, etc
     let choice = input("You've wrapped around to where you started your search - what would you like to do? (w)rap ")
     if choice == 'w'
-      execute 'normal! ' . a:key
+      " XXX continue with search as normal
     endif
+    " XXX don't do anything
   else
-    execute 'normal! ' . a:key
+    " XXX continue with search as normal
   endif
-  call BlingHighight()
 endfunction
 
 function! WrapScalionStart()
@@ -54,14 +54,6 @@ function! WrapScalionStart()
   call prop_add(line, column, {'type': 'search_start'})
 endfunction
 
-function! WrapScalionExpr()
-  let cmd_type = getcmdtype()
-  if cmd_type == '/' || cmd_type == '?'
-    return "\<CR>:call WrapScalionStart()\<CR>"
-  endif
-  return "\<CR>"
-endfunction
-
 try
   call prop_type_add('search_start', {})
 catch /^Vim\%((\a\+)\)\=:E969:/
@@ -69,6 +61,9 @@ catch /^Vim\%((\a\+)\)\=:E970:/
 endtry
 
 " XXX wrapscan *must* be on for this to work
-nnoremap <silent> n :call WrapScalionNext('n')<CR>
-nnoremap <silent> N :call WrapScalionNext('N')<CR>
-cnoremap <silent> <expr> <enter> WrapScalionExpr()
+"nnoremap <silent> n :call WrapScalionNext('n')<CR>
+"nnoremap <silent> N :call WrapScalionNext('N')<CR>
+
+autocmd User SearchNew call WrapScalionStart()
+autocmd User SearchNextPre call WrapScalionNext()
+autocmd User SearchPrevPre call WrapScalionNext()
