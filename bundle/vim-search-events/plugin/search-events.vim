@@ -56,6 +56,8 @@ function! s:NoOp()
 endfunction
 
 augroup SearchDummies
+  autocmd!
+
   autocmd User SearchNew call <SID>NoOp()
   autocmd User SearchNextPre call <SID>NoOp()
   autocmd User SearchNextPost call <SID>NoOp()
