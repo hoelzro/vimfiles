@@ -51,3 +51,9 @@ let g:netrw_silent = 1
 
 " vim-bling settings
 let g:bling_no_map=1
+
+augroup BlingBling
+  autocmd!
+
+  autocmd User SearchNew,SearchNextPost,SearchPrevPost call BlingHighight()
+augroup END
