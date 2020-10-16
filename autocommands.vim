@@ -20,6 +20,8 @@ augroup Custom
 
   " works with ProjectRelativePath and &statusline
   autocmd BufFilePost * unlet! b:relative_path
+
+  autocmd User SearchNew call <SID>FixSmartCase()
 augroup END
 
 " open help windows in their own tabs
@@ -40,5 +42,12 @@ function! s:HandleFileChange()
     let v:fcs_choice = ''
   else
     let v:fcs_choice = 'ask'
+  endif
+endfunction
+
+function! s:FixSmartCase()
+  let op = b:search_operator
+  if op == '*' || op == '#'
+    call setreg('/', '\C' . getreg('/'))
   endif
 endfunction
