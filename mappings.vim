@@ -171,7 +171,7 @@ function! StripBoundaryCharsUnlessSearch(s)
     return a:s
   endif
 
-  let matches = matchlist(a:s, '^\\<\(.*\)\\>$')
+  let matches = matchlist(a:s, '^\%(\\C\)\=\\<\(.*\)\\>$')
   if !empty(matches)
     return matches[1]
   endif
