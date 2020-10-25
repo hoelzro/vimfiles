@@ -29,7 +29,7 @@ unlet old_runtimepath
 unlet old_lines
 unlet old_columns
 
-call pathogen#helptags()
+"call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
 
 source ~/.vim/settings.vim
