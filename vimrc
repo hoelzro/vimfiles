@@ -14,15 +14,20 @@ let old_verbose=&verbose
 let old_verbosefile=&verbosefile
 let old_runtimepath=&runtimepath
 let old_filetype=&filetype
+let old_lines=&lines
+let old_columns=&columns
 set all&
 let &verbose=old_verbose
 let &verbosefile=old_verbosefile
 let &runtimepath=old_runtimepath
 let &filetype=old_filetype
+let &lines=old_lines
+let &columns=old_columns
 unlet old_verbose
 unlet old_verbosefile
 unlet old_runtimepath
-unlet old_filetype
+unlet old_lines
+unlet old_columns
 
 call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
