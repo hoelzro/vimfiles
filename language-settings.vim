@@ -94,4 +94,5 @@ if exists(':ALEEnable')
 endif
 
 " Vim
-let g:vimsyn_folding = 'f'
+let g:vimsyn_folding = 'f' " fold functions
+let g:vimsyn_embed   = 'l' " highlight Lua heredocs
