@@ -1,6 +1,9 @@
 if exists('g:nvim_lsp')
   finish
 endif
+if !has('nvim')
+  finish
+endif
 let g:nvim_lsp = 1
 
 lua << EOF
