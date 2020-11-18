@@ -111,7 +111,7 @@ local common_callbacks = {
   ['textDocument/publishDiagnostics'] = function() end,
 }
 
-local function attach_mappings()
+local function set_up_lsp_environment()
   vim.api.nvim_buf_set_keymap(0, 'n', '<c-]>', '<cmd>lua vim.lsp.buf.definition()<CR>', {
     silent = true,
   })
@@ -127,15 +127,17 @@ local function attach_mappings()
   vim.api.nvim_buf_set_keymap(0, 'n', 'gd', '<cmd>lua vim.lsp.buf.declaration()<CR>', {
     silent = true,
   })
+
+  vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 end
 
 lsp.elmls.setup{
-  on_attach = attach_mappings,
+  on_attach = set_up_lsp_environment,
   callbacks = common_callbacks,
 }
 
 lsp.gopls.setup{
-  on_attach = attach_mappings,
+  on_attach = set_up_lsp_environment,
   callbacks = common_callbacks,
 }
 END_LUA
