@@ -129,6 +129,8 @@ local function set_up_lsp_environment()
   })
 
   vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+  vim.cmd 'autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)'
 end
 
 lsp.elmls.setup{
