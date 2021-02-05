@@ -40,6 +40,44 @@ function! s:InitializeTemplate()
   call append(6, "")
 endfunction
 
+function! TiddlyWikiFold()
+  let line = getline(v:lnum)
+
+  let i = 1
+  let buffer_lines = line('$')
+  let last_field_line_number = 0
+  while i < buffer_lines
+    let field_line = getline(i)
+    if field_line == ''
+      break
+    endif
+    let last_field_line_number = i
+    let i += 1
+  endwhile
+
+  " Tiddler fields are all in their own fold
+  " XXX nice fold text
+  if v:lnum <= last_field_line_number
+    return 1
+  endif
+
+  " Match headings and set level accordingly
+  let m = matchlist(line, '^!\+')
+  if !empty(m)
+    return '>' . len(m[0])
+  endif
+
+  " Don't include trailing blank lines in previous fold
+  if nextnonblank(v:lnum) > v:lnum
+    return -1
+  endif
+
+  return '='
+endfunction
+
+setlocal foldexpr=TiddlyWikiFold()
+setlocal foldmethod=expr
+
 if exists("g:tiddlywiki_autoupdate")
   augroup tiddlywiki
     au BufWrite, *.tid call <SID>AutoUpdateModifiedTime()
