@@ -42,8 +42,9 @@ syn match twMacroDefineEnd /^\s*\\end/
 syn match twVariable /\$(\=\i\+)\=\$/
 
 " Header Fields
-syn match twFieldsLine /^\i\+:\s\+.*$/ contains=twFieldsKey
-syn match twFieldsKey /^\i\+:/ contained
+syntax region twFields start=/\%1l/ end=/^\s*$/ contains=twFieldsLine
+syn match twFieldsLine /^.\{-}\s*:\s*.*$/ contains=twFieldsKey contained
+syn match twFieldsKey /^.\{-}\s*:/ contained
 
 " Widgets
 syn region twWidgetStartTag start=/<\$\=\i\+/ end=/>/ contains=twWidgetAttr,twMacro,twTransclude,twStringTriple,twStringDouble,twStringSingle
