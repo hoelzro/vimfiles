@@ -20,6 +20,8 @@ let g:go_doc_popup_window = 1
 let g:go_template_autocreate = 0
 let g:go_alternate_mode = 'botright vnew'
 let g:go_fmt_command = 'gopls'
+"let g:go_highlight_string_spellcheck = 0
+"let g:go_diagnostics_enabled = 0
 
 " Haskell
 let hs_highlight_types = 1
@@ -143,3 +145,36 @@ lsp.gopls.setup{
   callbacks = common_callbacks,
 }
 END_LUA
+
+if executable('gopls')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'gopls',
+    \ 'cmd': {server_info->['gopls']},
+    \ 'allowlist': ['go'],
+    \ })
+endif
+
+function! s:on_lsp_buffer_enabled() abort
+  setlocal omnifunc=lsp#complete
+  if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+  nmap <buffer> gd <plug>(lsp-definition)
+  nmap <buffer> gr <plug>(lsp-references)
+  nmap <buffer> gi <plug>(lsp-implementation)
+  nmap <buffer> gt <plug>(lsp-type-definition)
+  nmap <buffer> <leader>rn <plug>(lsp-rename)
+  nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
+  nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
+  nmap <buffer> K <plug>(lsp-hover)
+
+  let g:lsp_format_sync_timeout = 1000
+  autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+endfunction
+
+augroup lsp_install
+  autocmd!
+  " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+let g:lsp_diagnostics_enabled = 0
