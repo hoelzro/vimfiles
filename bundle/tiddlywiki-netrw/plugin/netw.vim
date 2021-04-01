@@ -41,6 +41,10 @@ function! s:ReadTiddler(url)
   " XXX store these for the save?
   call remove(json, 'bag')
   call remove(json, 'revision')
+  if has_key(json, 'fields')
+    let fields = remove(json, 'fields')
+    call extend(json, fields, 'error')
+  endif
   let text = remove(json, 'text')
   for k in sort(keys(json))
     let v = json[k]
