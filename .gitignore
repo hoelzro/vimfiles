@@ -5,3 +5,4 @@ tags
 .perl-modules.db
 perl-lib/
 local.vim
+/bundle/unicode.vim/autoload/unicode/UnicodeData.*
