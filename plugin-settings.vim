@@ -57,3 +57,6 @@ augroup BlingBling
 
   autocmd User SearchNew,SearchNextPost,SearchPrevPost call BlingHighight()
 augroup END
+
+" viewdoc
+let g:no_viewdoc_abbrev = 1
