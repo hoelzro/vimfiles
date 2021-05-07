@@ -99,53 +99,6 @@ endif
 let g:vimsyn_folding = 'f' " fold functions
 let g:vimsyn_embed   = 'l' " highlight Lua heredocs
 
-lua <<END_LUA
-local has_lsp, lsp = pcall(require, 'nvim_lsp')
-
-if not has_lsp then
-  return
-end
-
-local common_callbacks = {
-  -- XXX load up the quickfix list, and maybe only right after a save or something
-  -- XXX that or show a sign and have hovering over the line do things
-  -- XXX also, just do compiler errors (reasonable ones - I often know about missing imports, and some lint rules would be good too)
-  ['textDocument/publishDiagnostics'] = function() end,
-}
-
-local function set_up_lsp_environment()
-  vim.api.nvim_buf_set_keymap(0, 'n', '<c-]>', '<cmd>lua vim.lsp.buf.definition()<CR>', {
-    silent = true,
-  })
-
-  vim.api.nvim_buf_set_keymap(0, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', {
-    silent = true,
-  })
-
-  vim.api.nvim_buf_set_keymap(0, 'n', 'gD', '<cmd>lua vim.lsp.buf.implementation()<CR>', {
-    silent = true,
-  })
-
-  vim.api.nvim_buf_set_keymap(0, 'n', 'gd', '<cmd>lua vim.lsp.buf.declaration()<CR>', {
-    silent = true,
-  })
-
-  vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  vim.cmd 'autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)'
-end
-
-lsp.elmls.setup{
-  on_attach = set_up_lsp_environment,
-  callbacks = common_callbacks,
-}
-
-lsp.gopls.setup{
-  on_attach = set_up_lsp_environment,
-  callbacks = common_callbacks,
-}
-END_LUA
-
 if executable('gopls')
   " XXX wrap me in an augroup
   autocmd User lsp_setup call lsp#register_server({
