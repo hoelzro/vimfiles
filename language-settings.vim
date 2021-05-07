@@ -155,6 +155,15 @@ if executable('gopls')
     \ })
 endif
 
+if executable('elm-language-server')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'elm-language-server',
+    \ 'cmd': {server_info->['elm-language-server']},
+    \ 'allowlist': ['elm'],
+    \ })
+endif
+
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
   if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
