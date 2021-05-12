@@ -117,6 +117,15 @@ if executable('elm-language-server')
     \ })
 endif
 
+if executable('clangd')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'clangd',
+    \ 'cmd': {server_info->['clangd']},
+    \ 'allowlist': ['c', 'cpp'],
+    \ })
+endif
+
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
   if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
