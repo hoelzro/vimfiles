@@ -65,9 +65,9 @@ syn cluster  javaScriptEmbededExpr	contains=javaScriptBoolean,javaScriptNull,jav
 
 if exists("javaScript_fold")
     syn match	javaScriptFunction	"\<function\>"
-    syn region	javaScriptFunctionFold	start="^\z(\s*\).*\<function\>.*[^};]$" end="^\z1}.*$" transparent fold keepend
+    syn region	javaScriptFunctionFold	start="^\z(\s*\).*\<async\|async\s\+function\|function\>.*[^};]$" end="^\z1}.*$" transparent fold keepend
 
-    syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\<function\>"
+    syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\async\|async\s\+function\|<function\>"
     syn sync match javaScriptSync	grouphere NONE "^}"
 
     setlocal foldmethod=syntax
