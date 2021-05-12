@@ -32,6 +32,8 @@ unlet old_columns
 "call pathogen#helptags()
 call pathogen#runtime_append_all_bundles()
 
+packadd matchit
+
 source ~/.vim/settings.vim
 source ~/.vim/plugin-settings.vim
 source ~/.vim/language-settings.vim
