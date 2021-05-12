@@ -39,7 +39,7 @@ let lisp_rainbow=1
 
 " Lua
 let lua_version=5
-let lua_subversion=1
+let lua_subversion=3
 
 " Perl
 let perl_include_pod=1
