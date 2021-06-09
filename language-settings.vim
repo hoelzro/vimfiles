@@ -148,4 +148,8 @@ augroup lsp_install
   autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
 
-let g:lsp_diagnostics_enabled = 0
+let g:lsp_diagnostics_echo_cursor          = 0
+let g:lsp_diagnostics_highlights_enabled   = 0
+let g:lsp_diagnostics_float_cursor         = 0
+let g:lsp_diagnostics_signs_enabled        = 0
+let g:lsp_diagnostics_virtual_text_enabled = 0
