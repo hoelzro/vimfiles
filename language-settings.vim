@@ -142,10 +142,25 @@ function! s:on_lsp_buffer_enabled() abort
   autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
 endfunction
 
+function! s:filter_diagnostics()
+  let all_diagnostics = lsp#ui#vim#diagnostics#get_document_diagnostics(bufnr())
+  for [server_name, diagnostics] in items(all_diagnostics)
+    let original_diagnostics = diagnostics['response']['params']['diagnostics']
+    let filtered_diagnostics = []
+    for diagnostic in original_diagnostics
+      if diagnostic['severity'] == 1
+        call add(filtered_diagnostics, diagnostic)
+      endif
+    endfor
+    let diagnostics['response']['params']['diagnostics'] = filtered_diagnostics
+  endfor
+endfunction
+
 augroup lsp_install
   autocmd!
   " call s:on_lsp_buffer_enabled only for languages that has the server registered.
   autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+  autocmd User lsp_diagnostics_updated call s:filter_diagnostics()
 augroup END
 
 let g:lsp_diagnostics_echo_cursor          = 0
