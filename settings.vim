@@ -65,3 +65,52 @@ if has('gui_running') || &t_Co == 256
 endif
 
 let mapleader="\\"
+
+" adapted from 'setting-tabline' in Vim help
+function! TabLabel(n)
+  let buflist = tabpagebuflist(a:n)
+  let winnr = tabpagewinnr(a:n)
+
+  let bufvars = getbufvar(buflist[winnr - 1], '')
+
+  if has_key(bufvars, 'topic')
+    let name = bufvars['topic']
+    let m = matchlist(name, '^\(\d\+\)\s\+\(.*\)')
+    if !empty(m)
+      let name = m[2] . '(' . m[1] . ')'
+    endif
+  else
+    let name = bufname(buflist[winnr - 1])
+  endif
+
+  if name == ''
+    let name = '[No Name]'
+  endif
+
+  return name
+endfunction
+
+function! TabLine()
+  let s = ''
+  for i in range(tabpagenr('$'))
+    if i + 1 == tabpagenr()
+      let s .= '%#TabLineSel#'
+    else
+      let s .= '%#TabLine#'
+    endif
+
+    let s .= '%' . (i + 1) . 'T'
+
+    let s .= ' %{TabLabel(' . (i + 1) . ')} '
+  endfor
+
+  let s .= '%#TabLineFill#%T'
+
+  if tabpagenr('$') > 1
+    let s .= '%=%#TabLine#%999Xclose'
+  endif
+
+  return s
+endfunction
+
+set tabline=%!TabLine()
