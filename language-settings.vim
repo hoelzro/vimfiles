@@ -126,6 +126,17 @@ if executable('clangd')
     \ })
 endif
 
+if executable('yaml-language-server')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'yaml-language-server',
+    \ 'cmd': ['yaml-language-server', '--stdio'],
+    \ 'allowlist': ['yaml'],
+    \ 'root_uri': {_->'/home/rob'},
+    \ 'workspace_config': {'yaml':{'schemas':{'kubernetes':'*.yaml'}}},
+    \ })
+endif
+
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
   if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
