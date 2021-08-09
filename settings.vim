@@ -80,7 +80,10 @@ function! TabLabel(n)
       let name = m[2] . '(' . m[1] . ')'
     endif
   else
-    let name = bufname(buflist[winnr - 1])
+    let name = pathshorten(bufname(buflist[winnr - 1]))
+    if getbufvar(buflist[winnr -1], '&modified')
+      let name = '+ ' . name
+    endif
   endif
 
   if name == ''
@@ -107,7 +110,7 @@ function! TabLine()
   let s .= '%#TabLineFill#%T'
 
   if tabpagenr('$') > 1
-    let s .= '%=%#TabLine#%999Xclose'
+    let s .= '%=%#TabLine#%999XX%X'
   endif
 
   return s
