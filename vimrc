@@ -1,5 +1,7 @@
 " vim: sts=2 sw=2
 
+set t_RC=
+
 if has('perl')
 
     perl <<PERL
