@@ -71,7 +71,6 @@ if exists("javaScript_fold")
     syn sync match javaScriptSync	grouphere NONE "^}"
 
     setlocal foldmethod=syntax
-    setlocal foldtext=getline(v:foldstart)
 else
     syn keyword javaScriptFunction	function
     syn match	javaScriptBraces	   "[{}\[\]]"
