@@ -133,7 +133,12 @@ if executable('yaml-language-server')
     \ 'cmd': ['yaml-language-server', '--stdio'],
     \ 'allowlist': ['yaml'],
     \ 'root_uri': {_->'/home/rob'},
-    \ 'workspace_config': {'yaml':{'schemas':{'kubernetes':'*.yaml'}}},
+    \ 'workspace_config': {'yaml':{'schemas':{
+    \   'kubernetes':'*.yaml',
+    \   'https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json': 'docker-compose.yaml',
+    \   'https://json.schemastore.org/github-workflow.json': '.github/workflows/*.yaml',
+    \   'https://json.schemastore.org/github-action.json': '.github/actions/*/action.yaml',
+    \ }}},
     \ })
 endif
 
