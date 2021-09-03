@@ -103,7 +103,7 @@ if executable('gopls')
   " XXX wrap me in an augroup
   autocmd User lsp_setup call lsp#register_server({
     \ 'name': 'gopls',
-    \ 'cmd': {server_info->['gopls']},
+    \ 'cmd': {server_info->['env', 'TMPDIR=/tmp/gotmp', 'gopls']},
     \ 'allowlist': ['go'],
     \ })
 endif
