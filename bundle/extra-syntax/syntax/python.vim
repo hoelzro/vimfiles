@@ -158,16 +158,16 @@ syn match   pythonEscape	"\\$"
 " https://docs.python.org/reference/lexical_analysis.html#numeric-literals
 if !exists("python_no_number_highlight")
   " numbers (including longs and complex)
-  syn match   pythonNumber	"\<0[oO]\=\o\+[Ll]\=\>"
-  syn match   pythonNumber	"\<0[xX]\x\+[Ll]\=\>"
-  syn match   pythonNumber	"\<0[bB][01]\+[Ll]\=\>"
-  syn match   pythonNumber	"\<\%([1-9]\d*\|0\)[Ll]\=\>"
-  syn match   pythonNumber	"\<\d\+[jJ]\>"
-  syn match   pythonNumber	"\<\d\+[eE][+-]\=\d\+[jJ]\=\>"
+  syn match   pythonNumber	"\<0[oO]\=[0-7_]\+[Ll]\=\>"
+  syn match   pythonNumber	"\<0[xX][0-9a-fA-F_]\+[Ll]\=\>"
+  syn match   pythonNumber	"\<0[bB][01_]\+[Ll]\=\>"
+  syn match   pythonNumber	"\<\%([1-9][0-9_]*\|0\)[Ll]\=\>"
+  syn match   pythonNumber	"\<[0-9_]\+[jJ]\>"
+  syn match   pythonNumber	"\<[0-9_]\+[eE][+-]\=[0-9_]\+[jJ]\=\>"
   syn match   pythonNumber
-	\ "\<\d\+\.\%([eE][+-]\=\d\+\)\=[jJ]\=\%(\W\|$\)\@="
+	\ "\<[0-9_]\+\.\%([eE][+-]\=[0-9_]\+\)\=[jJ]\=\%(\W\|$\)\@="
   syn match   pythonNumber
-	\ "\%(^\|\W\)\zs\d*\.\d\+\%([eE][+-]\=\d\+\)\=[jJ]\=\>"
+	\ "\%(^\|\W\)\zs[0-9_]*\.[0-9_]\+\%([eE][+-]\=[0-9_]\+\)\=[jJ]\=\>"
 endif
 
 " Group the built-ins in the order in the 'Python Library Reference' for
