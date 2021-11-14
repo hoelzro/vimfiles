@@ -134,6 +134,14 @@ syn region  pythonRawString matchgroup=pythonTripleQuotes
       \ start=+[uU]\=[rR]\z('''\|"""\)+ end="\z1" keepend
       \ contains=pythonSpaceError,pythonDoctest,@Spell
 
+" f-strings can contain expressions
+syn region pythonString matchgroup=pythonQuotes
+      \ start=+[uU]\=f\z(['"]\)+ end="\z1" skip="\\\\\|\\\z1"
+      \ contains=pythonEscape,pythonFStringExpr,@Spell
+syn region pythonFStringExpr matchgroup=Delimiter
+      \ start="{" end="}"
+      \ contained contains=ALLBUT,pythonDoctest,pythonFunction,@Spell
+
 syn match   pythonEscape	+\\[abfnrtv'"\\]+ contained
 syn match   pythonEscape	"\\\o\{1,3}" contained
 syn match   pythonEscape	"\\x\x\{2}" contained
