@@ -99,12 +99,22 @@ endif
 let g:vimsyn_folding = 'f' " fold functions
 let g:vimsyn_embed   = 'l' " highlight Lua heredocs
 
+function! GetLSPRoot(server_info)
+  let git_location = lsp#utils#find_nearest_parent_directory(expand('%:p'), '.git')
+  if git_location != ''
+    return lsp#utils#path_to_uri(git_location)
+  else
+    return lsp#utils#get_default_root_uri()
+  endif
+endfunction
+
 if executable('gopls')
   " XXX wrap me in an augroup
   autocmd User lsp_setup call lsp#register_server({
     \ 'name': 'gopls',
     \ 'cmd': {server_info->['env', 'TMPDIR=/tmp/gotmp', 'gopls']},
     \ 'allowlist': ['go'],
+    \ 'root_uri': function('GetLSPRoot'),
     \ })
 endif
 
@@ -114,6 +124,7 @@ if executable('elm-language-server')
     \ 'name': 'elm-language-server',
     \ 'cmd': {server_info->['elm-language-server']},
     \ 'allowlist': ['elm'],
+    \ 'root_uri': function('GetLSPRoot'),
     \ })
 endif
 
@@ -123,6 +134,7 @@ if executable('clangd')
     \ 'name': 'clangd',
     \ 'cmd': {server_info->['clangd']},
     \ 'allowlist': ['c', 'cpp'],
+    \ 'root_uri': function('GetLSPRoot'),
     \ })
 endif
 
@@ -139,6 +151,36 @@ if executable('yaml-language-server')
     \   'https://json.schemastore.org/github-workflow.json': '.github/workflows/*.yaml',
     \   'https://json.schemastore.org/github-action.json': '.github/actions/*/action.yaml',
     \ }}},
+    \ })
+endif
+
+if executable('terraform-ls')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'terraform-ls',
+    \ 'cmd': ['terraform-ls', 'serve', '-log-file=/tmp/tf-lsp.log'],
+    \ 'allowlist': ['terraform'],
+    \ 'root_uri': function('GetLSPRoot'),
+    \ })
+endif
+
+if executable('rls')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'rls',
+    \ 'cmd': ['rustup', 'run', 'stable-x86_64-unknown-linux-gnu', 'rls'],
+    \ 'allowlist': ['rust'],
+    \ 'root_uri': function('GetLSPRoot'),
+    \ })
+endif
+
+if executable('pylsp')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'pylsp',
+    \ 'cmd': ['pylsp'],
+    \ 'allowlist': ['python'],
+    \ 'root_uri': function('GetLSPRoot'),
     \ })
 endif
 
