@@ -128,6 +128,7 @@ if executable('elm-language-server')
     \ 'cmd': {server_info->['elm-language-server']},
     \ 'allowlist': ['elm'],
     \ 'root_uri': function('GetLSPRoot'),
+    \ 'initialization_options': {'elmPath': 'elm', 'runtime': 'node', 'elmFormatPath': 'elm-format', 'elmTestPath': 'elm-test', 'onlyUpdateDiagnosticsOnSave': 1, 'disableElmLSDiagnostics': 1},
     \ })
 endif
 
