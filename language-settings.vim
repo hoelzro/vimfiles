@@ -115,6 +115,7 @@ if executable('gopls')
     \ 'cmd': {server_info->['env', 'TMPDIR=/tmp/gotmp', 'gopls']},
     \ 'allowlist': ['go'],
     \ 'root_uri': function('GetLSPRoot'),
+    \ 'initialization_options': {'gofumpt': v:true},
     \ })
 endif
 
