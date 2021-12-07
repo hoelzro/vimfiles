@@ -117,6 +117,8 @@ if executable('gopls')
     \ 'root_uri': function('GetLSPRoot'),
     \ 'initialization_options': {'gofumpt': v:true},
     \ })
+
+  autocmd BufWritePre *.go :LspCodeActionSync source.organizeImports
 endif
 
 if executable('elm-language-server')
