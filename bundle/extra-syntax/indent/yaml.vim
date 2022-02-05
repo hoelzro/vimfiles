@@ -17,15 +17,10 @@ setlocal nosmartindent
 
 let b:undo_indent = 'setlocal indentexpr< indentkeys< smartindent<'
 
-" Only define the function once.
-if exists('*GetYAMLIndent')
-    finish
-endif
-
 let s:save_cpo = &cpo
 set cpo&vim
 
-function s:FindPrevLessIndentedLine(lnum, ...)
+function! s:FindPrevLessIndentedLine(lnum, ...)
     let prevlnum = prevnonblank(a:lnum-1)
     let curindent = a:0 ? a:1 : indent(a:lnum)
     while           prevlnum
@@ -36,7 +31,7 @@ function s:FindPrevLessIndentedLine(lnum, ...)
     return prevlnum
 endfunction
 
-function s:FindPrevLEIndentedLineMatchingRegex(lnum, regex)
+function! s:FindPrevLEIndentedLineMatchingRegex(lnum, regex)
     let plilnum = s:FindPrevLessIndentedLine(a:lnum, indent(a:lnum)+1)
     while plilnum && getline(plilnum) !~# a:regex
         let plilnum = s:FindPrevLessIndentedLine(plilnum)
@@ -71,7 +66,7 @@ let s:c_ns_tag_property = '\v'.s:c_verbatim_tag.
 
 let s:block_scalar_header = '\v[|>]%([+-]?[1-9]|[1-9]?[+-])?'
 
-function GetYAMLIndent(lnum)
+function! GetYAMLIndent(lnum)
     if a:lnum == 1 || !prevnonblank(a:lnum-1)
         return 0
     endif
