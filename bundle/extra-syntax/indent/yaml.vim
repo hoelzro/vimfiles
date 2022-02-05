@@ -107,7 +107,11 @@ function! GetYAMLIndent(lnum)
         "
         " - |-
         "     Block scalar without indentation indicator
-        return previndent+shiftwidth()
+        if line =~# '^\s*-'
+          return previndent
+        else
+          return previndent+shiftwidth()
+        endif
     elseif prevline =~# '\v[:-]\ [|>]%(\d+[+\-]?|[+\-]?\d+)%(\#.*|\s*)$'
         " - |+2
         "   block scalar with indentation indicator
