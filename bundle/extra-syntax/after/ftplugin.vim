@@ -17,6 +17,9 @@ augroup FileTypes
   autocmd BufRead,BufNewFile bash-* set filetype=sh " for CTRL-X CTRL-E
   autocmd BufRead,BufNewFile *.t setf  perl
   autocmd BufRead,BufNewFile *.qml set filetype=qml
+
+  " not really a filetype, but ¯\_(ツ)_/¯
+  autocmd BufRead,BufNewFile *.log set buftype=nofile
 augroup END
 
 " disable setting filetype=zsh when I do things like `vim =(ls)`
