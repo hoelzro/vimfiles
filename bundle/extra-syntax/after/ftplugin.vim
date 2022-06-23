@@ -19,4 +19,7 @@ augroup FileTypes
   autocmd BufRead,BufNewFile *.qml set filetype=qml
 augroup END
 
+" disable setting filetype=zsh when I do things like `vim =(ls)`
+autocmd! filetypedetect BufNewFile,BufRead zsh*
+
 let b:tt2_syn_tags = '\[% %] <!-- -->'
