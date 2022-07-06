@@ -59,12 +59,13 @@ syn keyword javaScriptMessage		alert confirm prompt status
 syn keyword javaScriptGlobal		self window top parent
 syn keyword javaScriptMember		document event location 
 syn keyword javaScriptDeprecated	escape unescape
-syn keyword javaScriptReserved		abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile async
+syn keyword javaScriptReserved		abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
 
 syn cluster  javaScriptEmbededExpr	contains=javaScriptBoolean,javaScriptNull,javaScriptIdentifier,javaScriptStringD,javaScriptStringS,javaScriptStringT
 
 if exists("javaScript_fold")
     syn match	javaScriptFunction	"\<function\>"
+    syn match	javaScriptReserved	"\<async\>"
     syn region	javaScriptFunctionFold	start="^\z(\s*\).*\%(\<async\|async\s\+function\|function\>\).*[^};]$" end="^\z1}" transparent fold keepend
 
     syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\async\|async\s\+function\|<function\>"
@@ -72,6 +73,7 @@ if exists("javaScript_fold")
 
     setlocal foldmethod=syntax
 else
+    syn keyword javaScriptReserved	async
     syn keyword javaScriptFunction	function
     syn match	javaScriptBraces	   "[{}\[\]]"
     syn match	javaScriptParens	   "[()]"
