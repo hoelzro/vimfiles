@@ -189,6 +189,24 @@ if executable('pylsp')
     \ })
 endif
 
+" XXX look for package.json for root_uri?
+if executable('typescript-language-server')
+  " XXX wrap me in an augroup
+  autocmd User lsp_setup call lsp#register_server({
+    \ 'name': 'tsserver',
+    \ 'cmd': ['typescript-language-server', '--stdio'],
+    \ 'allowlist': ['javascript', 'typescript'],
+    \ 'root_uri': function('GetLSPRoot'),
+    \ 'initialization_options': {'disableAutomaticTypingAcquisition': v:true, 'preferences': {'quotePreference': 'single'}},
+    \ 'workspace_config': {'javascript':{
+    \   'format': {
+    \     'indentSize': 2,
+    \     'insertSpaceAfterKeywordsInControlFlowStatements': v:false,
+    \  },
+    \ }},
+    \ })
+endif
+
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
   if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
