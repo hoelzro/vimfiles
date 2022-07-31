@@ -3,9 +3,9 @@ let $MANPAGER='less'
 filetype plugin indent on
 
 set showcmd
-set softtabstop=4
+set softtabstop=2
 set tabstop=8
-set shiftwidth=4
+set shiftwidth=2
 set scrolloff=3
 set autoindent
 set background=dark
@@ -45,6 +45,8 @@ set linebreak
 set breakindent
 set breakindentopt=shift:2
 set showbreak=↳\ 
+set comments-=fb:-
+set comments+=b:-
 
 set laststatus=2
 let &statusline = '%{ProjectRelativePath()}%=%l,%c%V   %P'
