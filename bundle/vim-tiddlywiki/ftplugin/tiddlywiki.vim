@@ -66,6 +66,16 @@ function! TiddlyWikiFold()
     return 0
   endif
 
+  " if we're at the start of a macro definition, start a new fold
+  if line[:6] == '\define'
+    return '>1'
+  endif
+
+  " if we're at the end of a macro define, end the fold
+  if line[:3] == '\end'
+    return '<1'
+  endif
+
   " Match headings and set level accordingly
   let m = matchlist(line, '^!\+')
   if !empty(m)
