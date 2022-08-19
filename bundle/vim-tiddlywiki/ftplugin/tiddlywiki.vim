@@ -93,6 +93,13 @@ endfunction
 setlocal foldexpr=TiddlyWikiFold()
 setlocal foldmethod=expr
 
+let b:undo_ftplugin = 'setlocal foldexpr< foldmethod<'
+if exists("loaded_matchit") && !exists("b:match_words")
+  let b:match_ignorecase = 0
+  let b:match_words = '^\\define:^\\end'
+  let b:undo_ftplugin .= " | unlet! b:match_words b:match_ignorecase"
+endif
+
 if exists("g:tiddlywiki_autoupdate")
   augroup tiddlywiki
     au BufWrite, *.tid call <SID>AutoUpdateModifiedTime()
