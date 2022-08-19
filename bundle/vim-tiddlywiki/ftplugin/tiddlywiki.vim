@@ -61,6 +61,11 @@ function! TiddlyWikiFold()
     return 1
   endif
 
+  " if we're done with the fields, end the current fold
+  if line == '' && prevnonblank(v:lnum) == last_field_line_number
+    return 0
+  endif
+
   " Match headings and set level accordingly
   let m = matchlist(line, '^!\+')
   if !empty(m)
