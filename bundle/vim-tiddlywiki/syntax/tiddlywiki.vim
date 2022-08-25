@@ -34,7 +34,7 @@ syn keyword twRulesValue macrocallblock quoteblock styleblock table contained
 syn keyword twRulesValue transcludeblock typedblock contained
 
 " Macros
-syn region twMacro start=/<<\i\+/ end=/>>/ contains=twStringTriple,twStringDouble,twStringSingle
+syn region twMacro start=/<<\%[\.]\i\+/ end=/>>/ contains=twStringTriple,twStringDouble,twStringSingle
 syn match twMacroDefineStart /^\s*\\define\s\+\i\+(\i*)/ contains=twMacroDefineName
 syn match twMacroDefineName /\i\+(\i*)/ contained contains=twMacroDefineArg
 syn region twMacroDefineArg start=/(/ms=s+1 end=/)/me=e-1 contained
