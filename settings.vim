@@ -63,7 +63,7 @@ endif
 
 if has('gui_running') || &t_Co == 256
   set t_Co=256
-  colorscheme peaksea
+  colorscheme plain
 endif
 
 let mapleader="\\"
