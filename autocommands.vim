@@ -22,6 +22,8 @@ augroup Custom
   autocmd BufFilePost * unlet! b:relative_path
 
   autocmd User SearchNew call <SID>FixSmartCase()
+
+  autocmd VimEnter * redraw!
 augroup END
 
 " open help windows in their own tabs
