@@ -29,6 +29,7 @@ if v:version >= 700 && has('spell')
   hi SpellLocal	cterm=undercurl	ctermbg=NONE	ctermfg=NONE
 endif
 
+hi MatchParen	ctermfg=NONE	ctermbg=90
 hi TabLine	cterm=underline
 hi TabLineFill	cterm=underline
 hi Underlined	cterm=underline
