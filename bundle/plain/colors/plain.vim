@@ -9,6 +9,7 @@ let g:colors_name = expand("<sfile>:t:r")
 hi Normal	ctermfg=252	ctermbg=234	cterm=NONE
 hi Search	ctermfg=NONE	ctermbg=63	cterm=NONE
 hi Ignore	ctermfg=16	ctermbg=NONE
+hi Todo		ctermfg=88	ctermbg=186	cterm=NONE
 
 hi! link	Comment		Normal
 hi! link	Statement	Normal
@@ -19,7 +20,6 @@ hi! link	Type		Normal
 hi! link	Special		Normal
 hi! link	Underlined	Normal
 hi! link	Error		Normal
-hi! link	Todo		Normal
 hi! link	LineNr		Normal
 
 if v:version >= 700 && has('spell')
