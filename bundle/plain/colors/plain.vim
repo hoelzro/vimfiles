@@ -21,6 +21,7 @@ hi! link	Special		Normal
 hi! link	Underlined	Normal
 hi! link	Error		Normal
 hi! link	LineNr		Normal
+hi! link	Title		Normal
 
 if v:version >= 700 && has('spell')
   hi SpellBad	cterm=undercurl	ctermbg=NONE	ctermfg=NONE
