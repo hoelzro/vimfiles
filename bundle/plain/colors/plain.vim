@@ -10,7 +10,7 @@ hi Normal	ctermfg=252	ctermbg=234	cterm=NONE
 hi Search	ctermfg=NONE	ctermbg=63	cterm=NONE
 hi Ignore	ctermfg=16	ctermbg=NONE
 hi Todo		ctermfg=88	ctermbg=186	cterm=NONE
-hi Comment	ctermfg=186	ctermbg=NONE	cterm=NONE
+hi Comment	ctermfg=244	ctermbg=NONE	cterm=NONE
 
 hi! link	Statement	Normal
 hi! link	Constant	Normal
