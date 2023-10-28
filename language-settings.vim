@@ -186,6 +186,19 @@ if executable('pylsp')
     \ 'cmd': ['pylsp'],
     \ 'allowlist': ['python'],
     \ 'root_uri': function('GetLSPRoot'),
+    \ 'workspace_config': {'pylsp':{
+    \   'plugins': {
+    \     'flake8': {
+    \       'enabled': v:false,
+    \     },
+    \     'pyflakes': {
+    \       'enabled': v:false,
+    \     },
+    \     'pycodestyle': {
+    \       'enabled': v:false,
+    \     },
+    \   },
+    \ }},
     \ })
 endif
 
