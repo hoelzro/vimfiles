@@ -234,3 +234,4 @@ let g:lsp_diagnostics_highlights_enabled   = 0
 let g:lsp_diagnostics_float_cursor         = 1
 let g:lsp_diagnostics_signs_enabled        = 1
 let g:lsp_diagnostics_virtual_text_enabled = 0
+let g:lsp_use_native_client = 1
