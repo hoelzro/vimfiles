@@ -284,8 +284,6 @@ endif
 " Sync at the beginning of class, function, or method definition.
 syn sync match pythonSync grouphere NONE "^\%(def\|class\)\s\+\h\w*\s*[(:]"
 
-syn region pythonCommentString        matchgroup=pythonComment start="_comment='''" end="'''" contains=@Spell
-
 " The default highlight links.  Can be overridden later.
 hi def link pythonStatement		Statement
 hi def link pythonConditional		Conditional
