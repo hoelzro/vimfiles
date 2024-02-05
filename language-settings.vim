@@ -100,6 +100,12 @@ let g:vimsyn_folding = 'f' " fold functions
 let g:vimsyn_embed   = 'l' " highlight Lua heredocs
 
 function! GetLSPRoot(server_info)
+  let cargo_location = lsp#utils#find_nearest_parent_file(expand('%:p'), 'Cargo.toml')
+  if cargo_location != ''
+    let cargo_location = substitute(cargo_location, 'Cargo\.toml$', '', '')
+    return lsp#utils#path_to_uri(cargo_location)
+  endif
+
   let git_location = lsp#utils#find_nearest_parent_directory(expand('%:p'), '.git')
   if git_location != ''
     let git_location = substitute(git_location, '\.git/$', '', '')
