@@ -175,11 +175,11 @@ if executable('terraform-ls')
     \ })
 endif
 
-if executable('rls')
+if executable('rust-analyzer')
   " XXX wrap me in an augroup
   autocmd User lsp_setup call lsp#register_server({
-    \ 'name': 'rls',
-    \ 'cmd': ['rustup', 'run', 'stable-x86_64-unknown-linux-gnu', 'rls'],
+    \ 'name': 'rust-analyzer',
+    \ 'cmd': ['rust-analyzer'],
     \ 'allowlist': ['rust'],
     \ 'root_uri': function('GetLSPRoot'),
     \ })
