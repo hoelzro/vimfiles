@@ -24,6 +24,7 @@ augroup Custom
   autocmd User SearchNew call <SID>FixSmartCase()
 
   autocmd VimEnter * redraw!
+  autocmd BufEnter * redraw!
 augroup END
 
 " open help windows in their own tabs
