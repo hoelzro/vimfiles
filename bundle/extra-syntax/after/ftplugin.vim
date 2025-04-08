@@ -17,6 +17,7 @@ augroup FileTypes
   autocmd BufRead,BufNewFile bash-* set filetype=sh " for CTRL-X CTRL-E
   autocmd BufRead,BufNewFile *.t setf  perl
   autocmd BufRead,BufNewFile *.qml set filetype=qml
+  autocmd BufRead,BufNewFile tiddlywiki.files set filetype=json
 
   " not really a filetype, but ¯\_(ツ)_/¯
   autocmd BufRead,BufNewFile *.log set buftype=nofile
