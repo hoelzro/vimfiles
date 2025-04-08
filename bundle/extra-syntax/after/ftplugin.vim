@@ -18,6 +18,7 @@ augroup FileTypes
   autocmd BufRead,BufNewFile *.t setf  perl
   autocmd BufRead,BufNewFile *.qml set filetype=qml
   autocmd BufRead,BufNewFile tiddlywiki.files set filetype=json
+  autocmd BufRead,BufNewFile plugin.info set filetype=json
 
   " not really a filetype, but ¯\_(ツ)_/¯
   autocmd BufRead,BufNewFile *.log set buftype=nofile
