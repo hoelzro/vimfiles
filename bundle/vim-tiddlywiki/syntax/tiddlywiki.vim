@@ -51,6 +51,12 @@ syn region twWidgetStartTag start=/<\$\=\i\+/ end=/>/ contains=twWidgetAttr,twMa
 syn match  twWidgetAttr /\s\i\+=/ contained
 syn match  twWidgetEndTag /<\/$\=\i\+>/
 
+" Conditional Shortcut
+syn region twConditionalIfTag start=/<%\s*if\s\+/ end=/%>/
+syn region twConditionalElseIfTag start=/<%\s*elseif\s\+/ end=/%>/
+syn match twConditionalElseTag /<%\s*else\s*%>/
+syn match twConditionalEndIfTag /<%\s*endif\s*%>/
+
 " Strings
 syn match twStringSingle /'[^']*'/ contained extend contains=@Spell
 syn match twStringDouble /"[^"]*"/ contained extend contains=@Spell
@@ -127,6 +133,10 @@ hi def link twTransclude Label
 hi def link twWidgetStartTag Structure
 hi def link twWidgetAttr Identifier
 hi def link twWidgetEndTag Structure
+hi def link twConditionalIfTag Conditional
+hi def link twConditionalElseIfTag Conditional
+hi def link twConditionalElseTag Conditional
+hi def link twConditionalEndIfTag Conditional
 hi def link twStringSingle String
 hi def link twStringDouble String
 hi def link twStringTriple String
