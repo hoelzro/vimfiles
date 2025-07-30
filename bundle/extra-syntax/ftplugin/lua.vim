@@ -3,9 +3,12 @@ setlocal shiftwidth=2
 runtime indent/lua.vim
 
 function! s:RunEqualsOperator()
+  let [_, _, cursor_pos, _] = getpos('.')
+
   let current_line = getline('.')
   let rhs_expr = ''
-  let m = matchlist(current_line, '^\s*\([a-zA-Z0-9_.]\+\[[a-zA-Z0-9_.]\+\]\)\s*\([-+*/]\|\.\.\)')
+
+  let m = matchlist(current_line[:cursor_pos], '^\s*\([a-zA-Z0-9_.]\+\[[a-zA-Z0-9_.]\+\]\)\s*\([-+*/]\|\.\.\)$')
   if !empty(m)
     let [lhs_expr, operator] = m[1:2]
     if operator == '..'
@@ -15,7 +18,7 @@ function! s:RunEqualsOperator()
     end
   endif
 
-  let m = matchlist(current_line, '^\s*\([a-zA-Z0-9_.]\+\)\s*\([-+*/]\|\.\.\)')
+  let m = matchlist(current_line[:cursor_pos], '^\s*\([a-zA-Z0-9_.]\+\)\s*\([-+*/]\|\.\.\)$')
   if !empty(m)
     let [lhs_expr, operator] = m[1:2]
     let rhs_expr = lhs_expr
