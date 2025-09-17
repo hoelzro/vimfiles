@@ -7,9 +7,11 @@
 "		(ss) repaired several quoting and grouping glitches
 "		(ss) fixed regex parsing issue with multiple qualifiers [gi]
 "		(ss) additional factoring of keywords, globals, and members
-" Last Change:	2020 May 14
+" Last Change:	2025 Sep 16
 " 		2013 Jun 12: adjusted javaScriptRegexpString (Kevin Locke)
 " 		2018 Apr 14: adjusted javaScriptRegexpString (LongJohnCoder)
+" 		2024 Aug 14: fix a few stylistic issues (#15480)
+" 		2025 Aug 07: as is a reserved keyword (#17912)
 
 " tuning parameters:
 " unlet javaScript_fold
@@ -39,9 +41,16 @@ syn region  javaScriptStringT	       start=+`+  skip=+\\\\\|\\`+  end=+`+	contai
 
 syn region  javaScriptEmbed	       start=+${+  end=+}+	contains=@javaScriptEmbededExpr
 
+" number handling by Christopher Leonard chris.j.leonard@gmx.com
 syn match   javaScriptSpecialCharacter "'\\.'"
-syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
-syn match   javaScriptNumber	       "-\=\<\d\+\%(_\d\+\)*\>"
+syn match   javaScriptNumber           "\<0[bB][0-1]\+\(_[0-1]\+\)*\>"
+syn match   javaScriptNumber           "\<0[oO][0-7]\+\(_[0-7]\+\)*\>"
+syn match   javaScriptNumber           "\<0\([0-7]\+\(_[0-7]\+\)*\)\?\>"
+syn match   javaScriptNumber           "\<0[xX][0-9a-fA-F]\+\(_[0-9a-fA-F]\+\)*\>"
+syn match   javaScriptNumber           "\<\d\+\(_\d\+\)*[eE][+-]\?\d\+\>"
+syn match   javaScriptNumber           "\<[1-9]\d*\(_\d\+\)*\(\.\(\d\+\(_\d\+\)*\([eE][+-]\?\d\+\)\?\)\?\)\?\>"
+syn match   javaScriptNumber           "\<\(\d\+\(_\d\+\)*\)\?\.\d\+\(_\d\+\)*\([eE][+-]\?\d\+\)\?\>"
+syn match   javaScriptNumber           "\<\d\+\(_\d\+\)*\.\(\d\+\(_\d\+\)*\([eE][+-]\?\d\+\)\?\)\?\>"
 syn region  javaScriptRegexpString     start=+[,(=+]\s*/[^/*]+ms=e-1,me=e-1 skip=+\\\\\|\\/+ end=+/[gimuys]\{0,2\}\s*$+ end=+/[gimuys]\{0,2\}\s*[+;.,)\]}]+me=e-1 end=+/[gimuys]\{0,2\}\s\+\/+me=e-1 contains=@htmlPreproc,javaScriptComment oneline
 
 syn keyword javaScriptConditional	if else switch
@@ -52,14 +61,15 @@ syn keyword javaScriptType		Array Boolean Date Function Number Object String Reg
 syn keyword javaScriptStatement		return with await yield
 syn keyword javaScriptBoolean		true false
 syn keyword javaScriptNull		null undefined
-syn keyword javaScriptIdentifier	arguments this var let
+syn keyword javaScriptIdentifier	arguments this
 syn keyword javaScriptLabel		case default
 syn keyword javaScriptException		try catch finally throw
 syn keyword javaScriptMessage		alert confirm prompt status
 syn keyword javaScriptGlobal		self window top parent
-syn keyword javaScriptMember		document event location 
+syn keyword javaScriptMember		document event location
 syn keyword javaScriptDeprecated	escape unescape
-syn keyword javaScriptReserved		abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
+syn keyword javaScriptReserved		abstract as boolean byte char class const debugger double enum export extends final float from goto implements import int interface let long native package private protected public short super synchronized throws transient var volatile
+syn keyword javaScriptModifier  static
 
 syn cluster  javaScriptEmbededExpr	contains=javaScriptBoolean,javaScriptNull,javaScriptIdentifier,javaScriptStringD,javaScriptStringS,javaScriptStringT
 
@@ -98,14 +108,14 @@ hi def link javaScriptStringD		String
 hi def link javaScriptStringT		String
 hi def link javaScriptCharacter		Character
 hi def link javaScriptSpecialCharacter	javaScriptSpecial
-hi def link javaScriptNumber		javaScriptValue
+hi def link javaScriptNumber		Number
 hi def link javaScriptConditional		Conditional
 hi def link javaScriptRepeat		Repeat
 hi def link javaScriptBranch		Conditional
 hi def link javaScriptOperator		Operator
 hi def link javaScriptType			Type
 hi def link javaScriptStatement		Statement
-hi def link javaScriptFunction		Function
+hi def link javaScriptFunction		Keyword
 hi def link javaScriptBraces		Function
 hi def link javaScriptError		Error
 hi def link javaScrParenError		javaScriptError
@@ -119,8 +129,9 @@ hi def link javaScriptException		Exception
 hi def link javaScriptMessage		Keyword
 hi def link javaScriptGlobal		Keyword
 hi def link javaScriptMember		Keyword
-hi def link javaScriptDeprecated		Exception 
+hi def link javaScriptDeprecated		Exception
 hi def link javaScriptReserved		Keyword
+hi def link javaScriptModifier		StorageClass
 hi def link javaScriptDebug		Debug
 hi def link javaScriptConstant		Label
 hi def link javaScriptEmbed		Special
