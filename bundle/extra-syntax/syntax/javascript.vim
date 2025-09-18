@@ -51,7 +51,7 @@ syn match   javaScriptNumber           "\<\d\+\(_\d\+\)*[eE][+-]\?\d\+\>"
 syn match   javaScriptNumber           "\<[1-9]\d*\(_\d\+\)*\(\.\(\d\+\(_\d\+\)*\([eE][+-]\?\d\+\)\?\)\?\)\?\>"
 syn match   javaScriptNumber           "\<\(\d\+\(_\d\+\)*\)\?\.\d\+\(_\d\+\)*\([eE][+-]\?\d\+\)\?\>"
 syn match   javaScriptNumber           "\<\d\+\(_\d\+\)*\.\(\d\+\(_\d\+\)*\([eE][+-]\?\d\+\)\?\)\?\>"
-syn region  javaScriptRegexpString     start=+[,(=+]\s*/[^/*]+ms=e-1,me=e-1 skip=+\\\\\|\\/+ end=+/[gimuysdv]\{0,2\}\s*$+ end=+/[gimuysdv]\{0,2\}\s*[+;.,)\]}]+me=e-1 end=+/[gimuysdv]\{0,2\}\s\+\/+me=e-1 contains=@htmlPreproc,javaScriptComment oneline
+syn region  javaScriptRegexpString     start=+[,(=+]\s*/[^/*]+ms=e-1,me=e-1 skip=+\\\\\|\\/+ end=+/[gimuysdv]*\s*$+ end=+/[gimuysdv]*\s*[+;.,)\]}]+me=e-1 end=+/[gimuysdv]*\s\+\/+me=e-1 contains=@htmlPreproc,javaScriptComment oneline
 
 syn keyword javaScriptConditional	if else switch
 syn keyword javaScriptRepeat		while for do in of
