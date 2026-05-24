@@ -66,8 +66,8 @@ function! TiddlyWikiFold()
     return 0
   endif
 
-  " if we're at the start of a macro definition, start a new fold
-  if line[:6] == '\define'
+  " if we're at the start of a pragma that uses \end, start a new fold
+  if line =~ '^\\\(define\|function\|procedure\|widget\)\>.*)\s*$'
     return '>1'
   endif
 
